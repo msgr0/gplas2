@@ -1,0 +1,40 @@
+---
+title: "README"
+author: "Sergio Arredondo"
+date: "7/9/2019"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# gplas
+
+gplas is a tool to bin plasmid-predicted contigs. MORE INFO coming soon
+
+## Installation 
+
+```{bash, eval = FALSE}
+git clone https://gitlab.com/sirarredondo/gplas.git
+cd gplas
+```
+
+### Installation of all the dependencies using a test graph
+
+```{bash, eval = FALSE}
+./gplas.sh -i test/faecium_graph.gfa
+```
+
+## Help page
+
+```{bash}
+./gplas.sh -h
+```
+
+## Advanced usage
+
+```{bash, eval = FALSE}
+./gplas.sh -i mygraph.gfa -o foldername -n myfirstprediction -s 'Helicobacter pylori' -t 0.5 -x 10
+```
+
