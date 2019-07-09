@@ -1,22 +1,28 @@
-gplas
-=====
+gplas documentation
+================
+
+# gplas
 
 gplas is a tool to bin plasmid-predicted contigs. MORE INFO coming soon
 
-Installation
-------------
+## Installation
 
-    git clone https://gitlab.com/sirarredondo/gplas.git
-    cd gplas
+``` bash
+git clone https://gitlab.com/sirarredondo/gplas.git
+cd gplas
+```
 
 ### Installation of all the dependencies using a test graph
 
-    ./gplas.sh -i test/faecium_graph.gfa
+``` bash
+./gplas.sh -i test/faecium_graph.gfa
+```
 
-Help page
----------
+## Help page
 
-    ./gplas.sh -h
+``` bash
+./gplas.sh -h
+```
 
     ## Welcome to the user guide of gplas:
     ## Basic usage: ./gplas.sh -i mygraph.gfa
@@ -31,7 +37,8 @@ Help page
     ##   -t      threshold to predict plasmid-derived sequences. Default: 0.5
     ##   -x      Number of times gplas finds plasmid paths per each plasmid seed. Default: 10
 
-Advanced usage
---------------
+## Advanced usage
 
-    ./gplas.sh -i mygraph.gfa -o foldername -n myfirstprediction -s 'Helicobacter pylori' -t 0.5 -x 10
+``` bash
+./gplas.sh -i mygraph.gfa -o foldername -n myfirstprediction -s 'Helicobacter pylori' -t 0.5 -x 10
+```

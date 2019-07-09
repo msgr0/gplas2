@@ -1,8 +1,10 @@
 ---
-title: "README"
-author: "Sergio Arredondo"
-date: "7/9/2019"
-output: md_document
+title: "gplas documentation"
+output: 
+    github_document:
+    toc: TRUE
+    toc_depth: 3
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
