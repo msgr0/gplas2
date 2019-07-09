@@ -1,0 +1,6 @@
+samples:
+  "checking": "/home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa"
+species: "'Enterococcus faecalis'"
+threshold_prediction: "0.5"
+number_iterations: "40"
+classifier: "plasflow"

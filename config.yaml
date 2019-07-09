@@ -1,0 +1,11 @@
+samples:
+    E0139: data/E0139.gfa
+    E6020: data/E6020.gfa
+    E4456: data/E4456.gfa
+    E4457: data/E4457.gfa
+    E4239: data/E4239.gfa
+    E7591: data/E7591.gfa
+species: "'Enterococcus faecium'"
+threshold_prediction: 0.7
+number_iterations: 20
+classifier: 'mlplasmids'
