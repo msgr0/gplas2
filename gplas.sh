@@ -17,7 +17,7 @@ while getopts ":o:i:n:s:t:x:h" opt; do
    echo -e "Input:\n \t -i \t graph file in *.gfa format used to extract nodes and links"
    echo -e "Output:\n \t -o \t folder name in which the results will be stored. Default: 'gplas_results/'"
    echo -e "Settings:\n \t -n \t project name given to gplas. Default: 'unnamed'"
-   echo -e "\t -s \t bacterial species corresponding to the graph file. If bacterial species corresponds to:
+   echo -e "\t -s \t bacterial species from the graph file. If bacterial species corresponds to:
                 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'"
    echo -e "\t -t \t threshold to predict plasmid-derived sequences. Default: 0.5"
    echo -e "\t -x \t Number of times gplas finds plasmid paths per each plasmid seed. Default: 10"
@@ -173,7 +173,7 @@ source activate snakeplas
 
 if [ "$classifier" == "mlplasmids" ];
 then
-snakemake --use-conda  -s mlsnake.smk network/"$name"_components.csv
+snakemake --use-conda  -s mlplasmidssnake.smk network/"$name"_components.csv
 else
   if command -v PlasFlow.py > /dev/null; then
    echo  -e 'PlasFlow is present in your environment so we can go straight ahead! Well done!'
