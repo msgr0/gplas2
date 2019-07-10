@@ -9,15 +9,14 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":o:i:n:s:t:x:h" opt; do
+while getopts ":i:n:s:t:x:h" opt; do
  case $opt in
    h)
    echo "Welcome to the user guide of gplas:"
    echo -e "Basic usage: ./gplas.sh -i mygraph.gfa"
    echo -e "Input:\n \t -i \t graph file in *.gfa format used to extract nodes and links"
-   echo -e "Output:\n \t -o \t folder name in which the results will be stored. Default: 'gplas_results/'"
-   echo -e "Settings:\n \t -n \t project name given to gplas. Default: 'unnamed'"
-   echo -e "\t -s \t bacterial species from the graph file. If bacterial species corresponds to:
+   echo -e "Projectname/Output:\n \t -n \t project name given to gplas. Default: 'unnamed'"
+   echo -e "Settings: \n \t -s \t bacterial species from the graph file. If bacterial species corresponds to:
                 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'"
    echo -e "\t -t \t threshold to predict plasmid-derived sequences. Default: 0.5"
    echo -e "\t -x \t Number of times gplas finds plasmid paths per each plasmid seed. Default: 10"
@@ -33,9 +32,6 @@ while getopts ":o:i:n:s:t:x:h" opt; do
    s)
        species=$OPTARG
        ;;
-   o)
-     output=$OPTARG
-     ;;
    h)
      help=$OPTARG
      ;;
@@ -74,14 +70,6 @@ else
   echo -e "This is your INPUT graph:" $input "\n"
 fi
 
-if [ -z "$output" ];
-then
-    echo -e "You have not indicated an OUTPUT directory, we will store the results in the following folder: 'gplas_results/'\n"
-    output="gplas_results"
-else
-  echo -e "This is the folder in which we will store the results:" $output "\n"
-  echo $output
-fi
 
 if [ -z "$species" ];
 then
@@ -173,22 +161,29 @@ source activate snakeplas
 
 if [ "$classifier" == "mlplasmids" ];
 then
-snakemake --use-conda  -s mlplasmidssnake.smk network/"$name"_components.csv
+snakemake --use-conda  -s mlplasmidssnake.smk results/"$name"_results.tab
 else
   if command -v PlasFlow.py > /dev/null; then
    echo  -e 'PlasFlow is present in your environment so we can go straight ahead! Well done!'
-   snakemake --use-conda  -s plasflowsnake.smk network/"$name"_components.csv
+   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
   else
    echo "PlasFlow is missing. No worries, starting installation using the conda environment...."
    conda install --name snakeplas --file spec-file.txt
-   snakemake --use-conda  -s plasflowsnake.smk network/"$name"_components.csv
+   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
   fi
 fi;
 
-echo -e "\n"
 
-echo -e "Congratulations! We have finished!!!!"
-echo -e "Your settings were the following:"
-cat final.yaml
-echo -e "\n"
-echo -e "Thank for using gplas :)"
+file_to_check=results/"$name"_results.tab
+
+if [ -f "$file_to_check" ];
+then
+  echo -e "\n"
+  echo -e "Congratulations! We have finished!!!!\n"
+  echo -e "Your settings were the following:\n"
+  cat final.yaml
+  echo -e "\n"
+  echo -e "Thank you for using gplas, hasta la vista amig@ :)"
+else
+  echo -e "Seems like something went wrong!"
+fi
