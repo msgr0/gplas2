@@ -57,13 +57,14 @@ rule gplas_coverage:
     	clean_prediction="coverage/{sample}_clean_prediction.tab",
     	initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     params:
-        classifier = config["classifier"]
+        classifier = config["classifier"],
+        threshold = config["threshold_prediction"]
     conda:
         "envs/r_packages.yaml"
     message:
         "Extracting the mad k-mer coverage from the chromosome-predicted contigs"
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_coverage.R"
+        "scripts/gplas_coverage.R"
 
 rule gplas_paths:
     input:
@@ -87,7 +88,7 @@ rule gplas_paths:
         "Searching for paths with a congruent probability of being plasmid and having a similar k-mer coverage"
     threads: 1
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_paths.R"
+        "scripts/gplas_paths.R"
 
 rule gplas_coocurr:
     input:
@@ -102,19 +103,23 @@ rule gplas_coocurr:
         solutions="paths/{sample}_solutions.csv"
     output:
         plot_graph="network/{sample}_plot_coocurrence_network.png",
-        components="network/{sample}_components.csv"
+        components="network/{sample}_components.tab",
+        results="results/{sample}_results.tab"
+    params:
+        threshold = config["threshold_prediction"],
+        classifier = config["classifier"]
     conda:
         "envs/r_packages.yaml"
     message:
         "Creating a co-occurrence network and selecting significant associations between nodes."
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_coocurrence.R"
+        "scripts/gplas_coocurrence.R"
 
 
 rule quast_alignment:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
-	reference="data/{sample}_reference.fasta"
+	    reference="data/{sample}_reference.fasta"
     output:
         align=directory("evaluation/{sample}_alignments"),
     shell:
@@ -147,4 +152,4 @@ rule gplas_evaluation:
     params:
         iterations = config["number_iterations"]
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_evaluation.R"
+        "scripts/gplas_evaluation.R"

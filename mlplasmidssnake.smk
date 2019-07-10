@@ -35,14 +35,14 @@ rule mlplasmids:
         "mlplasmids_prediction/{sample}_plasmid_prediction.tab"
     params:
         species = config["species"],
-        prob = config["threshold_prediction"]
+        threshold = config["threshold_prediction"]
     conda:
         "envs/r_packages.yaml"
     log:
         normalmessage="logs/{sample}_normal_log_mlplasmids.txt",
         errormessage="logs/{sample}_error_log_mlplasmids.txt"
     shell:
-        "Rscript /home/sergi/mlplasmids/scripts/run_mlplasmids.R {input} {output} {params.prob} {params.species} 1>> {log.normalmessage} 2>> {log.errormessage}"
+        "Rscript scripts/run_mlplasmids.R {input} {output} {params.threshold} {params.species} 1>> {log.normalmessage} 2>> {log.errormessage}"
 
 rule gplas_coverage:
     input:
@@ -57,11 +57,12 @@ rule gplas_coverage:
     	clean_prediction="coverage/{sample}_clean_prediction.tab",
     	initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     params:
-        classifier = config["classifier"]
+        classifier = config["classifier"],
+        threshold = config["threshold_prediction"]
     conda:
         "envs/r_packages.yaml"
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_coverage.R"
+        "scripts/gplas_coverage.R"
 
 rule gplas_paths:
     input:
@@ -83,7 +84,7 @@ rule gplas_paths:
         "envs/r_packages.yaml"
     threads: 1
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_paths.R"
+        "scripts/gplas_paths.R"
 
 rule gplas_coocurr:
     input:
@@ -98,11 +99,15 @@ rule gplas_coocurr:
         solutions="paths/{sample}_solutions.csv"
     output:
         plot_graph="network/{sample}_plot_coocurrence_network.png",
-        components="network/{sample}_components.csv"
+        components="network/{sample}_components.tab",
+        results="results/{sample}_results.tab"
+    params:
+        threshold = config["threshold_prediction"],
+        classifier = config["classifier"]
     conda:
         "envs/r_packages.yaml"
     script:
-        "/home/sergi/plasgraph/Scripts/gplas_coocurrence.R"
+        "scripts/gplas_coocurrence.R"
 
 
 rule quast_alignment:
