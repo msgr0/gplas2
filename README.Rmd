@@ -32,8 +32,10 @@ First-time installation can take some time (you don't have to do anything at all
 
 1. Conda is installed. 
 2. Snakemake is present in the conda environment. 
-3. Plasflow is present in the conda environment. 
-4. mlplasmids is present in the conda environment 
+3. Install many R libraries required to run gplas.
+4. Plasflow is present in the conda environment. 
+5. mlplasmids is present in the conda environment
+
 
 Running gplas without any other arguments will asume that:
 
@@ -64,8 +66,8 @@ If you want to explore more arguments, go into the help page of gplas.
 We can specify one of the species present in mlplasmids if we want to predict the contigs using this algorithm. In this case, we can also be more stringent setting
 the probability threshold to call a contig as 'plasmid-derived' to 0.7. 
 
-```{bash, eval = FALSE}
-./gplas.sh -i mygraph.gfa -o foldername -n mlplasmidsftw -s 'Enterococcus faecium' -t 0.7 -x 10
+```{bash}
+./gplas.sh -i test/faecium_graph.gfa -n usingmlplasmids -s 'Enterococcus faecium' -t 0.7 -x 10
 ```
 
 
