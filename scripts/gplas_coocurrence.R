@@ -20,7 +20,8 @@ path_graph_repeats <- snakemake@input[["graph_repeats"]]
 path_init_nodes <- snakemake@input[["initialize_nodes"]]
 path_cov_variation <- snakemake@input[["coverage"]]
 input_solutions <- snakemake@input[["solutions"]]
-
+classifier <- snakemake@params[["classifier"]]
+threshold <- snakemake@params[["threshold"]]
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -156,10 +157,34 @@ suppressMessages(ggsave(filename = snakemake@output[["plot_graph"]], plot = grap
 
 # Retrieving the clustering of the contigs into different components 
 
-results_subgraph <- data.frame(Contig_number = labels(components(hairball)$membership),
+results_subgraph <- data.frame(number = labels(components(hairball)$membership),
                                Component = as.numeric(as.character(components(hairball)$membership)))
 
-results_subgraph <- rbind(results_subgraph, results_subgraph[which(results_subgraph$Contig_number %in% circular_sequences[,1]),])
+results_subgraph <- rbind(results_subgraph, results_subgraph[which(results_subgraph$number %in% circular_sequences[,1]),])
+
+pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
+
+pl_notassigned <- subset(pl_nodes,! pl_nodes$number %in% results_subgraph$number)
 
 
-write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = FALSE)
+pl_repeats <- subset(pl_notassigned, pl_notassigned$number %in% repeats$number)
+
+pl_unassigned <- subset(pl_notassigned,! pl_notassigned$number %in% repeats$number)
+
+pl_assigned <- subset(pl_nodes, pl_nodes$number %in% results_subgraph$number)
+full_info_assigned <- merge(pl_assigned, results_subgraph, by = 'number')
+
+if(exists('pl_unassigned') == FALSE)
+{
+  pl_unassigned$Component <- 'Unbinned'
+  full_info_assigned <- rbind(full_info_assigned, pl_unassigned)
+}
+
+if(exists('pl_repeats') == FALSE)
+{
+  pl_repeats$Component <- 'Repeat-like'
+  full_info_assigned <- rbind(full_info_assigned, pl_repeats)
+}
+
+suppressWarnings(write.table(x = full_info_assigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
+suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
