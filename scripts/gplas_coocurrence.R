@@ -186,5 +186,10 @@ if(exists('pl_repeats') == FALSE)
   full_info_assigned <- rbind(full_info_assigned, pl_repeats)
 }
 
+full_info_assigned$Contig_length <- NULL
+full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
+full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
+full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
+
 suppressWarnings(write.table(x = full_info_assigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
 suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))

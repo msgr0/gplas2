@@ -28,15 +28,45 @@ cd gplas
 ./gplas.sh -i test/faecium_graph.gfa
 ```
 
+First-time installation can take some time (you don't have to do anything at all, so go for a coffee and come back in 10m). gplas needs to check whether:
+
+1. Conda is installed. 
+2. Snakemake is present in the conda environment. 
+3. Plasflow is present in the conda environment. 
+4. mlplasmids is present in the conda environment 
+
+Running gplas without any other arguments will asume that:
+
+- Classifier to predict plasmid-derived contigs: plasflow
+- Probability threshold to assign plasmid-derived contigs: 0.5
+- Number of iterations to look for plasmid paths per each plasmid seed: 20
+- Output files will be called as 'unnamed'
+
+
+gplas will automatically create different folders containing all the information generated. The final result is present in 'results/*_results.tab'
+
+```{R}
+results <- read.table(file = 'results/unnamed_project_results.tab')
+results
+```
+
+
 ## Help page
+
+If you want to explore more arguments, go into the help page of gplas. 
 
 ```{bash}
 ./gplas.sh -h
 ```
 
-## Advanced usage
+## Using mlplasmids 
+
+We can specify one of the species present in mlplasmids if we want to predict the contigs using this algorithm. In this case, we can also be more stringent setting
+the probability threshold to call a contig as 'plasmid-derived' to 0.7. 
 
 ```{bash, eval = FALSE}
-./gplas.sh -i mygraph.gfa -o foldername -n myfirstprediction -s 'Helicobacter pylori' -t 0.5 -x 10
+./gplas.sh -i mygraph.gfa -o foldername -n mlplasmidsftw -s 'Enterococcus faecium' -t 0.7 -x 10
 ```
+
+
 
