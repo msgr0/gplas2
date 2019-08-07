@@ -105,7 +105,7 @@ unique(mlplasmids$Species.x)
 
 report <- full_completeness_precision %>% group_by(Classifier.x, Species.x) %>% summarise(f1 = mean(f1), Precision_contigs = mean(Precision_contigs), Precision_bp = mean(Precision_bp), Precision = mean(Precision), Completeness_contigs = mean(completeness_contigs), Completeness_connections = mean(completeness_connections),Size_component_connections = mean(Size_component_connections), Size_component_bp = mean(Size_component_bp), Chromosomal_bp = mean(chromosomal_bp))
 
-classifier_results <- report %>% group_by(Classifier.x) %>% summarise(mean(Precision), mean(Completeness_contigs), mean(Size_component_bp), mean(Chromosomal_bp))
+classifier_results <- report %>% group_by(Classifier.x) %>% summarise(mean(Precision), mean(Completeness_contigs), mean(Size_component_bp), mean(Chromosomal_bp), mean(f1))
 
 
 ggplot(report, aes(x = report$Species.x, y = report$Precision, fill = report$Classifier.x))  + geom_col() + theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(.~ Classifier.x) + scale_fill_brewer(palette="Dark2")
