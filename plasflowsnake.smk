@@ -38,11 +38,8 @@ rule plasflow:
         prob = config["threshold_prediction"]
     message:
         "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph"
-    log:
-        normalmessage="logs/{sample}_normal_log_plasflow.txt",
-        errormessage="logs/{sample}_error_log_plasflow.txt"
     shell:
-        "PlasFlow.py --input {input} --output {output} 1>> {log.normalmessage} 2>> {log.errormessage}"
+        """current_path=$(pwd) && cd ~ && PlasFlow.py --input "$current_path"/{input} --output "$current_path"/{output}"""
 
 rule gplas_coverage:
     input:
@@ -119,37 +116,44 @@ rule gplas_coocurr:
 rule quast_alignment:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
-	    reference="data/{sample}_reference.fasta"
+        reference="reference_genome/{sample}_ref_genome.fasta"
     output:
-        align=directory("evaluation/{sample}_alignments"),
+        align=directory("evaluation/{sample}_alignments")
+    conda:
+        "envs/quast.yaml"
     shell:
         "quast.py -R {input.reference} -a all -m 1000 -o {output.align} {input.nodes}"
 
 rule awk_parsing_alignment:
     input:
-        "evaluation/{sample}_alignments/contigs_reports/all_alignments_{sample}_raw_nodes.tsv"
+        alignment=directory("evaluation/{sample}_alignments")
     output:
         "evaluation/{sample}_alignment_test.txt"
     shell:
-        """awk '{{print $5,$6}}' {input}'"""
+        """awk '{{print $5,$6}}' {input.alignment}/contigs_reports/*_raw_nodes.tsv > {output}"""
 
 rule gplas_evaluation:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
-	clean_links="coverage/{sample}_clean_links.tab",
+	    clean_links="coverage/{sample}_clean_links.tab",
         prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
         clean_prediction="coverage/{sample}_clean_prediction.tab",
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
-        alignments="data/{sample}_parsing_alignments.tsv",
+        alignments="evaluation/{sample}_alignment_test.txt",
         solutions="paths/{sample}_solutions.csv",
-        components="network/{sample}_components.csv"
+        components="network/{sample}_components.tab"
     output:
         completeness="evaluation/{sample}_completeness.tab",
         precision="evaluation/{sample}_precision.tab"
+    conda:
+        "envs/r_packages.yaml"
     params:
-        iterations = config["number_iterations"]
+        iterations = config["number_iterations"],
+        classifier = config["classifier"],
+        species = config["species"],
+        name = config["name"]
     script:
         "scripts/gplas_evaluation.R"

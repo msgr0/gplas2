@@ -1,6 +1,9 @@
 samples:
-  "checking": "/home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa"
-species: "'Enterococcus faecalis'"
+  "hidden": "/home/sergi/plasgraph/Data/K_pneumoniae/INF042/best_illumina_assembly.gfa"
+reference:
+  "/home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta": "/home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta"
+species: "metagenome"
 threshold_prediction: "0.5"
-number_iterations: "40"
+number_iterations: "10"
 classifier: "plasflow"
+name: "hidden"

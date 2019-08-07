@@ -128,6 +128,12 @@ truth_set <- truth_set[order(truth_set$Type, decreasing = TRUE),]
 
 truth_set <- truth_set[! duplicated(truth_set$Contig_number),]
 
+count_contigs_truth <- truth_set %>%
+  group_by(Type) %>%
+  count()
+
+count_contigs_truth$connections <- choose(count_contigs_truth$n, 2)
+
 #################### Fifth part
 # Merging the prediction with the ground truth 
 # Merging the reference results with the prediction given
@@ -165,6 +171,9 @@ total_component_info <- sort_benchmark
 
 reference_component <- sort_benchmark[! duplicated(sort_benchmark$Component),]
 reference_component <- reference_component[order(reference_component$Component, decreasing = FALSE),]
+
+reference_component$connections <- choose(as.numeric(as.character((reference_component$count))), 2)
+
 completeness_df <- NULL
 
 for(component in unique(reference_component$Component))
@@ -174,6 +183,8 @@ for(component in unique(reference_component$Component))
 
   total_component_contigs <- sum(as.numeric(total_component$count))
   total_component_bp <- sum(as.numeric(total_component$sum_comp))
+  
+  total_component_connections <- choose(total_component_contigs, 2)
   
   chr_component <- subset(total_component, total_component$Type == 'Chromosome1')
   
@@ -199,13 +210,17 @@ for(component in unique(reference_component$Component))
                                     component = component,
                                     total_contigs = comp_info$count,
                                     total_bp = comp_info$sum_comp,
+                                    total_connections = 0,
                                     reference = 0,
                                     contigs_ref_component = 0,
                                     bp_ref_component = 0,
+                                    connections_ref_component = 0,
                                     contigs_reference = 0,
                                     bp_reference = 0,
+                                    connections_reference = 0,
                                     completeness_contigs = 0,
                                     completeness_bp = 0,
+                                    completeness_connections = 0,
                                     chr_contigs = 0,
                                     chr_bp = 0)
   }
@@ -216,8 +231,12 @@ for(component in unique(reference_component$Component))
     
     count_truth_bp <- subset(contigs_reference_genome$Reference_sum_bp, contigs_reference_genome$Type == comp_info$Type)
     
+    count_truth_connections <- choose(count_truth,2)
+    
     completeness_contigs <- as.numeric(as.character(comp_info$count))/count_truth
     completeness_bp <- as.numeric(as.character(comp_info$sum_comp))/count_truth_bp
+    
+    completeness_connections <- comp_info$connections/count_truth_connections
     
     completeness_info <- data.frame(sample = sample,
                                     species = species,
@@ -228,21 +247,25 @@ for(component in unique(reference_component$Component))
                                     component = component,
                                     total_contigs = as.numeric(as.character(total_component_contigs)),
                                     total_bp = as.numeric(as.character(total_component_bp)),
+                                    total_connections = total_component_connections,
                                     reference = comp_info$Type,
                                     contigs_ref_component = comp_info$count,
                                     bp_ref_component = comp_info$sum_comp,
+                                    connections_ref_component = comp_info$connections,
                                     contigs_reference = count_truth,
                                     bp_reference = count_truth_bp,
+                                    connections_reference = count_truth_connections,
                                     completeness_contigs = completeness_contigs,
                                     completeness_bp = completeness_bp,
+                                    completeness_connections = completeness_connections,
                                     chr_contigs = chr_contigs,
                                     chr_bp = chr_bp)
     
   }
   completeness_df <- rbind(completeness_df, completeness_info)
   
-}
 
+}
 
 write.table(x = completeness_df, 
             file = snakemake@output[["completeness"]],
@@ -251,6 +274,7 @@ write.table(x = completeness_df,
             quote = FALSE, 
             col.names = FALSE)
 
+truth_set <- subset(truth_set, !truth_set$Contig_number %in% c('representation',''))
 
 all_truth <- NULL
 
@@ -270,8 +294,30 @@ for(seed in truth_set$Contig_number)
   all_truth <- rbind(all_truth, evaluation)
 }
 
-all_truth$Contig_pair <- paste(all_truth$Contig_number, all_truth$Pair_contig, sep = '-')
+collection_pairs <- NULL
 
+for(seed in 1:nrow(all_truth))
+{
+  info_row <- all_truth[seed,]
+  first_node <- as.numeric(as.character(info_row$Contig_number))
+  second_node <- as.numeric(as.character(info_row$Pair_contig))
+  
+  if(second_node < first_node)
+  {
+    contig_pair <- paste(second_node,first_node, sep = '-')
+  }
+  else
+  {
+    contig_pair <- paste(first_node,second_node, sep = '-')
+  }
+  
+  collection_pairs <- append(collection_pairs, values = contig_pair, after = length(collection_pairs))
+  
+}
+
+all_truth$Contig_pair <- collection_pairs
+
+all_truth <- all_truth[!duplicated(all_truth$Contig_pair),]
 
 ## Extracting the number of connections from each plasmid and chromosome
 
@@ -280,8 +326,6 @@ true_connections <- subset(all_truth, all_truth$Contig_number_type == all_truth$
 count_true_connections <- true_connections %>%
   group_by(Contig_number_type) %>%
   count()
-
-
 
 all_evaluation <- NULL
 
@@ -307,7 +351,6 @@ all_evaluation$Contig_pair <- paste(all_evaluation$Contig_number, all_evaluation
 # Creating a confusion matrix 
 
 eval_truth <<- merge(all_evaluation, all_truth, by = 'Contig_pair')
-
 
 eval_truth$Evaluation <- ifelse(eval_truth$Truth == eval_truth$Prediction, 'Positive', 'Negative')
 

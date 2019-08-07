@@ -1,8 +1,11 @@
 cat <<EOF >final.yaml
 samples:
   "${name}": "${input}"
+reference:
+  "${reference}": "${reference}"
 species: "${species}"
 threshold_prediction: "${threshold_prediction}"
 number_iterations: "${number_iterations}"
 classifier: "${classifier}"
+name: "${name}"
 EOF

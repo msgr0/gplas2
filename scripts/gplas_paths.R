@@ -223,22 +223,21 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       up_cutoff <- cov_connections_info$coverage + max_variation
       down_cutoff <- cov_connections_info$coverage - max_variation
       
-      up_threshold <- pnorm(up_cutoff, mean = path_mean, sd = 0.1 , lower.tail = TRUE)
+      up_threshold <- pnorm(up_cutoff, mean = path_mean, sd = max_variation , lower.tail = TRUE)
+      down_threshold <- pnorm(down_cutoff, mean = path_mean, sd = max_variation , lower.tail= TRUE)
       
-      down_threshold <- pnorm(down_cutoff, mean = path_mean, sd = 0.1 , lower.tail= FALSE)
+      # Simple test
       
       window <- up_threshold - down_threshold
       
-      cov_connections_info$Probability_cov <- 1-abs(window)
+      cov_connections_info$Probability_cov <- abs(window)
       
       record_connections$Probability_cov <- cov_connections_info$Probability_cov[match(record_connections$outgoing_node, cov_connections_info$number)]
       
       record_connections$Probability_cov[which(record_connections$outgoing_node %in% repeats_graph$number)] <- prob_small_repeats
-      
       record_connections$Probability_cov[which(record_connections$outgoing_node %in% small_contigs$number)] <- prob_small_repeats
       
-      
-      
+    
       record_connections$Probability <- record_connections$Probability_pl_chr * record_connections$Probability_cov
       
       record_connections$Probability_freq <- record_connections$Probability/(sum(record_connections$Probability))
@@ -246,7 +245,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       record_connections$Veredict <- 'non-selected'
       
       
-      if(length(which(record_connections$Probability > 0.1)) == 0)
+      if(length(which(record_connections$Probability >= 0.25)) == 0)
       {
         output <- paste(path, collapse = ',')
         write.table(x = output, 
@@ -270,7 +269,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       # Filter step to avoid going into really bad connections 
       
-      filter_connections <- subset(record_connections, record_connections$Probability > 0.1)
+      filter_connections <- subset(record_connections, record_connections$Probability >= 0.25)
       
       random_connection <- sample(x = filter_connections$outgoing_node, size = 1, prob = filter_connections$Probability) # Choose one connection 
       
@@ -335,8 +334,8 @@ for(seed in initialize_nodes)
   positive_seed <- paste(seed, '+', sep = '')
   negative_seed <- paste(seed, '-', sep = '')
   
-  plasmid_graph(nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = sqrt(0.6), max_variation = max_variation, classifier = 'mlplasmids')
-  plasmid_graph(nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = sqrt(0.6), max_variation = max_variation, classifier = 'mlplasmids')
+  plasmid_graph(nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier)
+  plasmid_graph(nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier)
 }  
 
 

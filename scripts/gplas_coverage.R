@@ -206,7 +206,7 @@ sd_estimation <- sd(cov_estimation$coverage)
 max_variation <- cov*1.0
 max_variation_small <- cov*5.0
 
-write.table(x = max_variation, file = snakemake@output[["coverage"]], row.names = FALSE)
+write.table(x = sd_estimation, file = snakemake@output[["coverage"]], row.names = FALSE)
 
 
 

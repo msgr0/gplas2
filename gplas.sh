@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:t:x:h" opt; do
+while getopts ":i:n:s:t:x:r:h" opt; do
  case $opt in
    h)
    echo "Welcome to the user guide of gplas:"
@@ -20,7 +20,7 @@ while getopts ":i:n:s:t:x:h" opt; do
                 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'"
    echo -e "\t -t \t threshold to predict plasmid-derived sequences. Default: 0.5"
    echo -e "\t -x \t Number of times gplas finds plasmid paths per each plasmid seed. Default: 10"
-
+   echo -e "Benchmarking: \n \t -r Complete reference genome corresponding to the graph given"
    exit
    ;;
    i)
@@ -40,6 +40,9 @@ while getopts ":i:n:s:t:x:h" opt; do
      ;;
    x)
      number_iterations=$OPTARG
+     ;;
+   r)
+     reference=$OPTARG
      ;;
    \?)
      echo "Invalid option: -$OPTARG" >&2
@@ -73,7 +76,7 @@ fi
 
 if [ -z "$species" ];
 then
-    echo -e "You have not indicated the SPECIES that you are trying to predict. Your genome will be considered as a METAGENOME and predicted by plasflow\n"
+    echo -e "You have not indicated the SPECIES that you are trying to predict. Your genome will predicted using plasflow\n"
     species="metagenome"
 else
   echo -e "This is the SPECIES that you are trying to predict:" $species "\n"
@@ -123,6 +126,17 @@ else
   echo -e "You have indicated a number of iterations of:" $number_iterations "\n"
 fi
 
+if [ -z "$reference" ];
+then
+    reference="No reference provided"
+else
+  echo -e "You have given a reference genome to evaluate the results of gplas:" $reference
+  mkdir -p reference_genome
+  rm reference_genome/*
+  cp $reference reference_genome/
+  mv reference_genome/*.fasta reference_genome/"$name"_ref_genome.fasta
+fi
+
 
 echo "##################################################################"
 
@@ -154,24 +168,34 @@ fi
 
 
 echo -e "Let's check if snakemake is present in a previous conda environment, otherwise will proceed to the installation"
-source activate snakeplas || conda create -y -n snakeplas snakemake=5.2.2 python=3.5 && source activate snakeplas
+#source activate snakeplas || conda create -y -n snakeplas snakemake=5.2.2 python=3.5 && source activate snakeplas
+source activate snakeplasflow || conda create --name snakeplasflow --file snakeplas.txt
+source activate snakeplasflow
 
-source activate snakeplas
+
+#if [ "$classifier" == "mlplasmids" ];
+#then
+#snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_precision.tab
+#else
+#  if command -v PlasFlow.py > /dev/null; then
+#   echo  -e 'PlasFlow is present in your environment so we can go straight ahead! Well done!'
+#   snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_precision.tab
+#  else
+#   echo "PlasFlow is missing. No worries, starting installation using the conda environment...."
+#   conda install --name snakeplas --file spec-file.txt
+#   snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_precision.tab
+# fi
+#fi;
 
 
 if [ "$classifier" == "mlplasmids" ];
 then
-snakemake --use-conda  -s mlplasmidssnake.smk results/"$name"_results.tab
+  snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_precision.tab
+  echo 'mlplasmids here'
 else
-  if command -v PlasFlow.py > /dev/null; then
-   echo  -e 'PlasFlow is present in your environment so we can go straight ahead! Well done!'
-   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
-  else
-   echo "PlasFlow is missing. No worries, starting installation using the conda environment...."
-   conda install --name snakeplas --file spec-file.txt
-   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
-  fi
-fi;
+  snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_precision.tab
+  echo 'plasflow here'
+fi
 
 
 file_to_check=results/"$name"_results.tab
