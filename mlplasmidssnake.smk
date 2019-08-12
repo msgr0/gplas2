@@ -82,10 +82,11 @@ rule gplas_paths:
         initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     output:
         solutions="paths/{sample}_solutions.csv",
-        connections="paths/{sample}_connections.csv"
+        connections="paths/{sample}_connections.tab"
     params:
         iterations = config["number_iterations"],
-        classifier = config["classifier"]
+        classifier = config["classifier"],
+        mode = config["mode"]
     conda:
         "envs/r_packages.yaml"
     threads: 1
@@ -107,7 +108,7 @@ rule gplas_coocurr:
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
         solutions="paths/{sample}_solutions.csv"
     output:
-        plot_graph="network/{sample}_plot_coocurrence_network.png",
+        plot_graph="network/{sample}_plasmidome_network.png",
         components="network/{sample}_components.tab",
         results="results/{sample}_results.tab"
     params:

@@ -12,17 +12,19 @@
 while getopts ":i:n:s:t:x:r:m:h" opt; do
  case $opt in
    h)
-   echo "Welcome to the user guide of gplas:"
-   echo -e "Basic usage: ./gplas.sh -i mygraph.gfa"
+   echo -e "Welcome to the user guide of gplas:\n"
+   echo -e "Basic usage: ./gplas.sh -i mygraph.gfa\n"
    echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format"
    echo -e "Projectname/Output:\n \t -n \t Optional: Project name given to gplas. Default: 'unnamed'"
    echo -e "Settings: \n \t -s \t Optional: Bacterial species from the graph file. If bacterial species corresponds to:
-                'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'"
+                'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids.
+                 Default: 'unknown'"
    echo -e "\t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5"
-   echo -e "\t -x \t Optional: Number of times gplas finds plasmid paths per each plasmid seed. Integer value ranging from 1 to infinite. Default: 10"
+   echo -e "\t -x \t Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
+                 Default: 10"
    echo -e "\t -m \t Optional: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path.
                  String value. Default: 'normal'"
-   echo -e "Benchmarking: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format"
+   echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format"
    exit
    ;;
    i)
@@ -51,32 +53,33 @@ while getopts ":i:n:s:t:x:r:m:h" opt; do
      ;;
    \?)
      echo "Invalid option: -$OPTARG" >&2
-     echo "Ups shomething went wrong!"
+     echo "\n Ups shomething went wrong! \n"
      echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
-     echo "./gplas.sh -i mygraph.gfa"
+     ./gplas.sh -h
      exit 1
      ;;
    :)
      echo "Option -$OPTARG requires an argument." >&2
-     echo "Ups shomething went wrong!"
-     echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
-     echo "./gplas.sh -i mygraph.gfa"
+     echo "\n Ups shomething went wrong!\n"
+     ./gplas.sh -h
      exit 1
      ;;
  esac
 done
-echo -e "\n"
-echo -e "!!!!!!Welcome to GPLAS!!!!!!\n"
-echo -e "####### Preparation of the files for snakemake #########################\n"
 
 if [ -z "$input" ];
 then
-    echo -e "Ups, it seems that you are missing the input graph. Use gplas in the following way:\n"
-    echo "./gplas.sh -i mygraph.gfa"
+    echo -e "\n Ups, it seems that you are missing the input graph.\n"
+    ./gplas.sh -h
     exit
 else
   echo -e "This is your INPUT graph:" $input "\n"
 fi
+
+echo -e "\n"
+echo -e "!!!!!!Welcome to GPLAS!!!!!!\n"
+echo -e "####### Preparation of the files for snakemake #########################\n"
+
 
 
 if [ -z "$species" ];
