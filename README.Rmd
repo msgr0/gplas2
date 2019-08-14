@@ -18,11 +18,9 @@ knitr::include_graphics("figures/logo.png")
 ## Installation 
 
 ```{bash, eval = FALSE}
-
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
 ./gplas.sh -i test/faecium_graph.gfa
-
 ```
 
 First-time installation can take some time (you don't have to do anything at all, so go for a coffee and come back in 10m). gplas needs to check whether:
@@ -63,9 +61,17 @@ First-time installation can take some time (you don't have to do anything at all
 
 Gplas only requires a single argument '-i' corresponding to an assembly graph in gfa format. 
 
+
+```{r, echo = FALSE}
+knitr::include_graphics("figures/graph.png")
+```
+
+
 ```{bash, eval = FALSE}
 ./gplas.sh -i test/faecium_graph.gfa
 ```
+
+
 
 ### Complete usage 
 
@@ -89,6 +95,11 @@ For benchmarking purposes you can pass a complete genome to gplas and will gener
 
 
 For example, if we want to use mlplasmids with the *Enterococcus faecium* model on the same test set we only need to specify the following:
+
+```{r, echo = FALSE}
+knitr::include_graphics("figures/mlplasmids_logo.png")
+```
+
 
 ```{bash, eval = FALSE}
 ./gplas.sh -i test/faecium_graph.gfa -n 'using_mlplasmids' -s 'Enterococcus_faecium'

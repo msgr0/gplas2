@@ -13,7 +13,6 @@ plasmid contigs belonging to different genomic units.
 ## Installation
 
 ``` bash
-
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
 ./gplas.sh -i test/faecium_graph.gfa
@@ -57,6 +56,8 @@ to check whether:
 
 Gplas only requires a single argument ‘-i’ corresponding to an assembly
 graph in gfa format.
+
+![](figures/graph.png)<!-- -->
 
 ``` bash
 ./gplas.sh -i test/faecium_graph.gfa
