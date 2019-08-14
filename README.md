@@ -1,20 +1,7 @@
--   [Gplas](#gplas)
-    -   [Installation](#installation)
-        -   [Installation of all the dependencies using a test
-            graph](#installation-of-all-the-dependencies-using-a-test-graph)
-    -   [Usage](#usage)
-        -   [Quick usage](#quick-usage)
-        -   [Complete usage](#complete-usage)
-    -   [Main output files](#main-output-files)
-        -   [results.tab](#results.tab)
-        -   [components.tab](#components.tab)
-        -   [plasmidome\_network.png](#plasmidome_network.png)
-        -   [components.fasta](#components.fasta)
-    -   [Help page](#help-page)
-    -   [Using mlplasmids](#using-mlplasmids)
+gplas documentation
+================
 
-Gplas
-=====
+# Gplas
 
 gplas is a tool to bin plasmid-predicted contigs using co-occurence
 networks. Gplas is a new implementation of mlplasmids which adds the
@@ -23,8 +10,7 @@ independent components. We rely on the structure of the assembly graph
 and k-mer information to create a new plasmidome network and predict
 plasmid contigs belonging to different genomic units.
 
-Installation
-------------
+## Installation
 
 ``` bash
 git clone https://gitlab.com/sirarredondo/gplas.git
@@ -42,7 +28,9 @@ anything at all, so go for a coffee and come back in 10m). gplas needs
 to check whether:
 
 1.  **Conda** is installed.
+
 2.  **Snakemake** is present in the conda environment.
+
 3.  Install all the **R libraries** required to run gplas.
 
       **igraph** version 1.2.4.1
@@ -61,11 +49,11 @@ to check whether:
 
       **ggrepel** version 0.8.0
 
-1.  **mlplasmids** (version 1.0.0) is present in the conda environment  
-2.  **Plasflow** (version 1.1) is present in the conda environment.
+4.  **mlplasmids** (version 1.0.0) is present in the conda environment
 
-Usage
------
+5.  **Plasflow** (version 1.1) is present in the conda environment.
+
+## Usage
 
 ### Quick usage
 
@@ -84,21 +72,21 @@ Gplas can take the following arguments:
 
 Mandatory arguments:
 
--   **-i**: Path to the graph file in \*.gfa format used to extract
+  - **-i**: Path to the graph file in \*.gfa format used to extract
     nodes and links. Gfa file format
 
 Optional arguments:
 
--   **-n**: Project name given to gplas. Default: ‘unnamed’
--   **-s**: Bacterial species from the graph file. If bacterial species
+  - **-n**: Project name given to gplas. Default: ‘unnamed’
+  - **-s**: Bacterial species from the graph file. If bacterial species
     corresponds to: ‘Enterococcus faecium’,‘Klebsiella pneumoniae’ or
     ‘Escherichia coli’ then prediction will be perfomed using
     mlplasmids. Default: ‘unknown’
--   **-t**: Threshold to predict plasmid-derived sequences. Integer
+  - **-t**: Threshold to predict plasmid-derived sequences. Integer
     value ranging from 0 to 1. Default: 0.5
--   **-x**: Number of times gplas finds plasmid paths per each plasmid
+  - **-x**: Number of times gplas finds plasmid paths per each plasmid
     starting node. Integer value ranging from 1 to infinite. Default: 10
--   **-m**: Mode to run gplas: ‘normal’ or ‘bold’. Bold mode increases
+  - **-m**: Mode to run gplas: ‘normal’ or ‘bold’. Bold mode increases
     the acceptance of connections to enlogate the path. String value.
     Default: ‘normal’
 
@@ -107,7 +95,7 @@ will generate a precision and completeness. Using this you can assess
 the performance of gplas on a small set of genomes in which perhaps you
 have generated long-reads.
 
--   **r**: Path to the complete reference genome corresponding to the
+  - **r**: Path to the complete reference genome corresponding to the
     graph given. Fasta file format
 
 For example, if we want to use mlplasmids with the *Enterococcus
@@ -118,8 +106,7 @@ following:
 ./gplas.sh -i test/faecium_graph.gfa -n 'using_mlplasmids' -s 'Enterococcus_faecium'
 ```
 
-Main output files
------------------
+## Main output files
 
 Gplas will create a folder called ‘results’ with the following files:
 
@@ -179,7 +166,8 @@ results
 ### components.tab
 
 Tab delimited file containing the bin prediction reported by gplas with
-the following information: contig number, component assignation
+the following information: contig number, component
+assignation
 
 ``` r
 components <- read.table(file = 'results/using_mlplasmids_components.tab')
@@ -210,7 +198,8 @@ to plasmid starting nodes.
 
 ### components.fasta
 
-Fasta files with the nodes belonging to each predicted component.
+Fasta files with the nodes belonging to each predicted
+    component.
 
 ``` bash
 grep '>' results/unnamed_project*.fasta
@@ -225,44 +214,3 @@ grep '>' results/unnamed_project*.fasta
     ## results/unnamed_project_component_2.fasta:>S46_LN:i:8487_dp:f:1.2210058174026983
     ## results/unnamed_project_component_2.fasta:>S50_LN:i:4993_dp:f:1.1698997426343487
     ## results/unnamed_project_component_2.fasta:>S60_LN:i:1589_dp:f:1.0577429501871556
-
-Help page
----------
-
-If you want to explore more arguments, go into the help page of gplas.
-
-``` bash
-./gplas.sh -h
-```
-
-    ## Welcome to the user guide of gplas:
-    ## 
-    ## Basic usage: ./gplas.sh -i mygraph.gfa
-    ## 
-    ## Input:
-    ##       -i      Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format
-    ## Projectname/Output:
-    ##       -n      Optional: Project name given to gplas. Default: 'unnamed'
-    ## Settings: 
-    ##       -s      Optional: Bacterial species from the graph file. If bacterial species corresponds to:
-    ##                 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids.
-    ##                  Default: 'unknown'
-    ##   -t      Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5
-    ##   -x      Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
-    ##                  Default: 10
-    ##   -m      Optional: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path.
-    ##                  String value. Default: 'normal'
-    ## Benchmarking purposes: 
-    ##       -r      Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format
-
-Using mlplasmids
-----------------
-
-We can specify one of the species present in mlplasmids if we want to
-predict the contigs using this algorithm. In this case, we can also be
-more stringent setting the probability threshold to call a contig as
-‘plasmid-derived’ to 0.7.
-
-``` bash
-./gplas.sh -i test/faecium_graph.gfa -n usingmlplasmids -s 'Enterococcus faecium' -t 0.7 -x 10
-```
