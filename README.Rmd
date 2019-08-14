@@ -106,8 +106,8 @@ ls results/using_mlplasmids*
 
 Tab delimited file containing the prediction given by mlplasmids or plasflow together with the bin prediction assigned by gplas. The file contains the following information: contig number, probability of being chromosome-derived, probability of being plasmid-derived,  class prediction, contig name, k-mer coverage, length, component assigned. 
 
-```{R}
-results <- read.table(file = 'results/using_mlplasmids_results.tab')
+```{r, echo = FALSE}
+results <- read.table(file = 'results/using_mlplasmids_results.tab', header = TRUE)
 knitr::kable(results)
 ```
 
@@ -115,8 +115,9 @@ knitr::kable(results)
 
 Tab delimited file containing the bin prediction reported by gplas with the following information: contig number, component assignation  
 
-```{r}
-components <- read.table(file = 'results/using_mlplasmids_components.tab')
+```{r, echo = FALSE}
+components <- read.table(file = 'results/using_mlplasmids_components.tab', header = TRUE)
+
 knitr::kable(components)
 ```
 

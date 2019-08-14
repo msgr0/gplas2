@@ -121,57 +121,45 @@ Tab delimited file containing the prediction given by mlplasmids or
 plasflow together with the bin prediction assigned by gplas. The file
 contains the following information: contig number, probability of being
 chromosome-derived, probability of being plasmid-derived, class
-prediction, contig name, k-mer coverage, length, component assigned.
+prediction, contig name, k-mer coverage, length, component
+assigned.
 
-``` r
-results <- read.table(file = 'results/using_mlplasmids_results.tab')
-knitr::kable(results)
-```
-
-| V1     | V2               | V3            | V4         | V5                                       | V6       | V7     | V8        |
-| :----- | :--------------- | :------------ | :--------- | :--------------------------------------- | :------- | :----- | :-------- |
 | number | Prob\_Chromosome | Prob\_Plasmid | Prediction | Contig\_name                             | coverage | length | Component |
-| 18     | 0.12             | 0.88          | Plasmid    | S18\_LN:i:54155\_dp:f:1.0514645940835776 | 1.05     | 54155  | 1         |
-| 33     | 0.35             | 0.65          | Plasmid    | S33\_LN:i:18202\_dp:f:1.1628830074648842 | 1.16     | 18202  | 1         |
-| 42     | 0.16             | 0.84          | Plasmid    | S42\_LN:i:10840\_dp:f:1.123936712804688  | 1.12     | 10840  | 1         |
-| 47     | 0.48             | 0.52          | Plasmid    | S47\_LN:i:8177\_dp:f:0.9996798934685464  | 1        | 8177   | 1         |
-| 49     | 0.45             | 0.55          | Plasmid    | S49\_LN:i:5022\_dp:f:1.1574796092139463  | 1.16     | 5022   | 1         |
-| 50     | 0.08             | 0.92          | Plasmid    | S50\_LN:i:4993\_dp:f:1.1698997426343487  | 1.17     | 4993   | 1         |
-| 52     | 0                | 1             | Plasmid    | S52\_LN:i:4014\_dp:f:0.9783821389091624  | 0.98     | 4014   | 1         |
-| 54     | 0.1              | 0.9           | Plasmid    | S54\_LN:i:3077\_dp:f:1.1553028848000615  | 1.16     | 3077   | 1         |
-| 55     | 0.04             | 0.96          | Plasmid    | S55\_LN:i:2927\_dp:f:1.1906170373500302  | 1.19     | 2927   | 1         |
-| 56     | 0.29             | 0.71          | Plasmid    | S56\_LN:i:2716\_dp:f:1.1248842281377909  | 1.12     | 2716   | 1         |
-| 57     | 0.29             | 0.71          | Plasmid    | S57\_LN:i:2626\_dp:f:0.9929149754371588  | 0.99     | 2626   | 1         |
-| 60     | 0.37             | 0.63          | Plasmid    | S60\_LN:i:1589\_dp:f:1.0577429501871556  | 1.06     | 1589   | 1         |
-| 66     | 0.01             | 0.99          | Plasmid    | S66\_LN:i:1102\_dp:f:0.8307959555606772  | 0.83     | 1102   | 1         |
+| -----: | ---------------: | ------------: | :--------- | :--------------------------------------- | -------: | -----: | --------: |
+|     18 |             0.12 |          0.88 | Plasmid    | S18\_LN:i:54155\_dp:f:1.0514645940835776 |     1.05 |  54155 |         1 |
+|     33 |             0.35 |          0.65 | Plasmid    | S33\_LN:i:18202\_dp:f:1.1628830074648842 |     1.16 |  18202 |         1 |
+|     42 |             0.16 |          0.84 | Plasmid    | S42\_LN:i:10840\_dp:f:1.123936712804688  |     1.12 |  10840 |         1 |
+|     47 |             0.48 |          0.52 | Plasmid    | S47\_LN:i:8177\_dp:f:0.9996798934685464  |     1.00 |   8177 |         1 |
+|     49 |             0.45 |          0.55 | Plasmid    | S49\_LN:i:5022\_dp:f:1.1574796092139463  |     1.16 |   5022 |         1 |
+|     50 |             0.08 |          0.92 | Plasmid    | S50\_LN:i:4993\_dp:f:1.1698997426343487  |     1.17 |   4993 |         1 |
+|     52 |             0.00 |          1.00 | Plasmid    | S52\_LN:i:4014\_dp:f:0.9783821389091624  |     0.98 |   4014 |         1 |
+|     54 |             0.10 |          0.90 | Plasmid    | S54\_LN:i:3077\_dp:f:1.1553028848000615  |     1.16 |   3077 |         1 |
+|     55 |             0.04 |          0.96 | Plasmid    | S55\_LN:i:2927\_dp:f:1.1906170373500302  |     1.19 |   2927 |         1 |
+|     56 |             0.29 |          0.71 | Plasmid    | S56\_LN:i:2716\_dp:f:1.1248842281377909  |     1.12 |   2716 |         1 |
+|     57 |             0.29 |          0.71 | Plasmid    | S57\_LN:i:2626\_dp:f:0.9929149754371588  |     0.99 |   2626 |         1 |
+|     60 |             0.37 |          0.63 | Plasmid    | S60\_LN:i:1589\_dp:f:1.0577429501871556  |     1.06 |   1589 |         1 |
+|     66 |             0.01 |          0.99 | Plasmid    | S66\_LN:i:1102\_dp:f:0.8307959555606772  |     0.83 |   1102 |         1 |
 
 ### components.tab
 
 Tab delimited file containing the bin prediction reported by gplas with
-the following information: contig number, component
-assignation
+the following information: contig number, component assignation
 
-``` r
-components <- read.table(file = 'results/using_mlplasmids_components.tab')
-knitr::kable(components)
-```
-
-| V1     | V2        |
-| :----- | :-------- |
 | number | Component |
-| 18     | 1         |
-| 33     | 1         |
-| 52     | 1         |
-| 57     | 1         |
-| 42     | 1         |
-| 56     | 1         |
-| 50     | 1         |
-| 49     | 1         |
-| 47     | 1         |
-| 60     | 1         |
-| 54     | 1         |
-| 55     | 1         |
-| 66     | 1         |
+| -----: | --------: |
+|     18 |         1 |
+|     33 |         1 |
+|     52 |         1 |
+|     57 |         1 |
+|     42 |         1 |
+|     56 |         1 |
+|     50 |         1 |
+|     49 |         1 |
+|     47 |         1 |
+|     60 |         1 |
+|     54 |         1 |
+|     55 |         1 |
+|     66 |         1 |
 
 ### plasmidome\_network.png
 
