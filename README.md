@@ -1,14 +1,19 @@
--   [gplas](#gplas)
-    -   [Installation](#installation)
-        -   [Installation of all the dependencies using a test
-            graph](#installation-of-all-the-dependencies-using-a-test-graph)
-    -   [Help page](#help-page)
-    -   [Using mlplasmids](#using-mlplasmids)
+-   [Installation](#installation)
+    -   [Installation of all the dependencies using a test
+        graph](#installation-of-all-the-dependencies-using-a-test-graph)
+-   [Usage](#usage)
+    -   [Quick usage](#quick-usage)
+-   [Help page](#help-page)
+-   [Using mlplasmids](#using-mlplasmids)
 
-gplas
-=====
+\#gplas
 
-gplas is a tool to bin plasmid-predicted contigs. MORE INFO coming soon
+gplas is a tool to bin plasmid-predicted contigs using co-occurence
+networks. Gplas is a new implementation of mlplasmids which adds the
+possibility of accurately binning predicted plasmid contigs into several
+independent components. We rely on the structure of the assembly graph
+and k-mer information to create a new plasmidome network and predict
+plasmid contigs belonging to different genomic units.
 
 Installation
 ------------
@@ -21,7 +26,7 @@ cd gplas
 ### Installation of all the dependencies using a test graph
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -s 'Enterococcus faecium' -t 0.7 -x 10
+./gplas.sh -i test/faecium_graph.gfa
 ```
 
 First-time installation can take some time (you don’t have to do
@@ -50,6 +55,20 @@ to check whether:
 
 1.  mlplasmids (version 1.0.0) is present in the conda environment  
 2.  Plasflow (version 1.1) is present in the conda environment.
+
+Usage
+-----
+
+### Quick usage
+
+*Running gplas providing uniquely the assembly graph*
+
+``` bash
+./gplas.sh -i test/faecium_graph.gfa
+```
+
+Gplas only requires a single argument ‘-i’ corresponding to an assembly
+graph in gfa format.
 
 Running gplas without any other arguments will asume that:
 
