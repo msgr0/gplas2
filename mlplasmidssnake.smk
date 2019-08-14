@@ -66,7 +66,7 @@ rule gplas_coverage:
     conda:
         "envs/r_packages.yaml"
     message:
-        "Extracting the mad k-mer coverage from the chromosome-predicted contigs"
+        "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
         "scripts/gplas_coverage.R"
 
@@ -108,12 +108,13 @@ rule gplas_coocurr:
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
         solutions="paths/{sample}_solutions.csv"
     output:
-        plot_graph="network/{sample}_plasmidome_network.png",
-        components="network/{sample}_components.tab",
+        plot_graph="results/{sample}_plasmidome_network.png",
+        components="results/{sample}_components.tab",
         results="results/{sample}_results.tab"
     params:
         threshold = config["threshold_prediction"],
-        classifier = config["classifier"]
+        classifier = config["classifier"],
+        sample = config["name"]
     conda:
         "envs/r_packages.yaml"
     message:
@@ -152,7 +153,7 @@ rule gplas_evaluation:
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
         alignments="evaluation/{sample}_alignment_test.txt",
         solutions="paths/{sample}_solutions.csv",
-        components="network/{sample}_components.tab"
+        components="results/{sample}_components.tab"
     output:
         completeness="evaluation/{sample}_completeness.tab",
         precision="evaluation/{sample}_precision.tab"

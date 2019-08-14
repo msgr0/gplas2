@@ -9,6 +9,8 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(spatstat))
 suppressMessages(library(cooccur))
 suppressMessages(library(ggrepel))
+suppressMessages(library(Biostrings))
+suppressMessages(library(seqinr))
 
 # Inputs
 
@@ -42,8 +44,6 @@ clean_pred <- read.table(file = path_prediction, header = TRUE)
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
 max_variation <- as.numeric(max_variation[1,1])
 max_variation_small <- max_variation*5.0
-
-
 
 max_nodes <- max(count.fields(input_solutions, sep = ","))
 
@@ -164,8 +164,11 @@ results_subgraph <- rbind(results_subgraph, results_subgraph[which(results_subgr
 
 pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
 
-pl_notassigned <- subset(pl_nodes,! pl_nodes$number %in% results_subgraph$number)
+raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
+pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
+
+pl_notassigned <- subset(pl_nodes,! pl_nodes$number %in% results_subgraph$number)
 
 pl_repeats <- subset(pl_notassigned, pl_notassigned$number %in% repeats$number)
 
@@ -174,13 +177,13 @@ pl_unassigned <- subset(pl_notassigned,! pl_notassigned$number %in% repeats$numb
 pl_assigned <- subset(pl_nodes, pl_nodes$number %in% results_subgraph$number)
 full_info_assigned <- merge(pl_assigned, results_subgraph, by = 'number')
 
-if(exists('pl_unassigned') == FALSE)
+if(nrow(pl_unassigned) > 1)
 {
   pl_unassigned$Component <- 'Unbinned'
   full_info_assigned <- rbind(full_info_assigned, pl_unassigned)
 }
 
-if(exists('pl_repeats') == FALSE)
+if(nrow(pl_repeats) > 1)
 {
   pl_repeats$Component <- 'Repeat-like'
   full_info_assigned <- rbind(full_info_assigned, pl_repeats)
@@ -190,6 +193,23 @@ full_info_assigned$Contig_length <- NULL
 full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
 full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
 full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
+
+
+assembly_nodes <- readDNAStringSet(filepath = path_nodes)
+df_nodes <- data.frame(Contig_name = names(assembly_nodes), Sequence = paste(assembly_nodes))
+
+df_nodes <- merge(df_nodes, full_info_assigned, by = 'Contig_name')
+
+for(component in unique(df_nodes$Component))
+{
+  nodes_component <- subset(df_nodes, df_nodes$Component == component)
+  component_complete_name <- paste(snakemake@params[["sample"]], 'component', sep = '_')
+  filename <- paste('results/', component_complete_name, sep = '')
+  filename <- paste(filename,component, sep = '_')
+  filename <- paste(filename,'.fasta',sep = '')
+  write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename)
+
+}
 
 suppressWarnings(write.table(x = full_info_assigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
 suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
