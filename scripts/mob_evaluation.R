@@ -1,3 +1,5 @@
+# hyasp evaluation 
+
 #!/usr/bin/Rscript
 # Getting the arguments out of SnakeMake
 
@@ -15,19 +17,36 @@ suppressMessages(library(ggrepel))
 
 path_nodes <- snakemake@input[["nodes"]]
 path_links <- snakemake@input[["clean_links"]]
-path_prediction <- snakemake@input[["clean_prediction"]]
 path_graph_contigs <- snakemake@input[["graph_contigs"]]
 path_graph_repeats <- snakemake@input[["graph_repeats"]]
-path_init_nodes <- snakemake@input[["initialize_nodes"]]
-path_cov_variation <- snakemake@input[["coverage"]]
-input_solutions <- snakemake@input[["solutions"]]
+path_cov_variation <- NA
 path_alignments <- snakemake@input[["alignments"]]
-path_components <- snakemake@input[["components"]]
+
+path_contig_bins <- snakemake@input[["bins"]]
 
 classifier <- snakemake@params[["classifier"]]
 number_iterations <- snakemake@params[["iterations"]]
 species <- snakemake@params[["species"]]
 sample <- snakemake@params[["name"]]
+
+# 
+# # # Use to debug 
+# # # 
+#  path_nodes <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_raw_nodes.fasta'
+#  path_links <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_clean_links.tab'
+# path_graph_contigs <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_graph_contigs.tab'
+# path_graph_repeats <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_repeats_graph.tab'
+# path_alignments <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_alignment_test.txt'
+# path_contig_bins <- '/home/sergi/gplas/mobrecon/SAMN10819811_mob_contig_report.txt'
+# #  # 
+#   classifier <- 'mobrecon'
+#   number_iterations <- NA
+#   species <- 'Enterococcus faecium'
+#   sample <- 'SAMN10819811'
+
+
+# Recovering some info about the graph and contigs
+max_variation <- NA
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -39,37 +58,22 @@ repeats <- repeats_graph
 repeats$number <- gsub(pattern = '\\+',replacement = '',x = repeats$number) # Removing directionality (to match the numbers present in mlplasmids prediction)
 repeats$number <- gsub(pattern = '\\-',replacement = '',x = repeats$number) # Removing directionality (to match the numbers present in mlplasmids prediction)
 
-initialize_nodes <- read.table(file = path_init_nodes, header = TRUE)
-initialize_nodes <- initialize_nodes[,1]
+# Reading the contig_report from mob_recon 
 
-clean_pred <- read.table(file = path_prediction, header = TRUE)
+mobrecon_contig_report <- read.table(path_contig_bins, sep = '\t', skip = 1)
 
+contig_number <- str_split_fixed(string = mobrecon_contig_report$V3, pattern = '_', n = 5)[,4]
+mobrecon_contig_report$Contig_number <- gsub(pattern = 'nodes.fasta\\|S', replacement = '', x = contig_number)
 
-max_variation <- read.table(file = path_cov_variation, header = TRUE)
-max_variation <- as.numeric(max_variation[1,1])
-max_variation_small <- max_variation*5.0
+mobrecon_results <- data.frame(Contig_number = mobrecon_contig_report$Contig_number, 
+                               Component = mobrecon_contig_report$V2,
+                               Length = mobrecon_contig_report$V4,
+                               Circularity = mobrecon_contig_report$V5)
 
-raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
+mobrecon_pl_results <- subset(mobrecon_results, mobrecon_results$Component != 'chromosome')
 
-raw_contig_names <- names(raw_nodes)
-
-raw_number <- str_split_fixed(string = raw_contig_names, pattern = '_', n = 2)[,1]
-number <- gsub(pattern = 'S', replacement = '', x = raw_number)
-
-raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
-length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
-
-coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
-
-
-contig_info <- data.frame(number = number,
-                          length = length,
-                          coverage = coverage)
-
-
-contig_info$length <- as.numeric(as.character(contig_info$length)) # Converting the column length into a numeric column
-contig_info$coverage <- as.numeric(as.character(contig_info$coverage)) # Converting the column coverage into a coverage column
-
+print('hey')
+# Second reading the results of quast to observe which contigs belong to each plasmid unit 
 
 alignment_quast <- read.table(file = path_alignments, sep = ' ', header = TRUE)
 
@@ -134,35 +138,21 @@ count_contigs_truth <- truth_set %>%
 
 count_contigs_truth$connections <- choose(count_contigs_truth$n, 2)
 
-#################### Fifth part
-# Merging the prediction with the ground truth 
-# Merging the reference results with the prediction given
+# Merging prediction together with the truth set that we defined using quast
 
-results_subgraph <- read.table(file = path_components)
+results <- merge(mobrecon_pl_results, gold_standard, by = 'Contig_number')
 
-colnames(results_subgraph) <- c('Contig_number','Component')
+results <- results[!duplicated(results),]
 
-results <- merge(results_subgraph, gold_standard, by = 'Contig_number')
+circular_results <- subset(results, results$Circularity != 'Incomplete')
 
-colnames(results)[c(9,10)] <- c('Reference_sum_bp','Reference_sum_contigs')
-
-singletons <- initialize_nodes[! initialize_nodes %in% results_subgraph$Contig_number]
-
-singletons_length <- subset(contig_info, contig_info$number %in% singletons)
-
+results$Bin <- results$Component
 
 benchmark <- results %>%
-  group_by(Component, Type) %>%
+  group_by(Bin, Type) %>%
   summarise(count = n(), sum_comp = sum(Contig_length))
 
-benchmark$Component <- as.character(benchmark$Component)
-
-
-singletons_info <- c('No_component',NA,length(singletons),sum(singletons_length$length))
-
-benchmark <- rbind(as.data.frame(benchmark), singletons_info)
-
-# We need to consider what is the reference genome predominating in a particular bin, e.g. completeness is based on this assumption whereas precision (or purity of the bin) is reference-independent
+benchmark$Component <- benchmark$Bin
 
 sort_benchmark <- benchmark[order(benchmark$Component),]
 sort_benchmark <- sort_benchmark[order(as.numeric(sort_benchmark$count), decreasing = TRUE),]
@@ -180,7 +170,7 @@ for(component in unique(reference_component$Component))
 {
   comp_info <- subset(reference_component, reference_component$Component == component)
   total_component <- subset(total_component_info, total_component_info$Component == component)
-
+  
   total_component_contigs <- sum(as.numeric(total_component$count))
   total_component_bp <- sum(as.numeric(total_component$sum_comp))
   
@@ -264,8 +254,15 @@ for(component in unique(reference_component$Component))
   }
   completeness_df <- rbind(completeness_df, completeness_info)
   
-
+  
 }
+multiple_contigs_comp <- subset(completeness_df, completeness_df$total_contigs > 1)
+single_contigs_comp <- subset(completeness_df, completeness_df$total_contigs == 1)
+single_contigs_eval_comp <- subset(single_contigs_comp, single_contigs_comp$completeness_contigs > 0.5)
+
+circular_contigs_comp <- subset(single_contigs_comp, single_contigs_eval_comp$component %in% circular_results$Bin)
+
+completeness_df <- rbind(multiple_contigs_comp, circular_contigs_comp)
 
 write.table(x = completeness_df, 
             file = snakemake@output[["completeness"]],
@@ -273,7 +270,6 @@ write.table(x = completeness_df,
             row.names = FALSE, 
             quote = FALSE, 
             col.names = FALSE)
-
 truth_set <- subset(truth_set, !truth_set$Contig_number %in% c('representation',''))
 
 all_truth <- NULL
@@ -318,7 +314,6 @@ for(seed in 1:nrow(all_truth))
 all_truth$Contig_pair <- collection_pairs
 
 all_truth <- all_truth[!duplicated(all_truth$Contig_pair),]
-
 ## Extracting the number of connections from each plasmid and chromosome
 
 true_connections <- subset(all_truth, all_truth$Contig_number_type == all_truth$Pair_contig_type)
@@ -327,17 +322,20 @@ count_true_connections <- true_connections %>%
   group_by(Contig_number_type) %>%
   count()
 
+duplicated_mob_results <- results[duplicated(results$Contig_number),]
+complete_mob_info <- subset(results,! results$Contig_number %in% duplicated_mob_results$Contig_number)
+
 all_evaluation <- NULL
 
-for(seed in results_subgraph$Contig_number)
+for(seed in complete_mob_info$Contig_number)
 {
-  contig_seed <- subset(results_subgraph, results_subgraph$Contig_number == seed)
-  other_contigs <- subset(results_subgraph, results_subgraph$Contig_number != seed)
+  contig_seed <- subset(complete_mob_info, complete_mob_info$Contig_number == seed)
+  other_contigs <- subset(complete_mob_info, complete_mob_info$Contig_number != seed)
   
   evaluation <- data.frame(Contig_number = seed,
                            Pair_contig = other_contigs$Contig_number,
-                           Contig_number_component = contig_seed$Component,
-                           Pair_contig_component = other_contigs$Component)
+                           Contig_number_component = contig_seed$Bin,
+                           Pair_contig_component = other_contigs$Bin)
   
   
   evaluation$Prediction <- ifelse(as.character(evaluation$Contig_number_component) == as.character(evaluation$Pair_contig_component), 'Same','Different')
@@ -351,6 +349,7 @@ all_evaluation$Contig_pair <- paste(all_evaluation$Contig_number, all_evaluation
 # Creating a confusion matrix 
 
 eval_truth <<- merge(all_evaluation, all_truth, by = 'Contig_pair')
+
 
 eval_truth$Evaluation <- ifelse(eval_truth$Truth == eval_truth$Prediction, 'Positive', 'Negative')
 
@@ -403,7 +402,6 @@ for(component in unique(purity_components$Pair_contig_component))
   
   
   precision_components <- rbind(precision_components, record_results)
-  
   
 }
 

@@ -1,0 +1,105 @@
+---
+title: "graph_viz"
+author: "Sergio Arredondo"
+date: "8/5/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(ggplot2)
+library(tidyverse)
+library(ggrepel)
+
+connections_it <- read.table(file = '/home/sergi/gplas/paths/agvizboldKSB17G_connections.csv')
+
+colnames(connections_it) <- c('cov','number_tries','iteration','elongation','first_node','ingoing_node','outgoing_node','Probability_pl_chr','Probability_cov','gplas_score','Probability_freq','Veredict')
+
+max_nodes <- max(count.fields('/home/sergi/gplas/paths/agvizboldKSB17G_solutions.csv', sep = ","))
+solutions <- read.table('/home/sergi/gplas/paths/agvizboldKSB17G_solutions.csv' ,sep=",",fill=TRUE,col.names=1:max_nodes)
+initialize_nodes <- unique(solutions[,1])    
+
+connections_it$order <- gsub(pattern = '\\+',replacement = '', x = connections_it$outgoing_node)
+connections_it$order <- as.numeric(as.character(gsub(pattern = '\\-',replacement = '', x = connections_it$order)))
+
+
+connections_it <- subset(connections_it, connections_it$first_node == '18-')
+
+initial_con <- levels(connections_it$outgoing_node)
+
+con <- gsub(pattern = '\\+',replacement = '', x = initial_con)
+con <- as.numeric(as.character(gsub(pattern = '\\-',replacement = '', x = con)))
+
+right_order <- initial_con[order(con)]
+
+
+connections_it$outgoing_node <- ordered(connections_it$outgoing_node, levels = right_order)
+
+connections_it$ingoing_node <- ordered(connections_it$ingoing_node, levels = as.character(unique(connections_it$ingoing_node)))
+
+connections_it$path <- ifelse(connections_it$outgoing_node %in% unique(connections_it$ingoing_node), 'accepted', 'no_explored')
+
+connections_it$elongation <- as.factor(connections_it$elongation)
+
+connections_it$elongation <- as.numeric(as.character(connections_it$elongation))
+
+length_paths <- connections_it %>%
+  group_by(cov, iteration) %>%
+  summarize(max(elongation))
+
+connections_it$elongation <- as.factor(connections_it$elongation)
+connections_it$ingoing_node <- as.character(connections_it$ingoing_node)
+
+accepted_conn <- subset(connections_it, connections_it$Veredict == 'selected')
+
+accepted_conn$class <- ifelse(accepted_conn$outgoing_node %in% initialize_nodes, 'plasmid starting node', NA)
+
+ggplot(connections_it, aes(x = elongation, y = outgoing_node, color = gplas_score)) + geom_point(size = 3.0) + geom_line(data = accepted_conn, aes(x = elongation, y = outgoing_node, group = Veredict), color = 'black') + scale_color_continuous(low = 'orange', high = 'blue', limits = c(0,1)) + geom_label_repel(data = accepted_conn, aes(x = elongation, y = outgoing_node, label = outgoing_node, fill = class)) + scale_fill_manual(values = c('lightblue','white')) + theme() + theme_bw() + facet_wrap(.~ iteration, nrow = 10, ncol = 1) + labs(x = 'Elongation', y = 'Outgoing node', color = 'gplas score')
+
+summary_connections <- ggplot(accepted_conn, aes(x = elongation, y = outgoing_node, color = as.factor(iteration), group = as.factor(iteration))) + geom_point(size = 3.0) + geom_line() +  theme_bw()
+
+```
+
+
+```{r}
+#' Draw Normal Distribution Density with an area shaded in.
+#'
+#' @param lb Lower bound of the shaded area. Use \code{-Inf} for a left tail.
+#' @param ub Upper bound of the shaded area. Use \code{Inf} for a right tail.
+#' @param mean Mean of the normal distribution
+#' @param sd Standard deviation of the normal distribution
+#' @param limits Lower and upper bounds on the x-axis of the area displayed.
+#' @return ggplot object.
+#' @examples
+#' # Standard normal with upper 2.5% tail shaded
+#' normal_prob_area_plot(2, Inf)
+#' # Standard normal with lower 2.5% tail shaded
+#' normal_prob_area_plot(-Inf, 2)
+#' # standard normal with middle 68% shaded.
+#' normal_prob_area_plot(-1, 1)
+normal_prob_area_plot <- function(lb, ub, mean = 0, sd = 1, limits = c(mean - 3 * sd, mean + 3 * sd), color) {
+    x <- seq(limits[1], limits[2], length.out = 100)
+    xmin <- max(lb, limits[1])
+    xmax <- min(ub, limits[2])
+    areax <- seq(xmin, xmax, length.out = 100)
+    area <- data.frame(x = areax, ymin = 0, ymax = dnorm(areax, mean = mean, sd = sd))
+    (ggplot()
+     + geom_line(data.frame(x = x, y = dnorm(x, mean = mean, sd = sd)),
+                 mapping = aes(x = x, y = y))
+     + geom_ribbon(data = area, mapping = aes(x = x, ymin = ymin, ymax = ymax), fill = color, alpha = 0.5)
+     + geom_vline(xintercept = 2.1, color = 'red', linetype="dotted") 
+     + scale_x_continuous(limits = limits))
+    
+}
+
+normal_prob_area_plot(lb = 2.1-0.1, ub = 2.1+0.1, mean = 2.1, sd = 0.1, color = 'forestgreen')
+normal_prob_area_plot(lb = 2.1-0.1*2.0, ub = 2.1+0.1*2.0, mean = 2.1, sd = 0.1, color = 'orange')
+```
+
+

@@ -22,6 +22,7 @@ path_cov_variation <- snakemake@input[["coverage"]]
 
 classifier <- snakemake@params[["classifier"]]
 number_iterations <- snakemake@params[["iterations"]]
+mode <- as.numeric(as.character(snakemake@params[["mode"]]))
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -47,7 +48,7 @@ max_variation_small <- max_variation*5.0
 output_path <- snakemake@output[["solutions"]]
 output_connections <- snakemake@output[["connections"]]
 
-plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier, verbose = TRUE, number_iterations = number_iterations, number_nodes = 20, initial_seed, max_variation = max_variation, prob_small_repeats = prob_small_repeats)
+plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier, verbose = TRUE, number_iterations = number_iterations, number_nodes = 20, initial_seed, max_variation = max_variation, prob_small_repeats = prob_small_repeats, mode = mode, direction)
 {
   initial_links <- links #Links to start the function 
   
@@ -136,7 +137,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       if(length(path) != 1) # If the path has more than one element  
       {
         remove_nodes <- path[2:length(path)]
-        
+      
         remove_nodes <- gsub(x = remove_nodes, pattern = '\\+', replacement = '')
         remove_nodes <- gsub(x = remove_nodes, pattern = '\\-', replacement = '')
         
@@ -145,11 +146,27 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
         
         ommit_nodes <- c(positive_remove_nodes, negative_remove_nodes)
         
+        first_node <- path[1]
+        
+        if(direction == 'forward')
+        {
+          first_node_to_exclude <- gsub(pattern = '\\+', replacement = '-', x = first_node)
+        }
+        
+        if(direction == 'reverse')
+        {
+          first_node_to_exclude <- gsub(pattern = '-', replacement = '+', x = first_node)
+        }
+        
+        ommit_nodes <- c(ommit_nodes, first_node_to_exclude)
+        
         # We need to remove directionality from the path to avoid paths e.g. 54-,161-,54+
         
-        ommit_nodes <- ommit_nodes[! ommit_nodes %in% repeats_graph$number] # Transposases can occurr more than one time 
+        ommit_nodes <- ommit_nodes[! ommit_nodes %in% repeats_graph$number] # Repeats can occurr more than one time 
         list_connections <- list_connections[! list_connections %in% ommit_nodes] # Avoiding loops within the solution
       }
+      
+      
       
       possible_connections <- as.character(list_connections) # Connections that can take place  
       total_connections <- length(possible_connections) # Number of connections
@@ -220,25 +237,24 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       cov_connections_info <- graph_contigs[graph_contigs$number %in% record_connections$outgoing_node,]
       
-      up_cutoff <- cov_connections_info$coverage + max_variation
-      down_cutoff <- cov_connections_info$coverage - max_variation
+      up_cutoff <- cov_connections_info$coverage + max_variation*mode
+      down_cutoff <- cov_connections_info$coverage - max_variation*mode
       
-      up_threshold <- pnorm(up_cutoff, mean = path_mean, sd = 0.1 , lower.tail = TRUE)
+      up_threshold <- pnorm(up_cutoff, mean = path_mean, sd = max_variation , lower.tail = TRUE)
+      down_threshold <- pnorm(down_cutoff, mean = path_mean, sd = max_variation , lower.tail= TRUE)
       
-      down_threshold <- pnorm(down_cutoff, mean = path_mean, sd = 0.1 , lower.tail= FALSE)
+      # Simple test
       
       window <- up_threshold - down_threshold
       
-      cov_connections_info$Probability_cov <- 1-abs(window)
+      cov_connections_info$Probability_cov <- abs(window)
       
       record_connections$Probability_cov <- cov_connections_info$Probability_cov[match(record_connections$outgoing_node, cov_connections_info$number)]
       
       record_connections$Probability_cov[which(record_connections$outgoing_node %in% repeats_graph$number)] <- prob_small_repeats
-      
       record_connections$Probability_cov[which(record_connections$outgoing_node %in% small_contigs$number)] <- prob_small_repeats
       
-      
-      
+    
       record_connections$Probability <- record_connections$Probability_pl_chr * record_connections$Probability_cov
       
       record_connections$Probability_freq <- record_connections$Probability/(sum(record_connections$Probability))
@@ -246,7 +262,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       record_connections$Veredict <- 'non-selected'
       
       
-      if(length(which(record_connections$Probability > 0.1)) == 0)
+      if(length(which(record_connections$Probability >= 0.25)) == 0)
       {
         output <- paste(path, collapse = ',')
         write.table(x = output, 
@@ -270,7 +286,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       # Filter step to avoid going into really bad connections 
       
-      filter_connections <- subset(record_connections, record_connections$Probability > 0.1)
+      filter_connections <- subset(record_connections, record_connections$Probability >= 0.25)
       
       random_connection <- sample(x = filter_connections$outgoing_node, size = 1, prob = filter_connections$Probability) # Choose one connection 
       
@@ -335,8 +351,8 @@ for(seed in initialize_nodes)
   positive_seed <- paste(seed, '+', sep = '')
   negative_seed <- paste(seed, '-', sep = '')
   
-  plasmid_graph(nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = sqrt(0.6), max_variation = max_variation, classifier = 'mlplasmids')
-  plasmid_graph(nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = sqrt(0.6), max_variation = max_variation, classifier = 'mlplasmids')
+  plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, mode = mode)
+  plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, mode = mode)
 }  
 
 

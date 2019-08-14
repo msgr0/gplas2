@@ -1,6 +1,10 @@
 samples:
-  "checking": "/home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa"
-species: "'Enterococcus faecalis'"
+  "agvizboldKSB17G": "/home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/best_illumina_assembly.gfa"
+reference:
+  "/home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta": "/home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta"
+species: "'Klebsiella pneumoniae'"
 threshold_prediction: "0.5"
-number_iterations: "40"
-classifier: "plasflow"
+number_iterations: "5"
+classifier: "mlplasmids"
+mode: "2.0"
+name: "agvizboldKSB17G"

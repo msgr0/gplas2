@@ -9,18 +9,22 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:t:x:h" opt; do
+while getopts ":i:n:s:t:x:r:m:h" opt; do
  case $opt in
    h)
-   echo "Welcome to the user guide of gplas:"
-   echo -e "Basic usage: ./gplas.sh -i mygraph.gfa"
-   echo -e "Input:\n \t -i \t graph file in *.gfa format used to extract nodes and links"
-   echo -e "Projectname/Output:\n \t -n \t project name given to gplas. Default: 'unnamed'"
-   echo -e "Settings: \n \t -s \t bacterial species from the graph file. If bacterial species corresponds to:
-                'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'"
-   echo -e "\t -t \t threshold to predict plasmid-derived sequences. Default: 0.5"
-   echo -e "\t -x \t Number of times gplas finds plasmid paths per each plasmid seed. Default: 10"
-
+   echo -e "Welcome to the user guide of gplas:\n"
+   echo -e "Basic usage: ./gplas.sh -i mygraph.gfa\n"
+   echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format"
+   echo -e "Projectname/Output:\n \t -n \t Optional: Project name given to gplas. Default: 'unnamed'"
+   echo -e "Settings: \n \t -s \t Optional: Bacterial species from the graph file. If bacterial species corresponds to:
+                'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids.
+                 Default: 'unknown'"
+   echo -e "\t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5"
+   echo -e "\t -x \t Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
+                 Default: 10"
+   echo -e "\t -m \t Optional: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path.
+                 String value. Default: 'normal'"
+   echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format"
    exit
    ;;
    i)
@@ -30,8 +34,8 @@ while getopts ":i:n:s:t:x:h" opt; do
      name=$OPTARG
      ;;
    s)
-       species=$OPTARG
-       ;;
+     species=$OPTARG
+     ;;
    h)
      help=$OPTARG
      ;;
@@ -41,39 +45,46 @@ while getopts ":i:n:s:t:x:h" opt; do
    x)
      number_iterations=$OPTARG
      ;;
+   m)
+     mode=$OPTARG
+     ;;
+   r)
+     reference=$OPTARG
+     ;;
    \?)
      echo "Invalid option: -$OPTARG" >&2
-     echo "Ups shomething went wrong!"
+     echo "\n Ups shomething went wrong! \n"
      echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
-     echo "./gplas.sh -i mygraph.gfa"
+     ./gplas.sh -h
      exit 1
      ;;
    :)
      echo "Option -$OPTARG requires an argument." >&2
-     echo "Ups shomething went wrong!"
-     echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
-     echo "./gplas.sh -i mygraph.gfa"
+     echo "\n Ups shomething went wrong!\n"
+     ./gplas.sh -h
      exit 1
      ;;
  esac
 done
-echo -e "\n"
-echo -e "!!!!!!Welcome to GPLAS!!!!!!\n"
-echo -e "####### Preparation of the files for snakemake #########################\n"
 
 if [ -z "$input" ];
 then
-    echo -e "Ups, it seems that you are missing the input graph. Use gplas in the following way:\n"
-    echo "./gplas.sh -i mygraph.gfa"
+    echo -e "\n Ups, it seems that you are missing the input graph.\n"
+    ./gplas.sh -h
     exit
 else
   echo -e "This is your INPUT graph:" $input "\n"
 fi
 
+echo -e "\n"
+echo -e "!!!!!!Welcome to GPLAS!!!!!!\n"
+echo -e "####### Preparation of the files for snakemake #########################\n"
+
+
 
 if [ -z "$species" ];
 then
-    echo -e "You have not indicated the SPECIES that you are trying to predict. Your genome will be considered as a METAGENOME and predicted by plasflow\n"
+    echo -e "You have not indicated the SPECIES that you are trying to predict. Your genome will predicted using plasflow\n"
     species="metagenome"
 else
   echo -e "This is the SPECIES that you are trying to predict:" $species "\n"
@@ -115,6 +126,15 @@ else
   echo -e "You have indicated a threshold prediction of:" $threshold_prediction "\n"
 fi
 
+if [ "$mode" == 'bold' ];
+then
+    echo -e "You have specified the 'bold' mode of gplas\n"
+    mode=2.0
+else
+    echo -e "Using 'normal' mode to run gplas \n"
+    mode=1.0
+fi
+
 if [ -z "$number_iterations" ];
 then
     echo -e "You have not passed the number of times to look for paths based on each plasmid seed, using 10 as default\n"
@@ -124,9 +144,19 @@ else
 fi
 
 
-echo "##################################################################"
+if [ -z "$reference" ];
+then
+    reference="No reference provided"
+else
+  echo -e "You have given a reference genome to evaluate the results of gplas:" $reference
+  mkdir -p reference_genome
+  rm reference_genome/*
+  cp $reference reference_genome/
+  mv reference_genome/*.fasta reference_genome/"$name"_ref_genome.fasta
+fi
 
-sleep 10s
+
+echo "##################################################################"
 
 ( echo "cat <<EOF >final.yaml";
   cat template.yml;
@@ -134,6 +164,9 @@ sleep 10s
 ) >temp.yaml
 . temp.yaml
 cat final.yaml
+
+sleep 10s
+
 
 if command -v conda > /dev/null; then
  echo  -e 'Conda is present, so there is no need to install it. Well done!\n'
@@ -154,25 +187,26 @@ fi
 
 
 echo -e "Let's check if snakemake is present in a previous conda environment, otherwise will proceed to the installation"
-source activate snakeplas || conda create -y -n snakeplas snakemake=5.2.2 python=3.5 && source activate snakeplas
-
-source activate snakeplas
+source activate snakeplasflow || conda create --name snakeplasflow --file snakeplas.txt
+source activate snakeplasflow
 
 
 if [ "$classifier" == "mlplasmids" ];
 then
-snakemake --use-conda  -s mlplasmidssnake.smk results/"$name"_results.tab
-else
-  if command -v PlasFlow.py > /dev/null; then
-   echo  -e 'PlasFlow is present in your environment so we can go straight ahead! Well done!'
-   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
+  if [ "$reference" == "No reference provided" ];
+  then
+      snakemake --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
   else
-   echo "PlasFlow is missing. No worries, starting installation using the conda environment...."
-   conda install --name snakeplas --file spec-file.txt
-   snakemake --use-conda  -s plasflowsnake.smk results/"$name"_results.tab
+      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
   fi
-fi;
-
+else
+  if [ "$reference" == "No reference provided" ];
+  then
+      snakemake --use-conda -s plasflowsnake.smk results/"$name"_results.tab
+  else
+      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
+  fi
+fi
 
 file_to_check=results/"$name"_results.tab
 

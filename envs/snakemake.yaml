@@ -1,0 +1,8 @@
+name: snakeplas
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+prefix: /home/sergi/anaconda/envs/snakeplas
+

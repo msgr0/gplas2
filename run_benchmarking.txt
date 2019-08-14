@@ -1,0 +1,191 @@
+
+#!/bin/bash
+
+# Independent set
+
+bash hyasp.sh -i independent_set/SAMN10819801/002_overlaps_removed.gfa -r independent_set/SAMN10819801/assembly.fasta -n 'SAMN10819801' -s 'Citrobacter braakii'
+bash mobrecon.sh -i independent_set/SAMN10819801/002_overlaps_removed.gfa -r independent_set/SAMN10819801/assembly.fasta -n 'SAMN10819801' -s 'Citrobacter braakii'
+./gplas.sh -i independent_set/SAMN10819801/002_overlaps_removed.gfa -r independent_set/SAMN10819801/assembly.fasta -n 'SAMN10819801' -s 'Citrobacter braakii'
+
+#bash hyasp.sh -i independent_set/SAMN10819803/002_overlaps_removed.gfa -r independent_set/SAMN10819803/assembly.fasta -n 'SAMN10819803' -s 'Enterobacter kobei'
+#bash mobrecon.sh -i independent_set/SAMN10819803/002_overlaps_removed.gfa -r independent_set/SAMN10819803/assembly.fasta -n 'SAMN10819803' -s 'Enterobacter kobei'
+#./gplas.sh -i independent_set/SAMN10819803/002_overlaps_removed.gfa -r independent_set/SAMN10819803/assembly.fasta -n 'SAMN10819803' -s 'Enterobacter kobei'
+
+bash hyasp.sh -i independent_set/SAMN10819805/002_overlaps_removed.gfa -r independent_set/SAMN10819805/assembly.fasta -n 'SAMN10819805' -s 'Klebsiella_pneumoniae'
+bash mobrecon.sh -i independent_set/SAMN10819805/002_overlaps_removed.gfa -r independent_set/SAMN10819805/assembly.fasta -n 'SAMN10819805' -s 'Klebsiella_pneumoniae'
+./gplas.sh -i independent_set/SAMN10819805/002_overlaps_removed.gfa -r independent_set/SAMN10819805/assembly.fasta -n 'SAMN10819805_pflow' -s 'Klebsiella_pneumoniae'
+./gplas.sh -i independent_set/SAMN10819805/002_overlaps_removed.gfa -r independent_set/SAMN10819805/assembly.fasta -n 'SAMN10819805_mlplasmids' -s 'Klebsiella pneumoniae'
+
+
+#bash hyasp.sh -i independent_set/SAMN10819809/002_overlaps_removed.gfa -r independent_set/SAMN10819809/assembly.fasta -n 'SAMN10819809' -s 'Enterobacter cloacae'
+#bash mobrecon.sh -i independent_set/SAMN10819809/002_overlaps_removed.gfa -r independent_set/SAMN10819809/assembly.fasta -n 'SAMN10819809' -s 'Enterobacter cloacae'
+#./gplas.sh -i independent_set/SAMN10819809/002_overlaps_removed.gfa -r independent_set/SAMN10819809/assembly.fasta -n 'SAMN10819809' -s 'Enterobacter cloacae'
+
+#bash hyasp.sh -i independent_set/SAMN10819810/002_overlaps_removed.gfa -r independent_set/SAMN10819810/assembly.fasta -n 'SAMN10819810' -s 'Citrobacter freundii'
+#bash mobrecon.sh -i independent_set/SAMN10819810/002_overlaps_removed.gfa -r independent_set/SAMN10819810/assembly.fasta -n 'SAMN10819810' -s 'Citrobacter freundii'
+#./gplas.sh -i independent_set/SAMN10819810/002_overlaps_removed.gfa -r independent_set/SAMN10819810/assembly.fasta -n 'SAMN10819810' -s 'Citrobacter freundii'
+
+#bash hyasp.sh -i independent_set/SAMN10819811/002_overlaps_removed.gfa -r independent_set/SAMN10819811/assembly.fasta -n 'SAMN10819811' -s 'Citrobacter braakii'
+#bash mobrecon.sh -i independent_set/SAMN10819811/002_overlaps_removed.gfa -r independent_set/SAMN10819811/assembly.fasta -n 'SAMN10819811' -s 'Citrobacter braakii'
+#./gplas.sh -i independent_set/SAMN10819811/002_overlaps_removed.gfa -r independent_set/SAMN10819811/assembly.fasta -n 'SAMN10819811' -s 'Citrobacter braakii'
+
+#bash hyasp.sh -i independent_set/SAMN10819812/002_overlaps_removed.gfa -r independent_set/SAMN10819812/assembly.fasta -n 'SAMN10819812' -s 'Enterobacter cloacae'
+#bash mobrecon.sh -i independent_set/SAMN10819812/002_overlaps_removed.gfa -r independent_set/SAMN10819812/assembly.fasta -n 'SAMN10819812' -s 'Enterobacter cloacae'
+#./gplas.sh -i independent_set/SAMN10819812/002_overlaps_removed.gfa -r independent_set/SAMN10819812/assembly.fasta -n 'SAMN10819812' -s 'Enterobacter cloacae'
+
+
+
+#bash hyasp.sh -i independent_set/SAMN10819813/002_overlaps_removed.gfa -r independent_set/SAMN10819813/assembly.fasta -n 'SAMN10819813' -s 'Shigella dysenteriae'
+#bash mobrecon.sh -i independent_set/SAMN10819813/002_overlaps_removed.gfa -r independent_set/SAMN10819813/assembly.fasta -n 'SAMN10819813' -s 'Shigella dysenteriae'
+#./gplas.sh -i independent_set/SAMN10819813/002_overlaps_removed.gfa -r independent_set/SAMN10819813/assembly.fasta -n 'SAMN10819813' -s 'Shigella dysenteriae'
+
+bash hyasp.sh -i independent_set/SAMN10819815/002_overlaps_removed.gfa -r independent_set/SAMN10819815/assembly.fasta -n 'SAMN10819815' -s 'Escherichia coli'
+bash mobrecon.sh -i independent_set/SAMN10819815/002_overlaps_removed.gfa -r independent_set/SAMN10819815/assembly.fasta -n 'SAMN10819815' -s 'Escherichia coli'
+./gplas.sh -i independent_set/SAMN10819815/002_overlaps_removed.gfa -r independent_set/SAMN10819815/assembly.fasta -n 'SAMN10819815_pflow' -s 'Escherichia_coli'
+./gplas.sh -i independent_set/SAMN10819815/002_overlaps_removed.gfa -r independent_set/SAMN10819815/assembly.fasta -n 'SAMN10819815_mlplasmids' -s 'Escherichia coli'
+
+
+#bash hyasp.sh -i independent_set/SAMN10819847/002_overlaps_removed.gfa -r independent_set/SAMN10819847/assembly.fasta -n 'SAMN10819847' -s 'Escherichia coli'
+#bash mobrecon.sh -i independent_set/SAMN10819847/002_overlaps_removed.gfa -r independent_set/SAMN10819847/assembly.fasta -n 'SAMN10819847' -s 'Escherichia coli'
+#./gplas.sh -i independent_set/SAMN10819847/002_overlaps_removed.gfa -r independent_set/SAMN10819847/assembly.fasta -n 'SAMN10819847_pflow' -s 'Escherichia_coli'
+#./gplas.sh -i independent_set/SAMN10819847/002_overlaps_removed.gfa -r independent_set/SAMN10819847/assembly.fasta -n 'SAMN10819847_mlplasmids' -s 'Escherichia coli'
+
+
+
+##################################################################
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa -n E0139_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E0139/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa -n E0139_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E0139/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa -n E0139_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E0139/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E0139/002_overlaps_removed.gfa -n E0139_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E0139/reference.fasta
+
+
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4239/002_overlaps_removed.gfa -n E4239_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4239/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4239/002_overlaps_removed.gfa -n E4239_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4239/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E4239/002_overlaps_removed.gfa -n E4239_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4239/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E4239/002_overlaps_removed.gfa -n E4239_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4239/reference.fasta
+#bash pspades.sh -i pspades/E4239_pspades/contigs.fasta -n E4239_pspades -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4239/reference.fasta
+
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4456/002_overlaps_removed.gfa -n E4456_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4456/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4456/002_overlaps_removed.gfa -n E4456_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4456/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E4456/002_overlaps_removed.gfa -n E4456_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4456/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E4456/002_overlaps_removed.gfa -n E4456_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4456/reference.fasta
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4457/002_overlaps_removed.gfa -n E4457_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4457/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E4457/002_overlaps_removed.gfa -n E4457_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4457/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E4457/002_overlaps_removed.gfa -n E4457_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4457/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E4457/002_overlaps_removed.gfa -n E4457_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4457/reference.fasta
+#bash pspades.sh -i pspades/E4457_pspades/contigs.fasta -n E4457_pspades -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E4457/reference.fasta
+
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E6020/002_overlaps_removed.gfa -n E6020_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E6020/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E6020/002_overlaps_removed.gfa -n E6020_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E6020/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E6020/002_overlaps_removed.gfa -n E6020_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E6020/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E6020/002_overlaps_removed.gfa -n E6020_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E6020/reference.fasta
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E7237/002_overlaps_removed.gfa -n E7237_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7237/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E7237/002_overlaps_removed.gfa -n E7237_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7237/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E7237/002_overlaps_removed.gfa -n E7237_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7237/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E7237/002_overlaps_removed.gfa -n E7237_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7237/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E7591/002_overlaps_removed.gfa -n E7591_pflow -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7591/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_faecium/E7591/002_overlaps_removed.gfa -n E7591_ml -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7591/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_faecium/E7591/002_overlaps_removed.gfa -n E7591_hyasp -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7591/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_faecium/E7591/002_overlaps_removed.gfa -n E7591_mobrecon -s 'Enterococcus faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7591/reference.fasta
+#bash pspades.sh -i pspades/E7591_pspades/contigs.fasta -n E7591_pspades -s 'Enterococcus_faecium' -r /home/sergi/plasgraph/Data/E_faecium/E7591/reference.fasta
+
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF042/best_illumina_assembly.gfa -n INF042_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF042/best_illumina_assembly.gfa -n INF042_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF042/best_illumina_assembly.gfa -n INF042_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF042/best_illumina_assembly.gfa -n INF042_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF042/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF059/assembly.gfa -n INF059_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF059/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF059/assembly.gfa -n INF059_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF059/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF059/assembly.gfa -n INF059_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF059/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF059/assembly.gfa -n INF059_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF059/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF164/best_illumina_assembly.gfa -n INF164_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF164/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF164/best_illumina_assembly.gfa -n INF164_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF164/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF164/best_illumina_assembly.gfa -n INF164_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF164/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/INF164/best_illumina_assembly.gfa -n INF164_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/INF164/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/best_illumina_assembly.gfa -n KSB17G_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/best_illumina_assembly.gfa -n KSB17G_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/best_illumina_assembly.gfa -n KSB17G_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/best_illumina_assembly.gfa -n KSB17G_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_7G/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/assembly.gfa -n KSB19D_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/assembly.gfa -n KSB19D_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/assembly.gfa -n KSB19D_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/assembly.gfa -n KSB19D_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB1_9D/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/assembly.gfa -n KSB21B_pflow -s 'Klebsiella_pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/assembly.gfa -n KSB21B_ml -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/assembly.gfa -n KSB21B_hyasp -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/assembly.gfa -n KSB21B_mobrecon -s 'Klebsiella pneumoniae' -r /home/sergi/plasgraph/Data/K_pneumoniae/KSB21B/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_coli/ECO889/assembly.gfa -n ECO889_pflow -s 'Escherichia_coli' -r /home/sergi/plasgraph/Data/E_coli/ECO889/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_coli/ECO889/assembly.gfa -n ECO889_ml -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/ECO889/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_coli/ECO889/assembly.gfa -n ECO889_hyasp -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/ECO889/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_coli/ECO889/assembly.gfa -n ECO889_mobrecon -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/ECO889/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_coli/JJ1886/best_illumina_assembly.gfa -n JJ1886_pflow -s 'Escherichia_coli' -r /home/sergi/plasgraph/Data/E_coli/JJ1886/reference.fasta
+#./gplas.sh -i /home/sergi/plasgraph/Data/E_coli/JJ1886/best_illumina_assembly.gfa -n JJ1886_ml -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/JJ1886/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/E_coli/JJ1886/best_illumina_assembly.gfa -n JJ1886_hyasp -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/JJ1886/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/E_coli/JJ1886/best_illumina_assembly.gfa -n JJ1886_mobrecon -s 'Escherichia coli' -r /home/sergi/plasgraph/Data/E_coli/JJ1886/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/BEST195/best_illumina_assembly.gfa -n BEST195_pflow -s 'Bacillus subtilis' -r /home/sergi/plasgraph/Data/Others/BEST195/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/BEST195/best_illumina_assembly.gfa -n BEST195_hyasp -s 'Bacillus subtilis' -r /home/sergi/plasgraph/Data/Others/BEST195/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/BEST195/best_illumina_assembly.gfa -n BEST195_mobrecon -s 'Bacillus subtilis' -r /home/sergi/plasgraph/Data/Others/BEST195/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/callunae/best_illumina_assembly.gfa -n callunae_pflow -s 'Corynebacterium callunae' -r /home/sergi/plasgraph/Data/Others/callunae/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/callunae/best_illumina_assembly.gfa -n callunae_hyasp -s 'Corynebacterium callunae' -r /home/sergi/plasgraph/Data/Others/callunae/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/callunae/best_illumina_assembly.gfa -n callunae_mobrecon -s 'Corynebacterium callunae' -r /home/sergi/plasgraph/Data/Others/callunae/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/CAV1320/best_illumina_assembly.gfa -n CAV1320_pflow -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1320/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/CAV1320/best_illumina_assembly.gfa -n CAV1320_hyasp -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1320/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/CAV1320/best_illumina_assembly.gfa -n CAV1320_mobrecon -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1320/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/CAV1669/best_illumina_assembly.gfa -n CAV1669_pflow -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1669/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/CAV1669/best_illumina_assembly.gfa -n CAV1669_hyasp -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1669/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/CAV1669/best_illumina_assembly.gfa -n CAV1669_mobrecon -s 'Klebsiella aerogenes' -r /home/sergi/plasgraph/Data/Others/CAV1669/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/CFNIH1/best_illumina_assembly.gfa -n CFNIH1_pflow -s 'Citrobacter freundii' -r /home/sergi/plasgraph/Data/Others/CFNIH1/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/CFNIH1/best_illumina_assembly.gfa -n CFNIH1_hyasp -s 'Citrobacter freundii' -r /home/sergi/plasgraph/Data/Others/CFNIH1/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/CFNIH1/best_illumina_assembly.gfa -n CFNIH1_mobrecon -s 'Citrobacter freundii' -r /home/sergi/plasgraph/Data/Others/CFNIH1/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/ECNIH3/best_illumina_assembly.gfa -n ECNIH3_pflow -s 'Enterobacter cloacae' -r /home/sergi/plasgraph/Data/Others/ECNIH3/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/ECNIH3/best_illumina_assembly.gfa -n ECNIH3_hyasp -s 'Enterobacter cloacae' -r /home/sergi/plasgraph/Data/Others/ECNIH3/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/ECNIH3/best_illumina_assembly.gfa -n ECNIH3_mobrecon -s 'Enterobacter cloacae' -r /home/sergi/plasgraph/Data/Others/ECNIH3/reference.fasta
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/KONIH1/best_illumina_assembly.gfa -n KONIH1_pflow -s 'Klebsiella oxytoca' -r /home/sergi/plasgraph/Data/Others/KONIH1/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/KONIH1/best_illumina_assembly.gfa -n KONIH1_hyasp -s 'Klebsiella oxytoca' -r /home/sergi/plasgraph/Data/Others/KONIH1/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/KONIH1/best_illumina_assembly.gfa -n KONIH1_mobrecon -s 'Klebsiella oxytoca' -r /home/sergi/plasgraph/Data/Others/KONIH1/reference.fasta
+
+
+#./gplas.sh -i /home/sergi/plasgraph/Data/Others/sphaeroides/assembly.gfa -n sphaeroides_pflow -s 'Rhodobacter sphaeroides' -r /home/sergi/plasgraph/Data/Others/sphaeroides/reference.fasta
+#bash hyasp.sh -i /home/sergi/plasgraph/Data/Others/sphaeroides/assembly.gfa -n sphaeroides_hyasp -s 'Rhodobacter sphaeroides' -r /home/sergi/plasgraph/Data/Others/sphaeroides/reference.fasta
+#bash mobrecon.sh -i /home/sergi/plasgraph/Data/Others/sphaeroides/assembly.gfa -n sphaeroides_mobrecon -s 'Rhodobacter sphaeroides' -r /home/sergi/plasgraph/Data/Others/sphaeroides/reference.fasta
