@@ -1,10 +1,9 @@
 ---
 title: "gplas documentation"
 output: 
-    github_document:
-    toc: TRUE
-    toc_depth: 3
-    df_print: paged
+  md_document:
+    variant: markdown_github 
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -25,33 +24,54 @@ cd gplas
 ### Installation of all the dependencies using a test graph
 
 ```{bash, eval = FALSE}
-./gplas.sh -i test/faecium_graph.gfa
+./gplas.sh -i test/faecium_graph.gfa -s 'Enterococcus faecium' -t 0.7 -x 10
 ```
 
 First-time installation can take some time (you don't have to do anything at all, so go for a coffee and come back in 10m). gplas needs to check whether:
 
 1. Conda is installed. 
 2. Snakemake is present in the conda environment. 
-3. Install many R libraries required to run gplas.
-4. Plasflow is present in the conda environment. 
-5. mlplasmids is present in the conda environment
+3. Install all the R libraries required to run gplas.
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;igraph version 1.2.4.1
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ggraph version 1.0.2
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Biostrings version 2.50.2
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seqinr version 3.4-5
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tidyverse version 1.2.1 
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spatstat version 1.59-0
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cooccur version 1.3
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ggrepel version 0.8.0 
+
+
+4. mlplasmids (version 1.0.0) is present in the conda environment  
+5. Plasflow (version 1.1) is present in the conda environment. 
 
 
 Running gplas without any other arguments will asume that:
 
 - Classifier to predict plasmid-derived contigs: plasflow
 - Probability threshold to assign plasmid-derived contigs: 0.5
-- Number of iterations to look for plasmid paths per each plasmid seed: 20
-- Output files will be called as 'unnamed'
+- Number of iterations to look for plasmid paths per each plasmid seed: 10
+- Output files will be called as 'unnamed_project'
 
 
 gplas will automatically create different folders containing all the information generated. The final result is present in 'results/*_results.tab'
+
+```{bash}
+ls results/unnamed_project*
+```
 
 ```{R}
 results <- read.table(file = 'results/unnamed_project_results.tab')
 results
 ```
-
 
 ## Help page
 
@@ -66,7 +86,7 @@ If you want to explore more arguments, go into the help page of gplas.
 We can specify one of the species present in mlplasmids if we want to predict the contigs using this algorithm. In this case, we can also be more stringent setting
 the probability threshold to call a contig as 'plasmid-derived' to 0.7. 
 
-```{bash}
+```{bash, eval = FALSE}
 ./gplas.sh -i test/faecium_graph.gfa -n usingmlplasmids -s 'Enterococcus faecium' -t 0.7 -x 10
 ```
 
