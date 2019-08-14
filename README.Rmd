@@ -1,5 +1,5 @@
 ---
-title: "gplas documentation"
+title: "gplas: binning plasmid-predicted contigs"
 output: 
   github_document
 fontsize: 16pt
@@ -8,8 +8,6 @@ fontsize: 16pt
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Gplas
 
 gplas is a tool to bin plasmid-predicted contigs using co-occurence networks. Gplas is a new implementation of mlplasmids which adds the possibility of accurately binning predicted plasmid contigs into several independent components. We rely on the structure of the assembly graph and k-mer information to create a new plasmidome network and predict plasmid contigs belonging to different genomic units.
 
@@ -20,14 +18,11 @@ knitr::include_graphics("figures/logo.png")
 ## Installation 
 
 ```{bash, eval = FALSE}
+
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
-```
-
-### Installation of all the dependencies using a test graph
-
-```{bash, eval = FALSE}
 ./gplas.sh -i test/faecium_graph.gfa
+
 ```
 
 First-time installation can take some time (you don't have to do anything at all, so go for a coffee and come back in 10m). gplas needs to check whether:
@@ -113,7 +108,7 @@ Tab delimited file containing the prediction given by mlplasmids or plasflow tog
 
 ```{R}
 results <- read.table(file = 'results/using_mlplasmids_results.tab')
-results
+knitr::kable(results)
 ```
 
 ### components.tab
@@ -122,7 +117,7 @@ Tab delimited file containing the bin prediction reported by gplas with the foll
 
 ```{r}
 components <- read.table(file = 'results/using_mlplasmids_components.tab')
-components
+knitr::kable(components)
 ```
 
 ### plasmidome_network.png
@@ -138,7 +133,7 @@ knitr::include_graphics("results/using_mlplasmids_plasmidome_network.png")
 Fasta files with the nodes belonging to each predicted component. 
 
 ```{bash}
-grep '>' results/unnamed_project*.fasta
+grep '>' results/using_mlplasmids*.fasta
 ```
 
 
