@@ -20,6 +20,13 @@ precision <- read.table(file = '/home/sergi/gplas/independent_set/precision.tab'
 
 colnames(precision) <- c('Sample','Species','Classifier','Factor','Number_iterations','Variance','Component','Tp_connections','Fp_connections','Precision')
 
+index_bold <- grep(pattern = 'bold', x = precision$Sample, value = FALSE)
+classifier_bold <- paste('bold',precision$Classifier[index_bold])
+
+precision$bold <- 'normal'
+precision$bold[index_bold] <- 'bold'
+precision$Classifier <- paste(precision$Classifier, precision$bold, sep = '_')
+
 precision$component_unique <- paste(precision$Sample,precision$Component, sep = '_')
 precision$component_unique <- paste(precision$component_unique,precision$Classifier, sep = '_')
 
@@ -35,6 +42,14 @@ precision$Species <- gsub(pattern = '_', replacement = ' ', x = precision$Specie
 completeness <- read.table(file = '/home/sergi/gplas/independent_set/completeness.tab')
 
 colnames(completeness) <- c('Sample','Species','Classifier','Factor','Number_iterations','Variance','Component','Size_component_contigs','Size_component_bp','Size_component_connections','Major_reference','Contigs_comp_reference','bp_comp_reference','Connections_comp_reference','Contigs_reference','bp_reference','Connections_reference','completeness_contigs','completeness_bp', 'completeness_connections','chromosomal_contigs','chromosomal_bp')
+
+index_bold <- grep(pattern = 'bold', x = completeness$Sample, value = FALSE)
+classifier_bold <- paste('bold',completeness$Classifier[index_bold])
+
+completeness$bold <- 'normal'
+completeness$bold[index_bold] <- 'bold'
+
+completeness$Classifier <- paste(completeness$Classifier, completeness$bold, sep = '_')
 
 completeness$component_unique <- paste(completeness$Sample,completeness$Component, sep = '_')
 completeness$component_unique <- paste(completeness$component_unique,completeness$Classifier, sep = '_')
@@ -71,6 +86,7 @@ for(comp in single_components)
                                    Tp_connections = 1,
                                    Fp_connections = 0,
                                    Precision = 1,
+                                   bold = comp_info$bold,
                                    component_unique = comp_info$component_unique)
   single_components_precision <- rbind(single_components_precision, comp_complete_info)
   
@@ -98,15 +114,28 @@ full_completeness_precision$f1 <- (2*full_completeness_precision$Precision*full_
 
 species <- c('Enterococcus faecium','Klebsiella pneumoniae','Escherichia coli')
 
-#full_completeness_precision <- subset(full_completeness_precision, full_completeness_precision$Species.x %in% species)
+full_completeness_precision$Classifier.x <- gsub(pattern = 'hyasp_normal', replacement = 'hyasp', x = full_completeness_precision$Classifier.x)
 
-mlplasmids <- subset(full_completeness_precision, full_completeness_precision$Classifier.x == 'mlplasmids')
-unique(mlplasmids$Species.x)
+full_completeness_precision$Classifier.x <- gsub(pattern = 'mob_recon_normal', replacement = 'mob-recon', x = full_completeness_precision$Classifier.x)
 
-report <- full_completeness_precision %>% group_by(Classifier.x, Species.x) %>% summarise(f1 = mean(f1), Precision_contigs = mean(Precision_contigs), Precision_bp = mean(Precision_bp), Precision = mean(Precision), Completeness_contigs = mean(completeness_contigs), Completeness_connections = mean(completeness_connections),Size_component_connections = mean(Size_component_connections), Size_component_bp = mean(Size_component_bp), Chromosomal_bp = mean(chromosomal_bp))
+full_completeness_precision$Classifier.x <- gsub(pattern = 'plasmidspades_normal', replacement = 'plasmidSPAdes', x = full_completeness_precision$Classifier.x)
 
-classifier_results <- report %>% group_by(Classifier.x) %>% summarise(mean(Precision), mean(Completeness_contigs), mean(Size_component_bp), mean(Chromosomal_bp), mean(f1))
+full_completeness_precision$Classifier.x <- gsub(pattern = 'mlplasmids_bold', replacement = 'gplas - mlplasmids (bold)', x = full_completeness_precision$Classifier.x)
 
+full_completeness_precision$Classifier.x <- gsub(pattern = 'mlplasmids_normal', replacement = 'gplas - mlplasmids (normal)', x = full_completeness_precision$Classifier.x)
+
+full_completeness_precision$Classifier.x <- gsub(pattern = 'plasflow_normal', replacement = 'gplas - plasflow (normal)', x = full_completeness_precision$Classifier.x)
+
+full_completeness_precision$Classifier.x <- gsub(pattern = 'plasflow_bold', replacement = 'gplas - plasflow (bold)', x = full_completeness_precision$Classifier.x)
+
+
+report <- full_completeness_precision %>% group_by(Classifier.x) %>% summarise(f1 = mean(f1), Precision_contigs = mean(Precision_contigs), Precision_bp = mean(Precision_bp), Precision = mean(Precision), Completeness_contigs = mean(completeness_contigs), Completeness_connections = mean(completeness_connections),Size_component_connections = mean(Size_component_connections), Size_component_bp = mean(Size_component_bp), Chromosomal_bp = mean(chromosomal_bp))
+
+classifier_averaging_species_results <- report %>% group_by(Classifier.x, Species.x) %>% summarise(mean(Precision), mean(Completeness_contigs), mean(Size_component_bp), mean(Chromosomal_bp), mean(f1))
+
+rownames(report) <- report$Classifier.x
+report$Classifier.x <- NULL
+round_report <- round(report, 2)
 
 ggplot(report, aes(x = report$Species.x, y = report$Precision, fill = report$Classifier.x))  + geom_col() + theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(.~ Classifier.x) + scale_fill_brewer(palette="Dark2")
 
@@ -114,6 +143,9 @@ ggplot(report, aes(x = report$Species.x, y = report$Completeness_contigs, fill =
 
 ggplot(report, aes(x = report$Species.x, y = report$Chromosomal_bp, fill = report$Classifier.x))  + geom_col() + theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(.~ Classifier.x) + scale_fill_brewer(palette="Dark2")
 
+
+ggplot(full_completeness_precision, aes(x = full_completeness_precision$completeness_contigs, y = full_completeness_precision$Precision, color = full_completeness_precision$Classifier.x, size = full_completeness_precision$Size_component_contigs)) + geom_jitter() + 
+  geom_smooth(method=lm, se=TRUE, fullrange=TRUE) + scale_color_brewer(palette="Dark2") + theme_bw() + facet_wrap(.~ Classifier.x, ncol = 2) + labs(colour = 'Tool', size = 'Component size (bp)',  x = 'Completeness (contigs)', y = 'Precision (connections)')
 
 ```
 

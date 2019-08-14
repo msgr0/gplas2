@@ -1,5 +1,0 @@
-cat <<EOF >final.yml
-samples:
-  "${name}": "${input}"
-species:"${species}"
-EOF
