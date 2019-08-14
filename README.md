@@ -99,6 +99,8 @@ For example, if we want to use mlplasmids with the *Enterococcus
 faecium* model on the same test set we only need to specify the
 following:
 
+![](figures/mlplasmids_logo.png)<!-- -->
+
 ``` bash
 ./gplas.sh -i test/faecium_graph.gfa -n 'using_mlplasmids' -s 'Enterococcus_faecium'
 ```
