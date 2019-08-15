@@ -125,7 +125,6 @@ dependencies:
   - r-openssl=1.0.2=r351h96ca727_1
   - r-parallelmap=1.4=r351h6115d3f_0
   - r-paramhelpers=1.12=r351h96ca727_0
-  - r-pillar=1.4.2=h6115d3f_0
   - r-pkgconfig=2.0.2=r351h6115d3f_1001
   - r-plogr=0.2.0=r351h6115d3f_1001
   - r-plyr=1.8.4=r351h29659fb_1002

@@ -1,4 +1,4 @@
-#!/bin/bash
+cd#!/bin/bash
 
 ##to debug
 #set -e
@@ -187,8 +187,8 @@ fi
 
 
 echo -e "Let's check if snakemake is present in a previous conda environment, otherwise will proceed to the installation"
-source activate snakeplasflow || conda create --name snakeplasflow --file snakeplas.txt
-source activate snakeplasflow
+source activate gplas || conda create --name gplas --file snakeplas.txt
+source activate gplas
 
 
 if [ "$classifier" == "mlplasmids" ];

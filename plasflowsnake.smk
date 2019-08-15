@@ -36,6 +36,8 @@ rule plasflow:
     params:
         species = config["species"],
         prob = config["threshold_prediction"]
+    conda:
+        "envs/plasflow.yaml"
     message:
         "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph"
     shell:
