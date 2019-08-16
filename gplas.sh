@@ -73,15 +73,17 @@ then
     echo -e "\n Ups, it seems that you are missing the input graph.\n"
     ./gplas.sh -h
     exit
-else
-  echo -e "This is your INPUT graph:" $input "\n"
 fi
 
 echo -e "\n"
-echo -e "!!!!!!Welcome to GPLAS!!!!!!\n"
-echo -e "####### Preparation of the files for snakemake #########################\n"
 
+cat figures/logo.txt
 
+echo -e "\n"
+echo "##################################################################"
+echo -e "\n"
+
+echo -e "This is your INPUT graph:" $input "\n"
 
 if [ -z "$species" ];
 then
@@ -99,7 +101,6 @@ do
   if [ "$element" == "$species" ];
   then
   echo -e $element "is included as one of the species in mlplasmids\n";
-  echo -e "using mlplasmids as classifier\n"
   classifier="mlplasmids"
   fi;
 done
@@ -164,7 +165,7 @@ echo "##################################################################"
   echo "EOF";
 ) >temp.yaml
 . temp.yaml
-cat final.yaml
+
 
 sleep 10s
 
@@ -196,15 +197,19 @@ if [ "$classifier" == "mlplasmids" ];
 then
   if [ "$reference" == "No reference provided" ];
   then
+      snakemake --unlock --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
       snakemake --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
   else
+      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
       snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
   fi
 else
   if [ "$reference" == "No reference provided" ];
   then
+      snakemake --unlock --use-conda -s plasflowsnake.smk results/"$name"_results.tab
       snakemake --use-conda -s plasflowsnake.smk results/"$name"_results.tab
   else
+      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
       snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
   fi
 fi
@@ -213,12 +218,19 @@ file_to_check=results/"$name"_results.tab
 
 if [ -f "$file_to_check" ];
 then
+  cat figures/logo.txt
   echo -e "\n"
   echo -e "Congratulations! We have finished!!!!\n"
-  echo -e "Your settings were the following:\n"
-  cat final.yaml
+  echo -e "This was your input graph:" $input "\n"
+  echo -e "This was the bacterial species that you indicated: " $species "\n"
+  echo -e "Gplas has used:" $classifier "\n"
   echo -e "\n"
-  echo -e "Thank you for using gplas, hasta la vista amig@ :)"
+
+  echo -e "Your results are present at results/ and path/"
+  echo -e "We hope it helps in your research, thanks for using gplas"
+  echo -e "\n"
+  echo -e "\n"
+
 else
   echo -e "Seems like something went wrong!"
 fi
