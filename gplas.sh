@@ -1,4 +1,4 @@
-cd#!/bin/bash
+#!/bin/bash
 
 ##to debug
 #set -e
@@ -12,6 +12,7 @@ cd#!/bin/bash
 while getopts ":i:n:s:t:x:r:m:h" opt; do
  case $opt in
    h)
+   cat figures/logo.txt
    echo -e "Welcome to the user guide of gplas:\n"
    echo -e "Basic usage: ./gplas.sh -i mygraph.gfa\n"
    echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format"
