@@ -35,13 +35,14 @@ rule plasflow:
         "plasflow_prediction/{sample}_plasmid_prediction.tab"
     params:
         species = config["species"],
-        prob = config["threshold_prediction"]
+        prob = config["threshold_prediction"],
+        threshold = config["threshold_prediction"]
     conda:
         "envs/plasflow.yaml"
     message:
         "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph"
     shell:
-        """current_path=$(pwd) && cd ~ && PlasFlow.py --input "$current_path"/{input} --output "$current_path"/{output}"""
+        """current_path=$(pwd) && cd ~ && PlasFlow.py --input "$current_path"/{input} --threshold {params.threshold} --output "$current_path"/{output}"""
 
 rule gplas_coverage:
     input:
