@@ -84,12 +84,94 @@ co_ocurrence <- t(co_ocurrence)
 ocurrence_large_nodes <- co_ocurrence[rownames(co_ocurrence) %in% unique(solutions[,1]),]
 ocurrence_large_nodes <- as.matrix(ocurrence_large_nodes)
 
+
+
+#################### Testing
+# 
+# number_tries <- 20
+# all_associations_per_node <- NULL
+# 
+# first_index <- 1
+# second_index <- 20
+# 
+# times <- nrow(solutions)/20
+# 
+# for(try in 1:times)
+# {
+#   solutions_node <- c(first_index:second_index)
+#   
+#   other_combinations <- c(1:nrow(solutions))
+#   other_combinations <- other_combinations[! other_combinations %in% solutions_node]
+#   other_solutions <- base::sample(x = other_combinations, size = number_tries, replace = TRUE)
+#   
+#   considered_solutions <- c(solutions_node, other_solutions)
+#   
+#   all_nodes <- NULL
+#   for(solution in considered_solutions)
+#   {
+#     iteration <- solutions[solution,]
+#     iteration <- t(iteration)
+#     nodes <- as.character(iteration[,1])
+#     nodes <- nodes[nodes != '']
+#     all_nodes <- append(x = all_nodes, values = nodes, after = length(all_nodes))
+#   }
+#   
+#   
+#   unique_nodes <- unique(all_nodes)
+#   unique_nodes <- unique_nodes[unique_nodes != ""]
+#   unique_nodes <- as.character(na.omit(unique_nodes))
+#   
+#   co_ocurrence <- data.frame(matrix(0, nrow = length(considered_solutions), ncol = length(unique_nodes)))
+#   colnames(co_ocurrence) <- unique_nodes
+#   
+#   for(index in 1:length(considered_solutions))
+#   {
+#     row <- considered_solutions[index]
+#     particular_solution <- solutions[row,]
+#     particular_solution <- t(particular_solution)
+#     particular_solution <- particular_solution[,1]
+#     particular_solution <- particular_solution[particular_solution != ""]
+#     presence_absence <- ifelse(colnames(co_ocurrence) %in% particular_solution == TRUE, 1, 0)
+#     co_ocurrence[index,] <- presence_absence
+#   }
+#   
+#   co_ocurrence <- apply(co_ocurrence, 2, as.integer)
+#   co_ocurrence <- t(co_ocurrence)
+#   
+#   ocurrence_large_nodes <- co_ocurrence[rownames(co_ocurrence) %in% unique(solutions[,1]),]
+#   ocurrence_large_nodes <- as.matrix(ocurrence_large_nodes)
+#   
+#   ocurrence_large_nodes <- as.data.frame(ocurrence_large_nodes)
+#   ocurrence_large_nodes <<- ocurrence_large_nodes[apply(ocurrence_large_nodes[,-1], 1, function(x) !all(x==0)),]
+#   
+#   large_node <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE)
+#   df_combinations <- prob.table(large_node)
+#   significant_associations <- subset(df_combinations, df_combinations$p_gt < 0.05)
+#   
+#   all_associations_per_node <- rbind(all_associations_per_node, significant_associations)
+#   
+#   first_index <- first_index + number_tries
+#   second_index <- second_index + number_tries
+#   print(first_index)
+# }
+# 
+
+####################################
+
 suppressMessages(test <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE))
 
 df_combinations <- prob.table(test)
 
-significant_associations <- subset(df_combinations, df_combinations$p_gt < 0.05/nrow(df_combinations))
+# Testing
 
+#significant_associations <- all_associations_per_node
+
+#
+#significant_associations <- subset(df_combinations, df_combinations$p_gt < 0.05/ncol(df_combinations))
+threshold <- choose(length(initialize_nodes)*2, 2)
+threshold <- 0.05/threshold
+
+significant_associations <- subset(df_combinations, df_combinations$p_gt < threshold)
 significant_associations$sp1_name <- gsub(pattern = '\\+',replacement = '', significant_associations$sp1_name)
 significant_associations$sp1_name <- gsub(pattern = '\\-',replacement = '', significant_associations$sp1_name)
 
