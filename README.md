@@ -82,7 +82,7 @@ plasmid-derived contigs.
 
 ### Running gplas just providing the assembly graph
 
-Gplas only requires a single argument *‘-i’* corresponding to an
+Gplas only requires a single argument **‘-i’** corresponding to an
 assembly graph in gfa format.
 
 ![](figures/graph.png)<!-- -->

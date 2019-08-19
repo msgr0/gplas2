@@ -67,7 +67,7 @@ Following this, it will install the tools that we use to predict plasmid-derived
 
 ### Running gplas just providing the assembly graph
 
-Gplas only requires a single argument *'-i'* corresponding to an assembly graph in gfa format. 
+Gplas only requires a single argument **'-i'** corresponding to an assembly graph in gfa format. 
 
 
 ```{r, echo = FALSE}
