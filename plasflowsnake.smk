@@ -40,7 +40,7 @@ rule plasflow:
     conda:
         "envs/plasflow.yaml"
     message:
-        "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph"
+        "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running plasflow, installation can take a few minutes"
     shell:
         """current_path=$(pwd) && cd ~ && PlasFlow.py --input "$current_path"/{input} --threshold {params.threshold} --output "$current_path"/{output}"""
 
@@ -62,7 +62,7 @@ rule gplas_coverage:
     conda:
         "envs/r_packages.yaml"
     message:
-        "Extracting the mad k-mer coverage from the chromosome-predicted contigs"
+        "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
         "scripts/gplas_coverage.R"
 

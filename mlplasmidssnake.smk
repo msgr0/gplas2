@@ -44,7 +44,7 @@ rule mlplasmids:
         normalmessage="logs/{sample}_normal_log_mlplasmids.txt",
         errormessage="logs/{sample}_error_log_mlplasmids.txt"
     message:
-        "Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph"
+        "Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes"
     shell:
         "Rscript scripts/run_mlplasmids.R {input} {output} {params.threshold} {params.species} 1>> {log.normalmessage} 2>> {log.errormessage}"
 
