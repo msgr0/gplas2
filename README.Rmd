@@ -94,7 +94,7 @@ Optional arguments:
 - **-s**: Bacterial species from the graph file. If bacterial species corresponds to: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'
 - **-t**: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5
 - **-x**: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite. Default: 10
-- **-m**: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path. String value. Default: 'normal'
+- **-f**: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
 
 For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
 

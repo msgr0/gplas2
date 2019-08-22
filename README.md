@@ -111,9 +111,8 @@ Optional arguments:
     value ranging from 0 to 1. Default: 0.5
   - **-x**: Number of times gplas finds plasmid paths per each plasmid
     starting node. Integer value ranging from 1 to infinite. Default: 10
-  - **-m**: Mode to run gplas: ‘normal’ or ‘bold’. Bold mode increases
-    the acceptance of connections to enlogate the path. String value.
-    Default: ‘normal’
+  - **-f**: Gplas filtering threshold score to reject possible outcoming
+    edges. Integer value ranging from 0 to 1. Default: 0.1
 
 For benchmarking purposes you can pass a complete genome to gplas and
 will generate a precision and completeness. Using this you can assess
@@ -160,8 +159,7 @@ following:
     ##   -t      Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5
     ##   -x      Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
     ##                  Default: 10
-    ##   -m      Optional: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path.
-    ##                  String value. Default: 'normal'
+    ##   -f      Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
     ## Benchmarking purposes: 
     ##       -r      Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format
 
@@ -174,7 +172,6 @@ ls results/using_mlplasmids*
 ```
 
     ## results/using_mlplasmids_component_1.fasta
-    ## results/using_mlplasmids_component_2.fasta
     ## results/using_mlplasmids_components.tab
     ## results/using_mlplasmids_plasmidome_network.png
     ## results/using_mlplasmids_results.tab
@@ -193,14 +190,15 @@ assigned.
 | number | Prob\_Chromosome | Prob\_Plasmid | Prediction | Contig\_name                             | coverage | length | Component |
 | -----: | ---------------: | ------------: | :--------- | :--------------------------------------- | -------: | -----: | --------: |
 |     18 |             0.01 |          0.99 | Plasmid    | S18\_LN:i:54155\_dp:f:1.0514645940835776 |     1.05 |  54155 |         1 |
-|     31 |             0.15 |          0.85 | Plasmid    | S31\_LN:i:21202\_dp:f:1.194722937126809  |     1.19 |  21202 |         2 |
-|     46 |             0.03 |          0.97 | Plasmid    | S46\_LN:i:8487\_dp:f:1.2210058174026983  |     1.22 |   8487 |         2 |
+|     31 |             0.15 |          0.85 | Plasmid    | S31\_LN:i:21202\_dp:f:1.194722937126809  |     1.19 |  21202 |         1 |
+|     33 |             0.40 |          0.60 | Plasmid    | S33\_LN:i:18202\_dp:f:1.1628830074648842 |     1.16 |  18202 |         1 |
+|     46 |             0.03 |          0.97 | Plasmid    | S46\_LN:i:8487\_dp:f:1.2210058174026983  |     1.22 |   8487 |         1 |
 |     47 |             0.04 |          0.96 | Plasmid    | S47\_LN:i:8177\_dp:f:0.9996798934685464  |     1.00 |   8177 |         1 |
-|     50 |             0.02 |          0.98 | Plasmid    | S50\_LN:i:4993\_dp:f:1.1698997426343487  |     1.17 |   4993 |         2 |
+|     50 |             0.02 |          0.98 | Plasmid    | S50\_LN:i:4993\_dp:f:1.1698997426343487  |     1.17 |   4993 |         1 |
 |     52 |             0.03 |          0.97 | Plasmid    | S52\_LN:i:4014\_dp:f:0.9783821389091624  |     0.98 |   4014 |         1 |
 |     54 |             0.08 |          0.92 | Plasmid    | S54\_LN:i:3077\_dp:f:1.1553028848000615  |     1.16 |   3077 |         1 |
 |     57 |             0.03 |          0.97 | Plasmid    | S57\_LN:i:2626\_dp:f:0.9929149754371588  |     0.99 |   2626 |         1 |
-|     60 |             0.00 |          1.00 | Plasmid    | S60\_LN:i:1589\_dp:f:1.0577429501871556  |     1.06 |   1589 |         2 |
+|     60 |             0.00 |          1.00 | Plasmid    | S60\_LN:i:1589\_dp:f:1.0577429501871556  |     1.06 |   1589 |         1 |
 
 ### results/\*components.tab
 
@@ -210,14 +208,15 @@ the following information: contig number, component assignation
 | number | Component |
 | -----: | --------: |
 |     18 |         1 |
-|     31 |         2 |
-|     60 |         2 |
-|     50 |         2 |
+|     33 |         1 |
+|     47 |         1 |
+|     31 |         1 |
+|     60 |         1 |
+|     50 |         1 |
 |     52 |         1 |
 |     57 |         1 |
-|     46 |         2 |
+|     46 |         1 |
 |     54 |         1 |
-|     47 |         1 |
 
 ### results/\*plasmidome\_network.png
 
@@ -229,22 +228,22 @@ to plasmid starting nodes.
 
 ### results/\*components.fasta
 
-Fasta files with the nodes belonging to each predicted
-    component.
+Fasta files with the nodes belonging to each predicted component.
 
 ``` bash
 grep '>' results/using_mlplasmids*.fasta
 ```
 
-    ## results/using_mlplasmids_component_1.fasta:>S18_LN:i:54155_dp:f:1.0514645940835776
-    ## results/using_mlplasmids_component_1.fasta:>S47_LN:i:8177_dp:f:0.9996798934685464
-    ## results/using_mlplasmids_component_1.fasta:>S52_LN:i:4014_dp:f:0.9783821389091624
-    ## results/using_mlplasmids_component_1.fasta:>S54_LN:i:3077_dp:f:1.1553028848000615
-    ## results/using_mlplasmids_component_1.fasta:>S57_LN:i:2626_dp:f:0.9929149754371588
-    ## results/using_mlplasmids_component_2.fasta:>S31_LN:i:21202_dp:f:1.194722937126809
-    ## results/using_mlplasmids_component_2.fasta:>S46_LN:i:8487_dp:f:1.2210058174026983
-    ## results/using_mlplasmids_component_2.fasta:>S50_LN:i:4993_dp:f:1.1698997426343487
-    ## results/using_mlplasmids_component_2.fasta:>S60_LN:i:1589_dp:f:1.0577429501871556
+    ## >S18_LN:i:54155_dp:f:1.0514645940835776
+    ## >S31_LN:i:21202_dp:f:1.194722937126809
+    ## >S33_LN:i:18202_dp:f:1.1628830074648842
+    ## >S46_LN:i:8487_dp:f:1.2210058174026983
+    ## >S47_LN:i:8177_dp:f:0.9996798934685464
+    ## >S50_LN:i:4993_dp:f:1.1698997426343487
+    ## >S52_LN:i:4014_dp:f:0.9783821389091624
+    ## >S54_LN:i:3077_dp:f:1.1553028848000615
+    ## >S57_LN:i:2626_dp:f:0.9929149754371588
+    ## >S60_LN:i:1589_dp:f:1.0577429501871556
 
 ## paths/
 
@@ -267,15 +266,15 @@ in different ways generating different plasmid-like
 head -n 10 paths/using_mlplasmids_solutions.csv
 ```
 
-    ## 18+,76-,102+,33+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,116+
+    ## 18+,76-,102+,33+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,116+,63+
+    ## 18+,76-,52+,94+,71-,77+,18+
     ## 18+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,102+,92+,76-,52+,94+,57-,77+,87-,65+,54-,94+
-    ## 18+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,52+,94+,57-,77+,18+
+    ## 18+,76-,102+,92+,47+,115-,64+,99+,107-,91+,83+,80-,95-
     ## 18+,76-,52+,94+,57-,77+,18+
     ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
-    ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
+    ## 18+,76-,102+,92+,47+,115-,64+,31-,79+,46-,79+,60-,70-,50+,64-,115+,63-,116-,64+,119-
     ## 18+,76-,52+,94+,57-,77+,18+
+    ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
     ## 18+,76-,52+,94+,57-,77+,18+
 
 For example, we can inspect in Bandage the path:
