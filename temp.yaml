@@ -7,6 +7,6 @@ species: "${species}"
 threshold_prediction: "${threshold_prediction}"
 number_iterations: "${number_iterations}"
 classifier: "${classifier}"
-mode: "${mode}"
+filt_gplas: "${filt_gplas}"
 name: "${name}"
 EOF

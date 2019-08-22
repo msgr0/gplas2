@@ -82,7 +82,7 @@ rule gplas_paths:
     params:
         iterations = config["number_iterations"],
         classifier = config["classifier"],
-        mode = config["mode"]
+        filt_gplas = config["filt_gplas"]
     conda:
         "envs/r_packages.yaml"
     message:

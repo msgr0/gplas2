@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:t:x:r:m:h" opt; do
+while getopts ":i:n:s:t:x:r:f:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
@@ -23,8 +23,7 @@ while getopts ":i:n:s:t:x:r:m:h" opt; do
    echo -e "\t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5"
    echo -e "\t -x \t Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
                  Default: 10"
-   echo -e "\t -m \t Optional: Mode to run gplas: 'normal' or 'bold'. Bold mode increases the acceptance of connections to enlogate the path.
-                 String value. Default: 'normal'"
+   echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1"
    echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format"
    exit
    ;;
@@ -46,8 +45,8 @@ while getopts ":i:n:s:t:x:r:m:h" opt; do
    x)
      number_iterations=$OPTARG
      ;;
-   m)
-     mode=$OPTARG
+   f)
+     filt_gplas=$OPTARG
      ;;
    r)
      reference=$OPTARG
@@ -128,19 +127,17 @@ else
   echo -e "You have indicated a threshold prediction of:" $threshold_prediction "\n"
 fi
 
-if [ "$mode" == 'bold' ];
+if [ -z "$filt_gplas" ];
 then
-    echo -e "You have specified the 'bold' mode of gplas\n"
-    mode=2.0
+    filt_gplas=0.1
 else
-    echo -e "Using 'normal' mode to run gplas \n"
-    mode=1.0
+    echo -e "Using the following gplas filtering threshold score:" $filt_gplas "\n"
 fi
 
 if [ -z "$number_iterations" ];
 then
-    echo -e "You have not passed the number of times to look for paths based on each plasmid seed, using 10 as default\n"
-    number_iterations=10
+    echo -e "You have not passed the number of times to look for paths based on each plasmid seed, using 20 as default\n"
+    number_iterations=20
 else
   echo -e "You have indicated a number of iterations of:" $number_iterations "\n"
 fi
@@ -220,7 +217,7 @@ if [ -f "$file_to_check" ];
 then
   cat figures/logo.txt
   echo -e "\n"
-  echo -e "Congratulations! We have finished!!!!\n"
+  echo -e "Congratulations! Prediction succesfully done.\n"
   echo -e "This was your input graph:" $input "\n"
   echo -e "This was the bacterial species that you indicated: " $species "\n"
   echo -e "Gplas has used:" $classifier "\n"

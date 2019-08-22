@@ -22,7 +22,7 @@ path_cov_variation <- snakemake@input[["coverage"]]
 
 classifier <- snakemake@params[["classifier"]]
 number_iterations <- snakemake@params[["iterations"]]
-mode <- as.numeric(as.character(snakemake@params[["mode"]]))
+filtering_threshold <- as.numeric(as.character(snakemake@params[["filt_gplas"]]))
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -48,7 +48,7 @@ max_variation_small <- max_variation*5.0
 output_path <- snakemake@output[["solutions"]]
 output_connections <- snakemake@output[["connections"]]
 
-plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier, verbose = TRUE, number_iterations = number_iterations, number_nodes = 20, initial_seed, max_variation = max_variation, prob_small_repeats = prob_small_repeats, mode = mode, direction)
+plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier, verbose = TRUE, number_iterations = number_iterations, number_nodes = 20, initial_seed, max_variation = max_variation, prob_small_repeats = prob_small_repeats, filtering_threshold = filtering_threshold, direction)
 {
   initial_links <- links #Links to start the function 
   
@@ -237,8 +237,8 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       cov_connections_info <- graph_contigs[graph_contigs$number %in% record_connections$outgoing_node,]
       
-      up_cutoff <- cov_connections_info$coverage + max_variation*mode
-      down_cutoff <- cov_connections_info$coverage - max_variation*mode
+      up_cutoff <- cov_connections_info$coverage + max_variation
+      down_cutoff <- cov_connections_info$coverage - max_variation
       
       up_threshold <- pnorm(up_cutoff, mean = path_mean, sd = max_variation , lower.tail = TRUE)
       down_threshold <- pnorm(down_cutoff, mean = path_mean, sd = max_variation , lower.tail= TRUE)
@@ -261,8 +261,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       record_connections$Veredict <- 'non-selected'
       
-      
-      if(length(which(record_connections$Probability >= 0.25)) == 0)
+      if(length(which(record_connections$Probability >= filtering_threshold)) == 0)
       {
         output <- paste(path, collapse = ',')
         write.table(x = output, 
@@ -286,7 +285,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       
       # Filter step to avoid going into really bad connections 
       
-      filter_connections <- subset(record_connections, record_connections$Probability >= 0.25)
+      filter_connections <- subset(record_connections, record_connections$Probability >= filtering_threshold)
       
       random_connection <- sample(x = filter_connections$outgoing_node, size = 1, prob = filter_connections$Probability) # Choose one connection 
       
@@ -351,8 +350,8 @@ for(seed in initialize_nodes)
   positive_seed <- paste(seed, '+', sep = '')
   negative_seed <- paste(seed, '-', sep = '')
   
-  plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, mode = mode)
-  plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, mode = mode)
+  plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
+  plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 20, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
 }  
 
 
