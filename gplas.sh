@@ -223,7 +223,7 @@ fi
 
 
 echo -e "Let's check if snakemake is present in a previous conda environment, otherwise will proceed to the installation"
-source activate gplas || conda create --name gplas --file snakeplas.txt
+source activate gplas || conda create --name gplas --file spec-snakemake.txt
 source activate gplas
 
 
