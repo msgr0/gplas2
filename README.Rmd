@@ -3,6 +3,8 @@ title: "gplas: binning plasmid-predicted contigs"
 output: 
   github_document
 fontsize: 16pt
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -22,19 +24,21 @@ knitr::include_graphics("figures/logo.png")
 ```{bash, eval = FALSE}
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
-./gplas.sh -i test/faecium_graph.gfa
+./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
 
-First-time installation can take some time depending on your internet speed. But! You do not have to worry about installing any dependencies or running the pipeline by yourself. Thanks to conda and snakemake, we integrated all the dependencies required to run gplas in different conda environments depending on the part of the pipeline. 
+First-time installation can take some time depending on your internet speed (~20 minutes). 
 
-After the first-time installation, you will get the prediction of gplas in a few minutes and using a single thread. 
+The good news are that you do not have to install any dependency so the snakemake pipeline and different conda environments integrate all the dependencies required to run gplas.  
 
+After the first-time installation, you will get the prediction of gplas in a few minutes and using a single thread! 
 
-Gplas will check if the following tools are present in your system:
+Gplas first checks if the following tools are present in your system:
 
 1. [Conda](https://bioconda.github.io/)
 
 2. [Snakemake](https://snakemake.readthedocs.io/en/stable/)
+
 
 After this, gplas will start the snakemake pipeline and will install different conda environments with the following R packages:
 
@@ -65,77 +69,37 @@ Following this, it will install the tools that we use to predict plasmid-derived
 
 ## Quick usage 
 
-### Running gplas just providing the assembly graph
+### Running gplas with an assembly graph 
 
-Gplas only requires a single argument **'-i'** corresponding to an assembly graph in gfa format. 
+Gplas only requires a single argument **'-i'** corresponding to an assembly graph in gfa format. You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument **'-c'**
 
+If you choose mlplasmids for the prediction, there is an additional mandatory argument **'-s'** in which you need to list any of the following three bacterial species:
 
-```{r, echo = FALSE}
-knitr::include_graphics("figures/graph.png")
-```
+- 'Enterococcus faecium'
+- 'Klebsiella pneumoniae'
+- 'Escherichia coli'
 
-
-```{bash, eval = FALSE}
-./gplas.sh -i test/faecium_graph.gfa
-```
-
-
-## Complete usage 
-
-Gplas can take the following arguments:
-
-Mandatory arguments: 
-
-- **-i**: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format
-
-Optional arguments:
-
-- **-n**: Project name given to gplas. Default: 'unnamed'
-- **-s**: Bacterial species from the graph file. If bacterial species corresponds to: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli' then prediction will be perfomed using mlplasmids. Default: 'unknown'
-- **-t**: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default: 0.5
-- **-x**: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite. Default: 10
-- **-f**: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
-
-For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
-
-- **-r**: Path to the complete reference genome corresponding to the graph given. Fasta file format
-
-
-For example, if we want to use mlplasmids with the *Enterococcus faecium* model on the same test set we only need to specify the following:
-
-```{r, echo = FALSE}
-knitr::include_graphics("figures/mlplasmids_logo.png")
-```
-
+You can use plasflow as a classifier if you have a different bacterial species. 
 
 ```{bash, eval = FALSE}
-./gplas.sh -i test/faecium_graph.gfa -n 'using_mlplasmids' -s 'Enterococcus faecium'
-```
-
-# Help page 
-
-
-```{bash}
-./gplas.sh -h
+./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'usingmlplasmids'
 ```
 
 
-# Main output files 
+## Main output files 
 
 Gplas will create a folder called 'results' with the following files: 
 
 ```{bash}
-ls results/using_mlplasmids*
+ls results/usingmlplasmids*
 ```
-
-## results/
 
 ### results/*results.tab 
 
 Tab delimited file containing the prediction given by mlplasmids or plasflow together with the bin prediction assigned by gplas. The file contains the following information: contig number, probability of being chromosome-derived, probability of being plasmid-derived,  class prediction, contig name, k-mer coverage, length, component assigned. 
 
 ```{r, echo = FALSE}
-results <- read.table(file = 'results/using_mlplasmids_results.tab', header = TRUE)
+results <- read.table(file = 'results/usingmlplasmids_results.tab', header = TRUE)
 knitr::kable(results)
 ```
 
@@ -144,7 +108,7 @@ knitr::kable(results)
 Tab delimited file containing the bin prediction reported by gplas with the following information: contig number, component assignation  
 
 ```{r, echo = FALSE}
-components <- read.table(file = 'results/using_mlplasmids_components.tab', header = TRUE)
+components <- read.table(file = 'results/usingmlplasmids_components.tab', header = TRUE)
 
 knitr::kable(components)
 ```
@@ -154,7 +118,7 @@ knitr::kable(components)
 Png file of the plasmidome network generated by gplas after creating an undirected graph using the significant co-occurrence links corresponding to plasmid starting nodes. 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("results/using_mlplasmids_plasmidome_network.png")
+knitr::include_graphics("results/usingmlplasmids_plasmidome_network.png")
 ```
 
 ### results/*components.fasta
@@ -162,10 +126,8 @@ knitr::include_graphics("results/using_mlplasmids_plasmidome_network.png")
 Fasta files with the nodes belonging to each predicted component. 
 
 ```{bash}
-grep '>' results/using_mlplasmids*.fasta
+grep '>' results/usingmlplasmids*.fasta
 ```
-
-## paths/ 
 
 ### paths/*solutions.csv
 
@@ -174,7 +136,7 @@ gplas generates plasmid-like paths per each plasmid starting node. These paths a
 In this case, we find different possible plasmid paths starting from the node 18+. These paths may contain inversions and rearrangements since repeats units such as transposases can be present several times in the same plasmid sequence. In these cases, gplas can traverse the sequence in different ways generating different plasmid-like paths. 
 
 ```{bash}
-head -n 10 paths/using_mlplasmids_solutions.csv
+head -n 10 paths/usingmlplasmids_solutions.csv
 ```
 
 For example, we can inspect in Bandage the path: 18+,76-,52+,94+,57-,77+,18+ 
@@ -184,6 +146,36 @@ This path forms a circular sequence since there is overlap between the initial a
 ```{r, echo=FALSE}
 knitr::include_graphics("figures/bandage_path.jpg")
 ```
+
+
+
+## Complete usage 
+
+Gplas can take the following arguments:
+
+Mandatory arguments: 
+
+- **-i**: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format
+- **-c**: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'
+- **-s**: Only applicable if mlplasmids is chosen. Bacterial species from the graph file. If you have specified mlplasmids as classifier you need to provide one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'
+
+Optional arguments:
+
+- **-n**: Project name given to gplas. Default: 'unnamed'
+- **-t**: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default mlplasmids threshold: 0.5 Default plasflow threshold: 0.7
+- **-x**: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite. Default: 20
+- **-f**: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
+
+For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
+
+- **-r**: Path to the complete reference genome corresponding to the graph given. Fasta file format
+
+# Help page 
+
+```{bash}
+./gplas.sh -h
+```
+
 
 # Issues/Bugs 
 
