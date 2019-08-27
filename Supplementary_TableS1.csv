@@ -1,4 +1,4 @@
-Sample,Genus,Species,Plasmids,Short-reads,Long-reads ,Reference
+Sample,Genus,Species,Plasmids,Short-reads,Long-reads,Reference
 SAMN10819801,Citrobacter,braakii,4,SRR8482582,SRR8494941,https://doi.org/10.1101/530824
 SAMN10819803,Enterobacter,kobei,6,SRR8482568,SRR8494942,https://doi.org/10.1101/530824
 SAMN10819804,Klebsiella,oxytoca,5,SRR8482580,SRR8494920,https://doi.org/10.1101/530825
