@@ -205,18 +205,16 @@ sleep 10s
 if command -v conda > /dev/null; then
  echo  -e 'Conda is present\n'
 else
- echo -e "We need conda to run gplas.\n Installing conda"
- wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
- chmod +x Miniconda3-latest-Linux-x86_64.sh
- mkdir -p ~/tmp
- ./Miniconda3-latest-Linux-x86_64.sh -b -p ~/tmp/Miniconda3
- rm Miniconda3-latest-Linux-x86_64.sh
- export PATH=~/tmp/Miniconda3/bin:$PATH
- export PYTHONPATH=~/tmp/Miniconda3/pkgs/
- conda config --add channels defaults
- conda config --add channels bioconda
- conda config --add channels conda-forge
- export PERL5LIB=~/tmp/Miniconda3/lib/perl5/site_perl/5.22.0
+  echo -e "We need conda to run gplas.\n Installing conda"
+  initial_path=$PWD
+  cd /tmp
+  curl -O https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh
+  bash Anaconda3-2019.03-Linux-x86_64.sh
+  source ~/.bashrc
+  conda config --add channels defaults
+  conda config --add channels bioconda
+  conda config --add channels conda-forge
+  cd $initial_path
 fi
 
 
