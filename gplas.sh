@@ -60,16 +60,16 @@ while getopts ":i:n:s:c:t:x:r:f:h" opt; do
      reference=$OPTARG
      ;;
    \?)
-     echo "Invalid option: -$OPTARG" >&2
-     echo "\n Ups shomething went wrong! \n"
-     echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
      ./gplas.sh -h
+     echo -e "\n"
+     echo "Invalid option: -$OPTARG" >&2
+     echo "gplas requires a single input corresponding to a gfa file, use the following syntax:"
      exit 1
      ;;
    :)
-     echo "Option -$OPTARG requires an argument." >&2
-     echo "\n Ups shomething went wrong!\n"
      ./gplas.sh -h
+     echo -e "\n"
+     echo "Error: Option -$OPTARG requires an argument." >&2
      exit 1
      ;;
  esac
@@ -200,14 +200,12 @@ echo "##################################################################"
 ) >temp.yaml
 . temp.yaml
 
-
 sleep 10s
 
-
 if command -v conda > /dev/null; then
- echo  -e 'Conda is present, so there is no need to install it. Well done!\n'
+ echo  -e 'Conda is present\n'
 else
- echo -e "We need conda to run gplas.\n Miniconda missing. Installing...."
+ echo -e "We need conda to run gplas.\n Installing conda"
  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
  chmod +x Miniconda3-latest-Linux-x86_64.sh
  mkdir -p ~/tmp
@@ -222,7 +220,7 @@ else
 fi
 
 
-echo -e "Let's check if snakemake is present in a previous conda environment, otherwise will proceed to the installation"
+echo -e "Creating a conda environment to install and run snakemake"
 source activate gplas || conda create --name gplas --file spec-snakemake.txt
 source activate gplas
 
@@ -255,16 +253,24 @@ then
   cat figures/logo.txt
   echo -e "\n"
   echo -e "Congratulations! Prediction succesfully done.\n"
-  echo -e "This was your input graph:" $input "\n"
-  echo -e "This was the bacterial species that you indicated: " $species "\n"
-  echo -e "Gplas has used:" $classifier "\n"
+  echo -e "Input graph:" $input "\n"
+  echo -e "Bacterial species: " $species "\n"
+  echo -e "Classifier:" $classifier "\n"
+  echo -e "Threshold for predicting plasmid-derived contigs: $threshold_prediction\n"
+  echo -e "Number of plasmid paths created per node: $number_iterations\n"
+  echo -e "Threshold of gplas scores: $filt_gplas\n"
   echo -e "\n"
 
-  echo -e "Your results are present at results/ and path/"
-  echo -e "We hope it helps in your research, thanks for using gplas"
+  echo -e "Your results are present at results/ and path/\n"
+  echo -e "We hope it helps in your research, thanks for using gplas\n"
+  echo -e "If you have used plasflow as a classifier please cite:
+  Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321"
   echo -e "\n"
+  echo -e "If you have used mlplasmids as a classifier please cite:
+  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
+  echo -e "Preprint of gplas coming soon, hasta la vista!"
 else
   echo -e "Seems like something went wrong!"
 fi
