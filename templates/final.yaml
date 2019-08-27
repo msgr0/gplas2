@@ -1,5 +1,5 @@
 samples:
-  "template": "test/faecium_graph.gfa"
+  "usingmlplasmids": "test/faecium_graph.gfa"
 reference:
   "No reference provided": "No reference provided"
 species: "'Enterococcus faecium'"
@@ -7,4 +7,4 @@ threshold_prediction: "0.5"
 number_iterations: "20"
 classifier: "mlplasmids"
 filt_gplas: "0.1"
-name: "template"
+name: "usingmlplasmids"

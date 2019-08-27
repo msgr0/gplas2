@@ -158,7 +158,7 @@ ocurrence_large_nodes <- as.matrix(ocurrence_large_nodes)
 
 ####################################
 
-suppressMessages(test <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE))
+invisible(capture.output(test <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE)))
 
 df_combinations <- prob.table(test)
 

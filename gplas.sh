@@ -194,11 +194,11 @@ fi
 
 echo "##################################################################"
 
-( echo "cat <<EOF >final.yaml";
-  cat template.yml;
+( echo "cat <<EOF >templates/final.yaml";
+  cat templates/template.yml;
   echo "EOF";
-) >temp.yaml
-. temp.yaml
+) > templates/temp.yaml
+. templates/temp.yaml
 
 sleep 10s
 
@@ -220,7 +220,7 @@ else
 fi
 
 
-echo -e "Creating a conda environment to install and run snakemake"
+echo -e "Creating (only the first-time) a conda environment to install and run snakemake"
 source activate gplas || conda create --name gplas --file spec-snakemake.txt
 source activate gplas
 
