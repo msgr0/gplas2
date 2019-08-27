@@ -82,19 +82,34 @@ unique_nodes <- unique(links$V1)
 
 # Loop to create a dataframe with the number of links from each node
 
-repeat_info <- NULL
+outdegree_info <- NULL
 for(node in unique_nodes)
 {
   repeat_links <- subset(links, links$V1 == node)
   repeat_links <- repeat_links[! duplicated(repeat_links),]
 
   node_info <- data.frame(number = node,
-                          connecting_nodes = length(repeat_links$V3))
+                          outdegree = length(repeat_links$V3))
 
-  repeat_info <- rbind(repeat_info, node_info)
+  outdegree_info <- rbind(outdegree_info, node_info)
 }
 
-repeats <- subset(repeat_info, repeat_info$connecting_nodes > 1) # Transposases may be identified as hubs in the graph. They should have more than one link
+
+indegree_info <- NULL
+for(node in unique_nodes)
+{
+  repeat_links <- subset(links, links$V3 == node)
+  repeat_links <- repeat_links[! duplicated(repeat_links),]
+  
+  node_info <- data.frame(number = node,
+                          indegree = length(repeat_links$V1))
+  
+  indegree_info <- rbind(indegree_info, node_info)
+}
+
+repeat_info <- merge(indegree_info, outdegree_info , by = 'number')
+
+repeats <- subset(repeat_info, repeat_info$indegree > 1 | repeat_info$outdegree > 1) # Transposases may be identified as hubs in the graph. They should have more than one link
 
 repeats_graph <- repeats
 

@@ -199,7 +199,7 @@ circular_sequences <- NULL
     iteration <- t(iteration)
     nodes <- as.character(iteration[,1])
     nodes <- nodes[nodes != '']
-    if(length(nodes) > 1 & length(nodes) < 4 & nodes[1] == nodes[length(nodes)])
+    if(length(nodes) > 1 & length(nodes) < 20 & nodes[1] == nodes[length(nodes)])
     {
       circular_sequences <- rbind(circular_sequences, c(nodes[1],nodes[length(nodes)]))
     }
