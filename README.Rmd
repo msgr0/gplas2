@@ -35,9 +35,9 @@ After the first-time installation, you will get the prediction of gplas in a few
 
 Gplas first checks if the following tools are present in your system:
 
-1. [Conda](https://bioconda.github.io/)
+1. [Conda](https://bioconda.github.io/) 
 
-2. [Snakemake](https://snakemake.readthedocs.io/en/stable/)
+2. [Snakemake](https://snakemake.readthedocs.io/en/stable/) version 5.5.4
 
 
 After this, gplas will start the snakemake pipeline and will install different conda environments with the following R packages:
@@ -81,7 +81,7 @@ If you choose mlplasmids for the prediction, there is an additional mandatory ar
 
 You can use plasflow as a classifier if you have a different bacterial species. 
 
-```{bash, eval = FALSE}
+```{bash, eval = TRUE}
 ./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'usingmlplasmids'
 ```
 

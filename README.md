@@ -34,7 +34,8 @@ Gplas first checks if the following tools are present in your system:
 
 1.  [Conda](https://bioconda.github.io/)
 
-2.  [Snakemake](https://snakemake.readthedocs.io/en/stable/)
+2.  [Snakemake](https://snakemake.readthedocs.io/en/stable/) version
+    5.5.4
 
 After this, gplas will start the snakemake pipeline and will install
 different conda environments with the following R packages:
@@ -101,6 +102,143 @@ species.
 ``` bash
 ./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'usingmlplasmids'
 ```
+
+    ## 
+    ## 
+    ##   _______ .______    __           ___           _______.
+    ##  /  _____||   _  \  |  |         /   \         /       |
+    ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
+    ## |  | |_ | |   ___/  |  |       /  /_\  \       \   \    
+    ## |  |__| | |  |      |  `----. /  _____  \  .----)   |   
+    ##  \______| | _|      |_______|/__/     \__\ |_______/    
+    ## 
+    ## 
+    ## ##################################################################
+    ## 
+    ## 
+    ## This is your input graph: test/faecium_graph.gfa 
+    ## 
+    ## This is the bacterial species that you have indicated: Enterococcus faecium 
+    ## 
+    ## Your results will be named using usingmlplasmids 
+    ## 
+    ## You have not indicated a threshold prediction. Using 0.5 since you are using mlplasmids
+    ## 
+    ## You have not passed the number of times to look for paths based on each plasmid seed, using 20 as default
+    ## 
+    ## ##################################################################
+    ## Conda is present
+    ## 
+    ## Creating (only the first-time) a conda environment to install and run snakemake
+    ## The flag 'directory' used in rule awk_parsing_alignment is only valid for outputs, not inputs.
+    ## Building DAG of jobs...
+    ## Unlocking working directory.
+    ## The flag 'directory' used in rule awk_parsing_alignment is only valid for outputs, not inputs.
+    ## Building DAG of jobs...
+    ## Using shell: /bin/bash
+    ## Provided cores: 1
+    ## Rules claiming more threads will be scaled down.
+    ## Job counts:
+    ##  count   jobs
+    ##  1   awk_links
+    ##  1   awk_nodes
+    ##  1   gplas_coocurr
+    ##  1   gplas_coverage
+    ##  1   gplas_paths
+    ##  1   mlplasmids
+    ##  6
+    ## 
+    ## [Tue Aug 27 11:29:12 2019]
+    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## [Tue Aug 27 11:29:16 2019]
+    ## Finished job 5.
+    ## 1 of 6 steps (17%) done
+    ## 
+    ## [Tue Aug 27 11:29:16 2019]
+    ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## [Tue Aug 27 11:29:18 2019]
+    ## Finished job 1.
+    ## 2 of 6 steps (33%) done
+    ## 
+    ## [Tue Aug 27 11:29:18 2019]
+    ## Job 3: Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## [Tue Aug 27 11:29:38 2019]
+    ## Finished job 3.
+    ## 3 of 6 steps (50%) done
+    ## 
+    ## [Tue Aug 27 11:29:38 2019]
+    ## Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
+    ## 
+    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## WARNING: ignoring environment value of R_HOME
+    ## [Tue Aug 27 11:29:49 2019]
+    ## Finished job 2.
+    ## 4 of 6 steps (67%) done
+    ## 
+    ## [Tue Aug 27 11:29:49 2019]
+    ## Job 4: Searching for plasmid-like paths using a greedy approach
+    ## 
+    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## WARNING: ignoring environment value of R_HOME
+    ## [Tue Aug 27 11:30:27 2019]
+    ## Finished job 4.
+    ## 5 of 6 steps (83%) done
+    ## 
+    ## [Tue Aug 27 11:30:27 2019]
+    ## Job 0: Creating a co-occurrence network and selecting significant associations between nodes.
+    ## 
+    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## WARNING: ignoring environment value of R_HOME
+    ## [Tue Aug 27 11:30:44 2019]
+    ## Finished job 0.
+    ## 6 of 6 steps (100%) done
+    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-08-27T112912.773651.snakemake.log
+    ##   _______ .______    __           ___           _______.
+    ##  /  _____||   _  \  |  |         /   \         /       |
+    ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
+    ## |  | |_ | |   ___/  |  |       /  /_\  \       \   \    
+    ## |  |__| | |  |      |  `----. /  _____  \  .----)   |   
+    ##  \______| | _|      |_______|/__/     \__\ |_______/    
+    ## 
+    ## 
+    ## Congratulations! Prediction succesfully done.
+    ## 
+    ## Input graph: test/faecium_graph.gfa 
+    ## 
+    ## Bacterial species:  'Enterococcus faecium' 
+    ## 
+    ## Classifier: mlplasmids 
+    ## 
+    ## Threshold for predicting plasmid-derived contigs: 0.5
+    ## 
+    ## Number of plasmid paths created per node: 20
+    ## 
+    ## Threshold of gplas scores: 0.1
+    ## 
+    ## 
+    ## 
+    ## Your results are present at results/ and path/
+    ## 
+    ## We hope it helps in your research, thanks for using gplas
+    ## 
+    ## If you have used plasflow as a classifier please cite:
+    ##   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
+    ## 
+    ## 
+    ## If you have used mlplasmids as a classifier please cite:
+    ##   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
+    ## 
+    ## 
+    ## Preprint of gplas coming soon, hasta la vista!
 
 ## Main output files
 
