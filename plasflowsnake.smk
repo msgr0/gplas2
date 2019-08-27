@@ -26,7 +26,7 @@ rule awk_nodes:
     log:
         "logs/{sample}_log_nodes.txt"
     shell:
-        """awk '{{if($1 == "S") print "\>"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
+        """awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
 
 rule plasflow:
     input:

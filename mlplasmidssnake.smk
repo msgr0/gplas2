@@ -28,7 +28,7 @@ rule awk_nodes:
     message:
         "Extracting the nodes from the graph {input}"
     shell:
-        """awk '{{if($1 == "S") print "\>"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
+        """awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
 
 rule mlplasmids:
     input:
