@@ -208,8 +208,8 @@ else
   echo -e "We need conda to run gplas.\n Installing conda"
   initial_path=$PWD
   cd /tmp
-  curl -O https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh
-  bash Anaconda3-2019.03-Linux-x86_64.sh
+  curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  bash Miniconda3-latest-Linux-x86_64.sh
   source ~/.bashrc
   conda config --add channels defaults
   conda config --add channels bioconda
