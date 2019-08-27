@@ -86,7 +86,7 @@ rule gplas_paths:
     conda:
         "envs/r_packages.yaml"
     message:
-        "Searching for paths with a congruent probability of being plasmid and having a similar k-mer coverage"
+        "Searching for plasmid-like paths using a greedy approach"
     threads: 1
     script:
         "scripts/gplas_paths.R"
@@ -127,7 +127,7 @@ rule quast_alignment:
     conda:
         "envs/quast.yaml"
     shell:
-        "quast.py -R {input.reference} -a all -m 1000 -o {output.align} {input.nodes}"
+        "quast.py -R {input.reference} --silent -a all -m 1000 -o {output.align} {input.nodes}"
 
 rule awk_parsing_alignment:
     input:
