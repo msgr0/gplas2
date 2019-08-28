@@ -3,10 +3,10 @@ gplas: binning plasmid-predicted contigs
 
 # Introduction
 
-gplas is a tool to bin plasmid-predicted contigs using co-occurence
-networks. Gplas is a new implementation of mlplasmids which adds the
+gplas is a tool to bin plasmid-predicted contigs using co-occurrence
+networks. Gplas builds on mlplasmids and adds the
 possibility of accurately binning predicted plasmid contigs into several
-independent components. We rely on the structure of the assembly graph
+independent components. It relies on the structure of the assembly graph
 and k-mer information to create a new plasmidome network and predict
 plasmid contigs belonging to different genomic units.
 
@@ -21,16 +21,16 @@ cd gplas
 ```
 
 First-time installation can take some time depending on your internet
-speed (~20 minutes).
+connection (~20 minutes).
 
-The good news are that you do not have to install any dependency so the
+The good news is that you do not have to install any dependencies. The
 snakemake pipeline and different conda environments integrate all the
 dependencies required to run gplas.
 
 After the first-time installation, you will get the prediction of gplas
 in a few minutes and using a single thread\!
 
-Gplas first checks if the following tools are present in your system:
+Gplas first checks if the following tools are present on your system:
 
 1.  [Conda](https://bioconda.github.io/)
 
@@ -85,8 +85,8 @@ plasmid-derived contigs.
 ### Running gplas with an assembly graph
 
 Gplas only requires a single argument **‘-i’** corresponding to an
-assembly graph in gfa format. You need to specify which classifier gplas
-is going to use, mlplasmids or plasflow, with the argument **‘-c’**
+assembly graph in gfa format. Such an assembly graph can be obtained with [SPAdes genome assembler](https://github.com/ablab/spades).
+You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument **‘-c’**
 
 If you choose mlplasmids for the prediction, there is an additional
 mandatory argument **‘-s’** in which you need to list any of the
@@ -96,7 +96,7 @@ following three bacterial species:
   - ‘Klebsiella pneumoniae’
   - ‘Escherichia coli’
 
-You can use plasflow as a classifier if you have a different bacterial
+You can use plasflow as a classifier if you want to predict for a different bacterial
 species.
 
 ``` bash
@@ -226,9 +226,9 @@ species.
     ## 
     ## 
     ## 
-    ## Your results are present at results/ and path/
+    ## Your results are at results/ and path/
     ## 
-    ## We hope it helps in your research, thanks for using gplas
+    ## We hope it helps  your research, thanks for using gplas!
     ## 
     ## If you have used plasflow as a classifier please cite:
     ##   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
@@ -385,10 +385,10 @@ Optional arguments:
   - **-f**: Gplas filtering threshold score to reject possible outcoming
     edges. Integer value ranging from 0 to 1. Default: 0.1
 
-For benchmarking purposes you can pass a complete genome to gplas and
-will generate a precision and completeness. Using this you can assess
+For benchmarking purposes you can pass a complete genome to gplas and gplas
+will generate precision and completeness values. Using this you can assess
 the performance of gplas on a small set of genomes in which perhaps you
-have generated long-reads.
+have generated long reads.
 
   - **-r**: Path to the complete reference genome corresponding to the
     graph given. Fasta file format
@@ -441,4 +441,4 @@ have generated long-reads.
 # Issues/Bugs
 
 You can report any issues or bugs that you find while installing/running
-gplas using the issue tracker
+gplas using the [issue tracker](https://gitlab.com/sirarredondo/gplas/issues)
