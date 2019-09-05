@@ -1,7 +1,7 @@
 name: r_packages
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
   - r
 dependencies:
@@ -53,7 +53,7 @@ dependencies:
   - lz4-c=1.8.3=he1b5a44_1001
   - make=4.2.1=h14c3975_2004
   - ncurses=6.1=hf484d3e_1002
-  - openssl=1.1.1b=h14c3975_1
+  - openssl=1.1.1c=h516909a_0
   - pango=1.40.14=he7ab937_1005
   - pcre=8.41=hf484d3e_1003
   - pixman=0.38.0=h516909a_1003
@@ -84,6 +84,7 @@ dependencies:
   - r-digest=0.6.19=r351h0357c0b_0
   - r-dplyr=0.8.2=r35h0357c0b_0
   - r-evaluate=0.11=r351h6115d3f_0
+  - r-expm=0.999_4=r35h9bbef5b_2
   - r-fansi=0.4.0=r351h96ca727_1000
   - r-farver=1.1.0=r351h29659fb_0
   - r-fastmatch=1.1_0=r351h96ca727_1003
@@ -115,6 +116,7 @@ dependencies:
   - r-markdown=0.8=r351h96ca727_0
   - r-mass=7.3_51.4=r351hcdcec82_0
   - r-matrix=1.2_17=r351hcdcec82_0
+  - r-mcl=1.0=r35h6115d3f_1001
   - r-memoise=1.1.0=r351h6115d3f_0
   - r-mgcv=1.8_28=r351hcdcec82_0
   - r-mime=0.5=r351h96ca727_0
