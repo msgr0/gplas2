@@ -11,6 +11,7 @@ suppressMessages(library(cooccur))
 suppressMessages(library(ggrepel))
 suppressMessages(library(Biostrings))
 suppressMessages(library(seqinr))
+suppressMessages(library(MCL))
 
 # Inputs
 
@@ -24,6 +25,7 @@ path_cov_variation <- snakemake@input[["coverage"]]
 input_solutions <- snakemake@input[["solutions"]]
 classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
+iterations <- snakemake@params[["iterations"]]
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -66,183 +68,146 @@ unique_nodes <- as.character(na.omit(unique_nodes))
 
 co_ocurrence <- data.frame(matrix(0, nrow = nrow(solutions), ncol = length(unique_nodes)))
 colnames(co_ocurrence) <- unique_nodes
-  
-  for(row in 1:nrow(co_ocurrence))
-  {
-    iteration <- co_ocurrence[row,]
-    particular_solution <- solutions[row,]
-    particular_solution <- t(particular_solution)
-    particular_solution <- particular_solution[,1]
-    particular_solution <- particular_solution[particular_solution != ""]
-    presence_absence <- ifelse(colnames(co_ocurrence) %in% particular_solution == TRUE, 1, 0)
-    co_ocurrence[row,] <- presence_absence
-  }
+
+for(row in 1:nrow(co_ocurrence))
+{
+  iteration <- co_ocurrence[row,]
+  particular_solution <- solutions[row,]
+  particular_solution <- t(particular_solution)
+  particular_solution <- particular_solution[,1]
+  particular_solution <- particular_solution[particular_solution != ""]
+  presence_absence <- ifelse(colnames(co_ocurrence) %in% particular_solution == TRUE, 1, 0)
+  co_ocurrence[row,] <- presence_absence
+}
 
 co_ocurrence <- apply(co_ocurrence, 2, as.integer)
-co_ocurrence <- t(co_ocurrence)
 
-ocurrence_large_nodes <- co_ocurrence[rownames(co_ocurrence) %in% unique(solutions[,1]),]
-ocurrence_large_nodes <- as.matrix(ocurrence_large_nodes)
+starting_nodes <- subset(unique_nodes, unique_nodes %in% unique(solutions[,1]))
 
 
+# Test
 
-#################### Testing
-# 
-# number_tries <- 20
-# all_associations_per_node <- NULL
-# 
-# first_index <- 1
-# second_index <- 20
-# 
-# times <- nrow(solutions)/20
-# 
-# for(try in 1:times)
-# {
-#   solutions_node <- c(first_index:second_index)
-#   
-#   other_combinations <- c(1:nrow(solutions))
-#   other_combinations <- other_combinations[! other_combinations %in% solutions_node]
-#   other_solutions <- base::sample(x = other_combinations, size = number_tries, replace = TRUE)
-#   
-#   considered_solutions <- c(solutions_node, other_solutions)
-#   
-#   all_nodes <- NULL
-#   for(solution in considered_solutions)
-#   {
-#     iteration <- solutions[solution,]
-#     iteration <- t(iteration)
-#     nodes <- as.character(iteration[,1])
-#     nodes <- nodes[nodes != '']
-#     all_nodes <- append(x = all_nodes, values = nodes, after = length(all_nodes))
-#   }
-#   
-#   
-#   unique_nodes <- unique(all_nodes)
-#   unique_nodes <- unique_nodes[unique_nodes != ""]
-#   unique_nodes <- as.character(na.omit(unique_nodes))
-#   
-#   co_ocurrence <- data.frame(matrix(0, nrow = length(considered_solutions), ncol = length(unique_nodes)))
-#   colnames(co_ocurrence) <- unique_nodes
-#   
-#   for(index in 1:length(considered_solutions))
-#   {
-#     row <- considered_solutions[index]
-#     particular_solution <- solutions[row,]
-#     particular_solution <- t(particular_solution)
-#     particular_solution <- particular_solution[,1]
-#     particular_solution <- particular_solution[particular_solution != ""]
-#     presence_absence <- ifelse(colnames(co_ocurrence) %in% particular_solution == TRUE, 1, 0)
-#     co_ocurrence[index,] <- presence_absence
-#   }
-#   
-#   co_ocurrence <- apply(co_ocurrence, 2, as.integer)
-#   co_ocurrence <- t(co_ocurrence)
-#   
-#   ocurrence_large_nodes <- co_ocurrence[rownames(co_ocurrence) %in% unique(solutions[,1]),]
-#   ocurrence_large_nodes <- as.matrix(ocurrence_large_nodes)
-#   
-#   ocurrence_large_nodes <- as.data.frame(ocurrence_large_nodes)
-#   ocurrence_large_nodes <<- ocurrence_large_nodes[apply(ocurrence_large_nodes[,-1], 1, function(x) !all(x==0)),]
-#   
-#   large_node <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE)
-#   df_combinations <- prob.table(large_node)
-#   significant_associations <- subset(df_combinations, df_combinations$p_gt < 0.05)
-#   
-#   all_associations_per_node <- rbind(all_associations_per_node, significant_associations)
-#   
-#   first_index <- first_index + number_tries
-#   second_index <- second_index + number_tries
-#   print(first_index)
-# }
-# 
+number_iterations <- as.numeric(iterations) ########## This should be passed by snakemake
 
-####################################
+count_left <- 1
 
-invisible(capture.output(test <- cooccur(mat = ocurrence_large_nodes, type = "spp_site", thresh = FALSE, spp_names = TRUE)))
+count_right <- number_iterations
 
-df_combinations <- prob.table(test)
+total_pairs <- NULL
 
-# Testing
-
-#significant_associations <- all_associations_per_node
-
-#
-#significant_associations <- subset(df_combinations, df_combinations$p_gt < 0.05/ncol(df_combinations))
-threshold <- choose(length(initialize_nodes)*2, 2)
-threshold <- 0.05/threshold
-
-significant_associations <- subset(df_combinations, df_combinations$p_gt < threshold)
-significant_associations$sp1_name <- gsub(pattern = '\\+',replacement = '', significant_associations$sp1_name)
-significant_associations$sp1_name <- gsub(pattern = '\\-',replacement = '', significant_associations$sp1_name)
-
-significant_associations$sp2_name <- gsub(pattern = '\\+',replacement = '', significant_associations$sp2_name)
-significant_associations$sp2_name <- gsub(pattern = '\\-',replacement = '', significant_associations$sp2_name)
-
-
-significant_associations <- significant_associations[! significant_associations$sp1_name %in% repeats$number,]
-significant_associations <- significant_associations[! significant_associations$sp2_name %in% repeats$number,]
-
-dimensions_sign <- dim(significant_associations)
+for(iteration in 1:length(starting_nodes))
+{
   
-  if(is.null(dimensions_sign) == TRUE)
-  {
-    print('No significant associations')
-    break
+  print(count_left)
+  print(count_right)
+
+  
+  node_sol <- co_ocurrence[c(count_left:count_right),]
+  sumatory <- colSums(node_sol)
+  df_test <- data.frame(Starting_node = solutions[count_left,1], 
+                        Connecting_node = colnames(node_sol),
+                        weight = sumatory)
+  total_pairs <- rbind(total_pairs, df_test)
+  
+  count_left <- count_left + number_iterations
+  count_right <- count_right + number_iterations
+  
+  
   }
-# Looking back in the solutions if there are circular graphs
+
+total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% starting_nodes)
+total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% starting_nodes)
+total_pairs <- subset(total_pairs, as.character(total_pairs$Connecting_node) != as.character(total_pairs$Starting_node))
+total_pairs <- subset(total_pairs, total_pairs$weight > 1)
+
+## Looking back in the solutions if there are circular graphs
 
 circular_sequences <- NULL
-
-  for(solution in 1:nrow(solutions))
+for(solution in 1:nrow(solutions))
+{
+  iteration <- solutions[solution,]
+  iteration <- t(iteration)
+  nodes <- as.character(iteration[,1])
+  nodes <- nodes[nodes != '']
+  if(length(nodes) > 1 & length(nodes) < 20 & nodes[1] == nodes[length(nodes)])
   {
-    iteration <- solutions[solution,]
-    iteration <- t(iteration)
-    nodes <- as.character(iteration[,1])
-    nodes <- nodes[nodes != '']
-    if(length(nodes) > 1 & length(nodes) < 20 & nodes[1] == nodes[length(nodes)])
-    {
-      circular_sequences <- rbind(circular_sequences, c(nodes[1],nodes[length(nodes)]))
-    }
+    circular_sequences <- rbind(circular_sequences, c(nodes[1],nodes[length(nodes)]))
   }
+}
 
-  if(is.null(circular_sequences) == TRUE)
+if(is.null(circular_sequences) == FALSE)
+{
+  
+}
+
+no_duplicated <- circular_sequences[!duplicated(circular_sequences),]
+for(combination in 1:nrow(no_duplicated))
+{
+  combi <- no_duplicated[combination,]
+  total_ocurrences <- subset(circular_sequences, circular_sequences[,2] == combi[2])
+  if(nrow(total_ocurrences) == number_iterations)
   {
-    df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
+    df_test <- data.frame(Starting_node = combi[1],
+                          Connecting_node = combi[2],
+                          weight = nrow(total_ocurrences))
+    
+    total_pairs <- rbind(total_pairs, df_test)
   }
-  if(is.null(circular_sequences) == FALSE)
-  {
-    circular_sequences <- data.frame(from = circular_sequences[,1], to = circular_sequences[,2])
-    circular_sequences <- circular_sequences[! duplicated(circular_sequences),]
-    df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
-    df_graph <- rbind(df_graph, circular_sequences)
-  }
+  
+}
 
-# Removing directionality from the graph 
+total_pairs$Starting_node <- gsub(pattern = '\\+', replacement = '', x = total_pairs$Starting_node)
+total_pairs$Starting_node <- gsub(pattern = '\\-', replacement = '', x = total_pairs$Starting_node)
 
-df_graph$from <- gsub(pattern = '\\+',replacement = '', df_graph$from)
-df_graph$from <- gsub(pattern = '\\-',replacement = '', df_graph$from)
-df_graph$to <- gsub(pattern = '\\+',replacement = '', df_graph$to)
-df_graph$to <- gsub(pattern = '\\-',replacement = '', df_graph$to)
+total_pairs$Connecting_node <- gsub(pattern = '\\+', replacement = '', x = total_pairs$Connecting_node)
+total_pairs$Connecting_node <- gsub(pattern = '\\-', replacement = '', x = total_pairs$Connecting_node)
 
 
-hairball <- graph_from_data_frame(df_graph)
+graph_pairs <- graph_from_data_frame(total_pairs, directed = FALSE)
 
-V(hairball)$name <- names(as.table(V(hairball)))
+#E(graph_pairs)$width <- E(graph_pairs)$weight
 
-graph_viz <- ggraph(hairball, layout = 'nicely') + 
+V(graph_pairs)$name <- names(as.table(V(graph_pairs)))
+
+graph_viz <- ggraph(graph_pairs, layout = 'nicely') + 
   geom_edge_link() +
   geom_node_point(size = 1.0) +
   geom_node_text(aes(label = name), size = 7.0) +
   geom_edge_loop()
 
+#mcl_input <- as_adj(graph_pairs,attr="weight")
+
+mcl_input <- as_adj(graph_pairs)
+
+
+results_mcl <- mcl(x = mcl_input, addLoops = FALSE, allow1 = TRUE)
+
+results_subgraph <- data.frame(number = rownames(mcl_input),
+                               Component = results_mcl$Cluster)
+
+
 suppressMessages(ggsave(filename = snakemake@output[["plot_graph"]], plot = graph_viz))
 
-# Retrieving the clustering of the contigs into different components 
 
-results_subgraph <- data.frame(number = labels(components(hairball)$membership),
-                               Component = as.numeric(as.character(components(hairball)$membership)))
 
-results_subgraph <- rbind(results_subgraph, results_subgraph[which(results_subgraph$number %in% circular_sequences[,1]),])
+
+ 
+   # if(is.null(circular_sequences) == TRUE)
+   # {
+   #   df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
+   # }
+   # if(is.null(circular_sequences) == FALSE)
+   # {
+   #   circular_sequences <- data.frame(from = circular_sequences[,1], to = circular_sequences[,2])
+   #   circular_sequences <- circular_sequences[! duplicated(circular_sequences),]
+   #   df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
+   #   df_graph <- rbind(df_graph, circular_sequences)
+#}
+
+
+
+
+
 
 pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
 
@@ -295,3 +260,8 @@ for(component in unique(df_nodes$Component))
 
 suppressWarnings(write.table(x = full_info_assigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
 suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
+
+
+
+
+

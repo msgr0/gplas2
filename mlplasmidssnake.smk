@@ -113,6 +113,7 @@ rule gplas_coocurr:
         results="results/{sample}_results.tab"
     params:
         threshold = config["threshold_prediction"],
+        iterations = config["number_iterations"],
         classifier = config["classifier"],
         sample = config["name"]
     conda:

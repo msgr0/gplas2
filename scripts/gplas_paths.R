@@ -349,8 +349,8 @@ for(seed in initialize_nodes)
   positive_seed <- paste(seed, '+', sep = '')
   negative_seed <- paste(seed, '-', sep = '')
   
-  plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 50, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
-  plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 50, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
+  plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
+  plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
 }  
 
 
