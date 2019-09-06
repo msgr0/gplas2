@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction 
 
-gplas is a tool to bin plasmid-predicted contigs using co-occurence networks. Gplas is a new implementation of mlplasmids which adds the possibility of accurately binning predicted plasmid contigs into several independent components. We rely on the structure of the assembly graph and k-mer information to create a new plasmidome network and predict plasmid contigs belonging to different genomic units.
+gplas is a tool to bin plasmid-predicted contigs using co-occurrence networks. Gplas builds on mlplasmids and adds the possibility of accurately binning predicted plasmid contigs into several independent components. It relies on the structure of the assembly graph and k-mer information to create a new plasmidome network and predict plasmid contigs belonging to different genomic units.
 
 ```{r, echo = FALSE}
 knitr::include_graphics("figures/logo.png")
@@ -27,13 +27,14 @@ cd gplas
 ./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
 
-First-time installation can take some time depending on your internet speed (~20 minutes). 
+First-time installation can take some time depending on your internet connection (~20 minutes).
 
-The good news are that you do not have to install any dependency so the snakemake pipeline and different conda environments integrate all the dependencies required to run gplas.  
+The good news is that you do not have to install any dependencies. The snakemake pipeline and different conda environments integrate all the
+dependencies required to run gplas.
 
-After the first-time installation, you will get the prediction of gplas in a few minutes and using a single thread! 
+After the first-time installation, you will get the prediction of gplas in a few minutes and using a single thread!
 
-Gplas first checks if the following tools are present in your system:
+Gplas first checks if the following tools are present on your system:
 
 1. [Conda](https://bioconda.github.io/) 
 
@@ -71,7 +72,7 @@ Following this, it will install the tools that we use to predict plasmid-derived
 
 ### Running gplas with an assembly graph 
 
-Gplas only requires a single argument **'-i'** corresponding to an assembly graph in gfa format. You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument **'-c'**
+Gplas only requires a single argument ‘-i’ corresponding to an assembly graph in gfa format. Such an assembly graph can be obtained with [SPAdes genome assembler](https://github.com/ablab/spades) or [Unicycler genome assembler](https://github.com/rrwick/Unicycler) among other assemblers. You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument ‘-c’
 
 If you choose mlplasmids for the prediction, there is an additional mandatory argument **'-s'** in which you need to list any of the following three bacterial species:
 
@@ -96,7 +97,7 @@ ls results/usingmlplasmids*
 
 ### results/*results.tab 
 
-Tab delimited file containing the prediction given by mlplasmids or plasflow together with the bin prediction assigned by gplas. The file contains the following information: contig number, probability of being chromosome-derived, probability of being plasmid-derived,  class prediction, contig name, k-mer coverage, length, component assigned. 
+Tab delimited file containing the prediction given by mlplasmids or plasflow together with the bin prediction assigned by gplas. The file contains the following information: contig number, probability of being chromosome-derived, probability of being plasmid-derived, class prediction, contig name, k-mer coverage, length, component assigned.
 
 ```{r, echo = FALSE}
 results <- read.table(file = 'results/usingmlplasmids_results.tab', header = TRUE)
@@ -133,7 +134,7 @@ grep '>' results/usingmlplasmids*.fasta
 
 gplas generates plasmid-like paths per each plasmid starting node. These paths are used later on to construct the co-occurrence networks but they can also be useful to observe all the different paths starting from a single node. These paths can be directly given to Bandage to visualize and manually inspect a path. 
 
-In this case, we find different possible plasmid paths starting from the node 18+. These paths may contain inversions and rearrangements since repeats units such as transposases can be present several times in the same plasmid sequence. In these cases, gplas can traverse the sequence in different ways generating different plasmid-like paths. 
+In this case, we find different possible plasmid paths starting from the node 18+. These paths may contain inversions and rearrangements since repeats units such as transposases can be present several times in the same plasmid sequence. In these cases, gplas can traverse the sequence in different ways generating different plasmid-like paths.
 
 ```{bash}
 head -n 10 paths/usingmlplasmids_solutions.csv
@@ -166,7 +167,7 @@ Optional arguments:
 - **-x**: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite. Default: 20
 - **-f**: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
 
-For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
+For benchmarking purposes you can pass a complete genome to gplas and gplas will generate precision and completeness values. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long reads.
 
 - **-r**: Path to the complete reference genome corresponding to the graph given. Fasta file format
 
@@ -179,5 +180,5 @@ For benchmarking purposes you can pass a complete genome to gplas and will gener
 
 # Issues/Bugs 
 
-You can report any issues or bugs that you find while installing/running gplas using the issue tracker
+You can report any issues or bugs that you find while installing/running gplas using the [issue tracker](https://gitlab.com/sirarredondo/gplas/issues)
 
