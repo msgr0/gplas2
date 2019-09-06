@@ -78,14 +78,14 @@ done
 if [ -z "$input" ];
 then
     ./gplas.sh -h
-    echo -e "\n Error: Ups, it seems that you are missing the input graph.\n"
+    echo -e "\n Error: Oops, it seems that you are missing the input graph.\n"
     exit
 fi
 
 if [ -z "$classifier" ];
 then
     ./gplas.sh -h
-    echo -e "\n Error: Ups, it seems that you are missing the classifier that you want to use.\n"
+    echo -e "\n Error: Oops, it seems that you are missing the classifier that you want to use.\n"
     exit
 fi
 
@@ -94,7 +94,7 @@ then
   if [ "$classifier" != "mlplasmids" ];
   then
     ./gplas.sh -h
-    echo -e "\n Error: Ups, it seems that you have given a classifier not listed in gplas\n"
+    echo -e "\n Error: Oops, it seems that you have given a classifier not listed in gplas\n"
     exit
   fi
 fi
@@ -106,7 +106,7 @@ then
   if [ -z "$species" ];
   then
       ./gplas.sh -h
-      echo -e "\n Error: You have specified mlplasmids as classifier you have not indicidate one of the following three bacterial species:
+      echo -e "\n Error: You have specified mlplasmids as classifier but you have not indicated one of the following three bacterial species:
       \t'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'\n"
       exit
   fi
@@ -119,7 +119,7 @@ then
   if [ -z "$species" ];
    then
     ./gplas.sh -h
-    echo -e "\n Error: Remember to indicate one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'.\n"
+    echo -e "\n Error: Please indicate one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'.\n"
     exit
    fi
 fi
@@ -136,7 +136,7 @@ echo -e "This is your input graph:" $input "\n"
 
 if [ -z "$species" ];
 then
-    echo -e "You have not indicated the bacterial species that you are using in the graph\n"
+    echo -e "You did not indicate the bacterial species that you are using in the graph\n"
     species="unknown"
 else
   echo -e "This is the bacterial species that you have indicated:" $species "\n"
@@ -145,24 +145,24 @@ fi
 
 if [ -z "$name" ];
 then
-    echo -e "You have not passed an output name. Your results will be named as 'unnamed''\n"
+    echo -e "You did not pass an output name. Your results will be named as 'unnamed''\n"
     name="unnamed"
 else
-  echo -e "Your results will be named using" $name "\n"
+  echo -e "Your results will be named " $name "\n"
 fi
 
 if [ -z "$threshold_prediction" ];
 then
   if [ "$classifier" == "plasflow" ];
   then
-    echo -e "You have not indicated a threshold prediction. Using 0.7 since you are using plasflow\n"
+    echo -e "You did not indicate a threshold prediction. Using 0.7 because you are using plasflow\n"
     threshold_prediction=0.7
   else
-    echo -e "You have not indicated a threshold prediction. Using 0.5 since you are using mlplasmids\n"
+    echo -e "You did not indicate a threshold prediction. Using 0.5 because you are using mlplasmids\n"
     threshold_prediction=0.5
   fi
 else
-  echo -e "You have indicated a threshold prediction of:" $threshold_prediction "\n"
+  echo -e "You indicated a threshold prediction of:" $threshold_prediction "\n"
 fi
 
 if [ -z "$filt_gplas" ];
@@ -174,10 +174,10 @@ fi
 
 if [ -z "$number_iterations" ];
 then
-    echo -e "You have not passed the number of times to look for paths based on each plasmid seed, using 20 as default\n"
+    echo -e "You did not pass the number of times to look for paths based on each plasmid seed, using 20 as default\n"
     number_iterations=20
 else
-  echo -e "You have indicated a number of iterations of:" $number_iterations "\n"
+  echo -e "You indicated a number of iterations of:" $number_iterations "\n"
 fi
 
 if [ -z "$reference" ];
@@ -205,7 +205,7 @@ sleep 10s
 if command -v conda > /dev/null; then
  echo  -e 'Conda is present\n'
 else
-  echo -e "We need conda to run gplas.\n Installing conda"
+  echo -e "Conda is needed to run gplas.\n Installing conda"
   initial_path=$PWD
   cd /tmp
   curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -259,8 +259,8 @@ then
   echo -e "Threshold of gplas scores: $filt_gplas\n"
   echo -e "\n"
 
-  echo -e "Your results are present at results/ and path/\n"
-  echo -e "We hope it helps in your research, thanks for using gplas\n"
+  echo -e "Your results are in results/ and path/\n"
+  echo -e "We hope it helps your research, thanks for using gplas!\n"
   echo -e "If you have used plasflow as a classifier please cite:
   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321"
   echo -e "\n"
@@ -270,5 +270,5 @@ then
 
   echo -e "Preprint of gplas coming soon, hasta la vista!"
 else
-  echo -e "Seems like something went wrong!"
+  echo -e "Looks like something went wrong!"
 fi
