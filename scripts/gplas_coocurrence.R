@@ -84,10 +84,7 @@ co_ocurrence <- apply(co_ocurrence, 2, as.integer)
 
 starting_nodes <- subset(unique_nodes, unique_nodes %in% unique(solutions[,1]))
 
-
-# Test
-
-number_iterations <- as.numeric(iterations) ########## This should be passed by snakemake
+number_iterations <- as.numeric(iterations)
 
 count_left <- 1
 
@@ -97,11 +94,7 @@ total_pairs <- NULL
 
 for(iteration in 1:length(starting_nodes))
 {
-  
-  print(count_left)
-  print(count_right)
 
-  
   node_sol <- co_ocurrence[c(count_left:count_right),]
   sumatory <- colSums(node_sol)
   df_test <- data.frame(Starting_node = solutions[count_left,1], 
@@ -187,26 +180,6 @@ results_subgraph <- data.frame(number = rownames(mcl_input),
 
 
 suppressMessages(ggsave(filename = snakemake@output[["plot_graph"]], plot = graph_viz))
-
-
-
-
- 
-   # if(is.null(circular_sequences) == TRUE)
-   # {
-   #   df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
-   # }
-   # if(is.null(circular_sequences) == FALSE)
-   # {
-   #   circular_sequences <- data.frame(from = circular_sequences[,1], to = circular_sequences[,2])
-   #   circular_sequences <- circular_sequences[! duplicated(circular_sequences),]
-   #   df_graph <- data.frame(from = significant_associations$sp1_name, to = significant_associations$sp2_name)
-   #   df_graph <- rbind(df_graph, circular_sequences)
-#}
-
-
-
-
 
 
 pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
