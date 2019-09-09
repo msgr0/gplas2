@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction 
 
-gplas is a tool to bin plasmid-predicted contigs using co-occurence networks. Gplas is a new implementation of mlplasmids which adds the possibility of accurately binning predicted plasmid contigs into several independent components. We rely on the structure of the assembly graph and k-mer information to create a new plasmidome network and predict plasmid contigs belonging to different genomic units.
+gplas is a tool to bin plasmid-predicted contigs based on sequence composition, coverage and assembly graph information. Gplas is a new tool that extends the possibility of accurately binning predicted plasmid contigs into several discrete plasmid components. 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("figures/logo.png")
@@ -54,7 +54,7 @@ After this, gplas will start the snakemake pipeline and will install different c
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [spatstat](https://cran.r-project.org/web/packages/spatstat/index.html) version 1.59-0
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [cooccur](https://cran.r-project.org/web/packages/cooccur/index.html) version 1.3
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [mcl](https://cran.r-project.org/web/packages/MCL/index.html) version 1.0
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html) version 0.8.0 
 

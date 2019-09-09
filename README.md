@@ -3,12 +3,10 @@ gplas: binning plasmid-predicted contigs
 
 # Introduction
 
-gplas is a tool to bin plasmid-predicted contigs using co-occurrence
-networks. Gplas builds on mlplasmids and adds the
-possibility of accurately binning predicted plasmid contigs into several
-independent components. It relies on the structure of the assembly graph
-and k-mer information to create a new plasmidome network and predict
-plasmid contigs belonging to different genomic units.
+gplas is a tool to bin plasmid-predicted contigs based on sequence
+composition, coverage and assembly graph information. Gplas is a new
+tool that extends the possibility of accurately binning predicted
+plasmid contigs into several discrete plasmid components.
 
 ![](figures/logo.png)<!-- -->
 
@@ -21,7 +19,7 @@ cd gplas
 ```
 
 First-time installation can take some time depending on your internet
-connection (~20 minutes).
+speed (~20 minutes).
 
 The good news is that you do not have to install any dependencies. The
 snakemake pipeline and different conda environments integrate all the
@@ -62,9 +60,8 @@ version 3.4-5
 [spatstat](https://cran.r-project.org/web/packages/spatstat/index.html)
 version 1.59-0
 
-      
-[cooccur](https://cran.r-project.org/web/packages/cooccur/index.html)
-version 1.3
+       [mcl](https://cran.r-project.org/web/packages/MCL/index.html)
+version 1.0
 
       
 [ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html)
@@ -85,8 +82,10 @@ plasmid-derived contigs.
 ### Running gplas with an assembly graph
 
 Gplas only requires a single argument **‘-i’** corresponding to an
-assembly graph in gfa format. Such an assembly graph can be obtained with [SPAdes genome assembler](https://github.com/ablab/spades).
-You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument **‘-c’**
+assembly graph in gfa format. Such an assembly graph can be obtained
+with [SPAdes genome assembler](https://github.com/ablab/spades). You
+need to specify which classifier gplas is going to use, mlplasmids or
+plasflow, with the argument **‘-c’**
 
 If you choose mlplasmids for the prediction, there is an additional
 mandatory argument **‘-s’** in which you need to list any of the
@@ -96,7 +95,7 @@ following three bacterial species:
   - ‘Klebsiella pneumoniae’
   - ‘Escherichia coli’
 
-You can use plasflow as a classifier if you want to predict for a different bacterial
+You can use plasflow as a classifier if you have a different bacterial
 species.
 
 ``` bash
@@ -120,11 +119,11 @@ species.
     ## 
     ## This is the bacterial species that you have indicated: Enterococcus faecium 
     ## 
-    ## Your results will be named using usingmlplasmids 
+    ## Your results will be named  usingmlplasmids 
     ## 
-    ## You have not indicated a threshold prediction. Using 0.5 since you are using mlplasmids
+    ## You did not indicate a threshold prediction. Using 0.5 because you are using mlplasmids
     ## 
-    ## You have not passed the number of times to look for paths based on each plasmid seed, using 20 as default
+    ## You did not pass the number of times to look for paths based on each plasmid seed, using 20 as default
     ## 
     ## ##################################################################
     ## Conda is present
@@ -148,60 +147,64 @@ species.
     ##  1   mlplasmids
     ##  6
     ## 
-    ## [Tue Aug 27 11:29:12 2019]
-    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
-    ## [Tue Aug 27 11:29:16 2019]
-    ## Finished job 5.
-    ## 1 of 6 steps (17%) done
-    ## 
-    ## [Tue Aug 27 11:29:16 2019]
+    ## [Mon Sep  9 17:04:09 2019]
     ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
     ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
-    ## [Tue Aug 27 11:29:18 2019]
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
+    ## [Mon Sep  9 17:04:14 2019]
     ## Finished job 1.
+    ## 1 of 6 steps (17%) done
+    ## 
+    ## [Mon Sep  9 17:04:14 2019]
+    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
+    ## [Mon Sep  9 17:04:16 2019]
+    ## Finished job 5.
     ## 2 of 6 steps (33%) done
     ## 
-    ## [Tue Aug 27 11:29:18 2019]
+    ## [Mon Sep  9 17:04:16 2019]
     ## Job 3: Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes
     ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
-    ## [Tue Aug 27 11:29:38 2019]
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
+    ## [Mon Sep  9 17:04:31 2019]
     ## Finished job 3.
     ## 3 of 6 steps (50%) done
     ## 
-    ## [Tue Aug 27 11:29:38 2019]
+    ## [Mon Sep  9 17:04:31 2019]
     ## Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Tue Aug 27 11:29:49 2019]
+    ## [Mon Sep  9 17:04:42 2019]
     ## Finished job 2.
     ## 4 of 6 steps (67%) done
     ## 
-    ## [Tue Aug 27 11:29:49 2019]
+    ## [Mon Sep  9 17:04:42 2019]
     ## Job 4: Searching for plasmid-like paths using a greedy approach
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Tue Aug 27 11:30:27 2019]
+    ## [Mon Sep  9 17:05:47 2019]
     ## Finished job 4.
     ## 5 of 6 steps (83%) done
     ## 
-    ## [Tue Aug 27 11:30:27 2019]
+    ## [Mon Sep  9 17:05:47 2019]
     ## Job 0: Creating a co-occurrence network and selecting significant associations between nodes.
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/053333da
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Tue Aug 27 11:30:44 2019]
+    ## NULL
+    ## Warning message:
+    ## In mapply(FUN = f, ..., SIMPLIFY = FALSE) :
+    ##   longer argument not a multiple of length of shorter
+    ## [Mon Sep  9 17:06:07 2019]
     ## Finished job 0.
     ## 6 of 6 steps (100%) done
-    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-08-27T112912.773651.snakemake.log
+    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-09-09T170409.852530.snakemake.log
     ##   _______ .______    __           ___           _______.
     ##  /  _____||   _  \  |  |         /   \         /       |
     ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
@@ -226,9 +229,9 @@ species.
     ## 
     ## 
     ## 
-    ## Your results are at results/ and path/
+    ## Your results are in results/ and path/
     ## 
-    ## We hope it helps  your research, thanks for using gplas!
+    ## We hope it helps your research, thanks for using gplas!
     ## 
     ## If you have used plasflow as a classifier please cite:
     ##   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
@@ -256,8 +259,8 @@ ls results/usingmlplasmids*
 ### results/\*results.tab
 
 Tab delimited file containing the prediction given by mlplasmids or
-plasflow together with the bin prediction assigned by gplas. The file
-contains the following information: contig number, probability of being
+plasflow together with the bin prediction by gplas. The file contains
+the following information: contig number, probability of being
 chromosome-derived, probability of being plasmid-derived, class
 prediction, contig name, k-mer coverage, length, component
 assigned.
@@ -283,15 +286,15 @@ the following information: contig number, component assignation
 | number | Component |
 | -----: | --------: |
 |     18 |         1 |
-|     33 |         1 |
-|     47 |         1 |
 |     31 |         1 |
-|     60 |         1 |
+|     33 |         1 |
+|     46 |         1 |
+|     47 |         1 |
 |     50 |         1 |
 |     52 |         1 |
-|     57 |         1 |
 |     54 |         1 |
-|     46 |         1 |
+|     57 |         1 |
+|     60 |         1 |
 
 ### results/\*plasmidome\_network.png
 
@@ -323,16 +326,16 @@ grep '>' results/usingmlplasmids*.fasta
 ### paths/\*solutions.csv
 
 gplas generates plasmid-like paths per each plasmid starting node. These
-paths are used later on to construct the co-occurrence networks but they
+paths are used later to construct the co-occurrence networks but they
 can also be useful to observe all the different paths starting from a
 single node. These paths can be directly given to Bandage to visualize
 and manually inspect a path.
 
 In this case, we find different possible plasmid paths starting from the
-node 18+. These paths may contain inversions and rearrangements since
-repeats units such as transposases can be present several times in the
-same plasmid sequence. In these cases, gplas can traverse the sequence
-in different ways generating different plasmid-like
+node 18+. T hese paths may contain inversions and rearrangements since
+repeats units such as transposases which can be present several times in
+the same plasmid sequence. In these cases, gplas can traverse the
+sequence in different ways generating different plasmid-like
     paths.
 
 ``` bash
@@ -385,10 +388,10 @@ Optional arguments:
   - **-f**: Gplas filtering threshold score to reject possible outcoming
     edges. Integer value ranging from 0 to 1. Default: 0.1
 
-For benchmarking purposes you can pass a complete genome to gplas and gplas
-will generate precision and completeness values. Using this you can assess
+For benchmarking purposes you can pass a complete genome to gplas and
+will generate a precision and completeness. Using this you can assess
 the performance of gplas on a small set of genomes in which perhaps you
-have generated long reads.
+have generated long-reads.
 
   - **-r**: Path to the complete reference genome corresponding to the
     graph given. Fasta file format
@@ -441,4 +444,5 @@ have generated long reads.
 # Issues/Bugs
 
 You can report any issues or bugs that you find while installing/running
-gplas using the [issue tracker](https://gitlab.com/sirarredondo/gplas/issues)
+gplas using the [issue
+tracker](https://gitlab.com/sirarredondo/gplas/issues)
