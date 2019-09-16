@@ -13,22 +13,42 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 path_prediction <- snakemake@input[["prediction"]]
 
-
 raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
-
 raw_contig_names <- names(raw_nodes)
+
+# Checking if the assembly was generated using Velvet or SPAdes
+
+kc_check <- grep(pattern = 'KC', x = raw_contig_names)
+
+if(length(kc_check) == length(raw_contig_names))
+{
+  length <- as.numeric(nchar(as.character(paste(raw_nodes))))
+  kc_count <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
+  kc_count <- as.numeric(gsub(pattern = '_', replacement = '', x = kc_count))
+  kc_coverage <- kc_count/length
+  coverage <- kc_coverage/median(kc_coverage)
+}
+
 
 raw_number <- str_split_fixed(string = raw_contig_names, pattern = '_', n = 2)[,1]
 number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
-raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
-length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
+# Checking if the assembly was generated using Unicycler 
 
-coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
+if(length(kc_check) != length(raw_contig_names))
+{
+  raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
+  length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
+  coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
+  
+}
+
+
 
 contig_info <- data.frame(number = number,
                           length = length,
-                          coverage = coverage)
+                          coverage = coverage,
+                          Contig_name = raw_contig_names)
 
 
 contig_info$length <- as.numeric(as.character(contig_info$length)) # Converting the column length into a numeric column
@@ -180,11 +200,16 @@ raw_number <- str_split_fixed(string = clean_pred$Contig_name, pattern = '_', n 
 clean_pred$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
 
-clean_pred$coverage <- str_split_fixed(string = clean_pred$Contig_name, pattern = ':', n = 5)[,5]
+#clean_pred$coverage <- str_split_fixed(string = clean_pred$Contig_name, pattern = ':', n = 5)[,5]
 
+#clean_pred$coverage <- as.numeric(as.character(clean_pred$coverage)) # Converting the column length into a numeric column 
+#clean_pred$length <- as.numeric(as.character(clean_pred$Contig_length)) # Converting the column coverage into a coverage column 
 
-clean_pred$coverage <- as.numeric(as.character(clean_pred$coverage)) # Converting the column length into a numeric column 
-clean_pred$length <- as.numeric(as.character(clean_pred$Contig_length)) # Converting the column coverage into a coverage column 
+clean_pred$length <- NULL
+clean_pred$coverage <- NULL
+clean_pred$number <- NULL
+
+clean_pred <- merge(clean_pred, contig_info, by = 'Contig_name')
 
 final_prediction <- clean_pred[! clean_pred$number %in% repeats$number,]
 
