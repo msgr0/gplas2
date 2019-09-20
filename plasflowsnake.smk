@@ -143,6 +143,7 @@ rule gplas_evaluation:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
 	    clean_links="coverage/{sample}_clean_links.tab",
         prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
+        reference="reference_genome/{sample}_ref_genome.fasta",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
