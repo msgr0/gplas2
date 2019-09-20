@@ -43,12 +43,12 @@ if(length(kc_check) != length(raw_contig_names))
   
 }
 
-
-
 contig_info <- data.frame(number = number,
                           length = length,
                           coverage = coverage,
                           Contig_name = raw_contig_names)
+
+
 
 
 contig_info$length <- as.numeric(as.character(contig_info$length)) # Converting the column length into a numeric column

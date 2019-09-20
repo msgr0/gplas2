@@ -14,6 +14,7 @@ suppressMessages(library(ggrepel))
 # Inputs
 
 path_nodes <- snakemake@input[["nodes"]]
+path_reference <- snakemake@input[["reference"]]
 path_links <- snakemake@input[["clean_links"]]
 path_prediction <- snakemake@input[["clean_prediction"]]
 path_graph_contigs <- snakemake@input[["graph_contigs"]]
@@ -44,7 +45,6 @@ initialize_nodes <- initialize_nodes[,1]
 
 clean_pred <- read.table(file = path_prediction, header = TRUE)
 
-
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
 max_variation <- as.numeric(max_variation[1,1])
 max_variation_small <- max_variation*5.0
@@ -53,38 +53,72 @@ raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
 
 raw_contig_names <- names(raw_nodes)
 
+
+# Checking if the assembly was generated using Velvet or SPAdes
+
+kc_check <- grep(pattern = 'KC', x = raw_contig_names)
+
+if(length(kc_check) == length(raw_contig_names))
+{
+  length <- as.numeric(nchar(as.character(paste(raw_nodes))))
+  kc_count <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
+  kc_count <- as.numeric(gsub(pattern = '_', replacement = '', x = kc_count))
+  kc_coverage <- kc_count/length
+  coverage <- kc_coverage/median(kc_coverage)
+}
+
+
 raw_number <- str_split_fixed(string = raw_contig_names, pattern = '_', n = 2)[,1]
 number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
-raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
-length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
+# Checking if the assembly was generated using Unicycler 
 
-coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
-
+if(length(kc_check) != length(raw_contig_names))
+{
+  raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
+  length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
+  coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
+  
+}
 
 contig_info <- data.frame(number = number,
+                          Contig_length = length,
                           length = length,
-                          coverage = coverage)
+                          coverage = coverage,
+                          Contig_name = raw_contig_names)
 
 
-contig_info$length <- as.numeric(as.character(contig_info$length)) # Converting the column length into a numeric column
+contig_info$length <- as.numeric(as.character(contig_info$length))
+contig_info$Contig_length <- as.numeric(as.character(contig_info$Contig_length)) # Converting the column length into a numeric column
 contig_info$coverage <- as.numeric(as.character(contig_info$coverage)) # Converting the column coverage into a coverage column
 
 
 alignment_quast <- read.table(file = path_alignments, sep = ' ', header = TRUE)
 
-alignment_quast$Reference_number <- str_split_fixed(alignment_quast$Reference, "_", 6)[,1] # Extracting the reference of the number
-alignment_quast$Reference_length <- as.numeric(str_split_fixed(alignment_quast$Reference, "_", 6)[,3]) # Extracting the length of the reference genome
+raw_complete_genome <- readDNAStringSet(filepath = path_reference, format="fasta")
+raw_names_complete_genome <- names(raw_complete_genome)
+length_complete_genomes <- as.numeric(nchar(as.character(paste(raw_complete_genome))))
 
+info_complete_genomes <- data.frame(Reference = raw_names_complete_genome,
+                                    Reference_length = length_complete_genomes)
+
+info_complete_genomes$Reference_number <- c(1:nrow(info_complete_genomes))
+
+info_complete_genomes$Reference <- gsub(pattern = '\\|', replacement = '_', x = info_complete_genomes$Reference)
+info_complete_genomes$Reference <- gsub(pattern = '=', replacement = '_', x = info_complete_genomes$Reference)
+
+info_complete_genomes$Reference <- gsub(pattern = ' ', replacement = '_', x = info_complete_genomes$Reference)
+
+alignment_quast <- merge(alignment_quast, info_complete_genomes, by = 'Reference')
+alignment_quast$Contig_name <- alignment_quast$Contig
 alignment_quast$Contig_number <- str_split_fixed(alignment_quast$Contig, "_", 6)[,1] # Extracting the contig number
 alignment_quast$Contig_number <- gsub(pattern = 'S', replacement = '', x = alignment_quast$Contig_number)
 
-alignment_quast$Contig_length <- as.numeric(str_split_fixed(alignment_quast$Contig, "_", 6)[,4]) # Extracting the contig number
+contig_info$Contig_number <- contig_info$number
 
+alignment_quast <- merge(alignment_quast, contig_info, by = 'Contig_number')
 alignment_quast$Type <- ifelse(alignment_quast$Reference_length > 4e5, 'Chromosome','Plasmid')
 alignment_quast$Type <- paste(alignment_quast$Type,alignment_quast$Reference_number, sep = '')
-
-colnames(alignment_quast)[2] <- 'Contig_name'
 
 # Remove duplicates present in the alignment (e.g. based on the fact that plasmids are circular)
 
@@ -101,10 +135,11 @@ gold_standard <- gold_standard %>%
   mutate(sum(Contig_length),
          count = n())
 
-colnames(gold_standard)[c(8,9)] <- c('Reference_sum_bp','Reference_sum_contigs')
+colnames(gold_standard)[c(13,14)] <- c('Reference_sum_bp','Reference_sum_contigs')
 evaluation_ref_genomes <- gold_standard
 
 # Dataframe with all the stats regarding the reference genomes (Number of contigs and number of base-pairs)
+
 stats_gold_standard <- gold_standard %>% 
   group_by(Type) %>%
   summarise(sum(Contig_length),
@@ -144,7 +179,7 @@ colnames(results_subgraph) <- c('Contig_number','Component')
 
 results <- merge(results_subgraph, gold_standard, by = 'Contig_number')
 
-colnames(results)[c(9,10)] <- c('Reference_sum_bp','Reference_sum_contigs')
+#colnames(results)[c(9,10)] <- c('Reference_sum_bp','Reference_sum_contigs')
 
 singletons <- initialize_nodes[! initialize_nodes %in% results_subgraph$Contig_number]
 
@@ -198,7 +233,6 @@ for(component in unique(reference_component$Component))
     chr_contigs <- 0
     chr_bp <- 0
   }
-  
   if(component == 'No_component')
   {
     completeness_info <- data.frame(sample = sample,
@@ -224,7 +258,8 @@ for(component in unique(reference_component$Component))
                                     chr_contigs = 0,
                                     chr_bp = 0)
   }
-  else
+  
+  if(component != 'No_component')
   {
     
     count_truth <- subset(contigs_reference_genome$Reference_sum_contigs, contigs_reference_genome$Type == comp_info$Type)
@@ -262,9 +297,7 @@ for(component in unique(reference_component$Component))
                                     chr_bp = chr_bp)
     
   }
-  completeness_df <- rbind(completeness_df, completeness_info)
-  
-
+  suppressWarnings(completeness_df <- rbind(completeness_df, completeness_info))
 }
 
 write.table(x = completeness_df, 
@@ -404,7 +437,6 @@ for(component in unique(purity_components$Pair_contig_component))
   
   precision_components <- rbind(precision_components, record_results)
   
-  
 }
 
 write.table(x = precision_components, 
@@ -413,3 +445,4 @@ write.table(x = precision_components,
             row.names = FALSE, 
             quote = FALSE, 
             col.names = FALSE)
+
