@@ -174,7 +174,8 @@ Optional arguments:
 
 For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
 
-- **-r**: Path to the complete reference genome corresponding to the graph given. Fasta file format
+- **-r**: Path to the complete reference genome corresponding to the graph given. For optimal results using this benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000' for your chromosome and plasmids. Fasta file format
+Fasta file format
 
 # Help page 
 

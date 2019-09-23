@@ -147,51 +147,51 @@ species.
     ##  1   mlplasmids
     ##  6
     ## 
-    ## [Mon Sep  9 17:04:09 2019]
-    ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep  9 17:04:14 2019]
-    ## Finished job 1.
-    ## 1 of 6 steps (17%) done
-    ## 
-    ## [Mon Sep  9 17:04:14 2019]
+    ## [Mon Sep 23 08:54:07 2019]
     ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
     ## 
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep  9 17:04:16 2019]
+    ## [Mon Sep 23 08:54:11 2019]
     ## Finished job 5.
+    ## 1 of 6 steps (17%) done
+    ## 
+    ## [Mon Sep 23 08:54:11 2019]
+    ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
+    ## [Mon Sep 23 08:54:14 2019]
+    ## Finished job 1.
     ## 2 of 6 steps (33%) done
     ## 
-    ## [Mon Sep  9 17:04:16 2019]
+    ## [Mon Sep 23 08:54:14 2019]
     ## Job 3: Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes
     ## 
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep  9 17:04:31 2019]
+    ## [Mon Sep 23 08:54:29 2019]
     ## Finished job 3.
     ## 3 of 6 steps (50%) done
     ## 
-    ## [Mon Sep  9 17:04:31 2019]
+    ## [Mon Sep 23 08:54:29 2019]
     ## Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Mon Sep  9 17:04:42 2019]
+    ## [Mon Sep 23 08:54:38 2019]
     ## Finished job 2.
     ## 4 of 6 steps (67%) done
     ## 
-    ## [Mon Sep  9 17:04:42 2019]
+    ## [Mon Sep 23 08:54:38 2019]
     ## Job 4: Searching for plasmid-like paths using a greedy approach
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Mon Sep  9 17:05:47 2019]
+    ## [Mon Sep 23 08:55:11 2019]
     ## Finished job 4.
     ## 5 of 6 steps (83%) done
     ## 
-    ## [Mon Sep  9 17:05:47 2019]
+    ## [Mon Sep 23 08:55:11 2019]
     ## Job 0: Creating a co-occurrence network and selecting significant associations between nodes.
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
@@ -201,10 +201,10 @@ species.
     ## Warning message:
     ## In mapply(FUN = f, ..., SIMPLIFY = FALSE) :
     ##   longer argument not a multiple of length of shorter
-    ## [Mon Sep  9 17:06:07 2019]
+    ## [Mon Sep 23 08:55:24 2019]
     ## Finished job 0.
     ## 6 of 6 steps (100%) done
-    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-09-09T170409.852530.snakemake.log
+    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-09-23T085407.732464.snakemake.log
     ##   _______ .______    __           ___           _______.
     ##  /  _____||   _  \  |  |         /   \         /       |
     ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
@@ -265,18 +265,18 @@ chromosome-derived, probability of being plasmid-derived, class
 prediction, contig name, k-mer coverage, length, component
 assigned.
 
-| number | Prob\_Chromosome | Prob\_Plasmid | Prediction | Contig\_name                             | coverage | length | Component |
-| -----: | ---------------: | ------------: | :--------- | :--------------------------------------- | -------: | -----: | --------: |
-|     18 |             0.01 |          0.99 | Plasmid    | S18\_LN:i:54155\_dp:f:1.0514645940835776 |     1.05 |  54155 |         1 |
-|     31 |             0.15 |          0.85 | Plasmid    | S31\_LN:i:21202\_dp:f:1.194722937126809  |     1.19 |  21202 |         1 |
-|     33 |             0.40 |          0.60 | Plasmid    | S33\_LN:i:18202\_dp:f:1.1628830074648842 |     1.16 |  18202 |         1 |
-|     46 |             0.03 |          0.97 | Plasmid    | S46\_LN:i:8487\_dp:f:1.2210058174026983  |     1.22 |   8487 |         1 |
-|     47 |             0.04 |          0.96 | Plasmid    | S47\_LN:i:8177\_dp:f:0.9996798934685464  |     1.00 |   8177 |         1 |
-|     50 |             0.02 |          0.98 | Plasmid    | S50\_LN:i:4993\_dp:f:1.1698997426343487  |     1.17 |   4993 |         1 |
-|     52 |             0.03 |          0.97 | Plasmid    | S52\_LN:i:4014\_dp:f:0.9783821389091624  |     0.98 |   4014 |         1 |
-|     54 |             0.08 |          0.92 | Plasmid    | S54\_LN:i:3077\_dp:f:1.1553028848000615  |     1.16 |   3077 |         1 |
-|     57 |             0.03 |          0.97 | Plasmid    | S57\_LN:i:2626\_dp:f:0.9929149754371588  |     0.99 |   2626 |         1 |
-|     60 |             0.00 |          1.00 | Plasmid    | S60\_LN:i:1589\_dp:f:1.0577429501871556  |     1.06 |   1589 |         1 |
+| number | Contig\_name                             | Prob\_Chromosome | Prob\_Plasmid | Prediction | length | coverage | Component |
+| -----: | :--------------------------------------- | ---------------: | ------------: | :--------- | -----: | -------: | --------: |
+|     18 | S18\_LN:i:54155\_dp:f:1.0514645940835776 |             0.01 |          0.99 | Plasmid    |  54155 |     1.05 |         1 |
+|     31 | S31\_LN:i:21202\_dp:f:1.194722937126809  |             0.15 |          0.85 | Plasmid    |  21202 |     1.19 |         1 |
+|     33 | S33\_LN:i:18202\_dp:f:1.1628830074648842 |             0.40 |          0.60 | Plasmid    |  18202 |     1.16 |         1 |
+|     46 | S46\_LN:i:8487\_dp:f:1.2210058174026983  |             0.03 |          0.97 | Plasmid    |   8487 |     1.22 |         1 |
+|     47 | S47\_LN:i:8177\_dp:f:0.9996798934685464  |             0.04 |          0.96 | Plasmid    |   8177 |     1.00 |         1 |
+|     50 | S50\_LN:i:4993\_dp:f:1.1698997426343487  |             0.02 |          0.98 | Plasmid    |   4993 |     1.17 |         1 |
+|     52 | S52\_LN:i:4014\_dp:f:0.9783821389091624  |             0.03 |          0.97 | Plasmid    |   4014 |     0.98 |         1 |
+|     54 | S54\_LN:i:3077\_dp:f:1.1553028848000615  |             0.08 |          0.92 | Plasmid    |   3077 |     1.16 |         1 |
+|     57 | S57\_LN:i:2626\_dp:f:0.9929149754371588  |             0.03 |          0.97 | Plasmid    |   2626 |     0.99 |         1 |
+|     60 | S60\_LN:i:1589\_dp:f:1.0577429501871556  |             0.00 |          1.00 | Plasmid    |   1589 |     1.06 |         1 |
 
 ### results/\*components.tab
 
@@ -394,7 +394,10 @@ the performance of gplas on a small set of genomes in which perhaps you
 have generated long-reads.
 
   - **-r**: Path to the complete reference genome corresponding to the
-    graph given. Fasta file format
+    graph given. For optimal results using this benchmarking flag,
+    please name the reference genomes using the Unicycler scheme: e.g.
+    ‘1 length=4123456’ ‘2 length=10000’ ‘3 length=2000’ for your
+    chromosome and plasmids. Fasta file format Fasta file format
 
 # Help page
 
@@ -439,7 +442,9 @@ have generated long-reads.
     ##                  Default: 0.1
     ## 
     ## Benchmarking purposes: 
-    ##       -r      Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format
+    ##       -r      Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
+    ##                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
+    ##                  for your chromosome and plasmids. Fasta file format
 
 # Issues/Bugs
 

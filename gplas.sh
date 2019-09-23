@@ -29,7 +29,9 @@ while getopts ":i:n:s:c:t:x:r:f:h" opt; do
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
-   echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. Fasta file format"
+   echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
+                 benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
+                 for your chromosome and plasmids. Fasta file format"
    exit
    ;;
    i)
