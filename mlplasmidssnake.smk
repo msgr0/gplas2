@@ -81,8 +81,8 @@ rule gplas_paths:
         clean_prediction="coverage/{sample}_clean_prediction.tab",
         initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     output:
-        solutions="paths/{sample}_solutions.csv",
-        connections="paths/{sample}_connections.tab"
+        solutions="walks/{sample}_solutions.csv",
+        connections="walks/{sample}_connections.tab"
     params:
         iterations = config["number_iterations"],
         classifier = config["classifier"],
@@ -91,7 +91,7 @@ rule gplas_paths:
         "envs/r_packages.yaml"
     threads: 1
     message:
-        "Searching for plasmid-like paths using a greedy approach"
+        "Searching for plasmid-like walks using a greedy approach"
 
     script:
         "scripts/gplas_paths.R"
@@ -106,7 +106,7 @@ rule gplas_coocurr:
         graph_repeats="coverage/{sample}_repeats_graph.tab",
         clean_prediction="coverage/{sample}_clean_prediction.tab",
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
-        solutions="paths/{sample}_solutions.csv"
+        solutions="walks/{sample}_solutions.csv"
     output:
         plot_graph="results/{sample}_plasmidome_network.png",
         components="results/{sample}_components.tab",
@@ -154,7 +154,7 @@ rule gplas_evaluation:
         clean_prediction="coverage/{sample}_clean_prediction.tab",
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
         alignments="evaluation/{sample}_alignment_test.txt",
-        solutions="paths/{sample}_solutions.csv",
+        solutions="walks/{sample}_solutions.csv",
         components="results/{sample}_components.tab"
     output:
         completeness="evaluation/{sample}_completeness.tab",

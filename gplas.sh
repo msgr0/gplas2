@@ -25,7 +25,7 @@ while getopts ":i:n:s:c:t:x:r:f:h" opt; do
    echo -e "Settings:\n \t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1.
                  Default mlplasmids threshold: 0.5
                  Default plasflow threshold: 0.7\n"
-   echo -e "\t -x \t Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
+   echo -e "\t -x \t Optional: Number of times gplas finds plasmid walks per each plasmid starting node. Integer value ranging from 1 to infinite.
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
@@ -176,7 +176,7 @@ fi
 
 if [ -z "$number_iterations" ];
 then
-    echo -e "You did not pass the number of times to look for paths based on each plasmid seed, using 20 as default\n"
+    echo -e "You did not pass the number of times to look for walks based on each plasmid seed, using 20 as default\n"
     number_iterations=20
 else
   echo -e "You indicated a number of iterations of:" $number_iterations "\n"
@@ -257,11 +257,11 @@ then
   echo -e "Bacterial species: " $species "\n"
   echo -e "Classifier:" $classifier "\n"
   echo -e "Threshold for predicting plasmid-derived contigs: $threshold_prediction\n"
-  echo -e "Number of plasmid paths created per node: $number_iterations\n"
+  echo -e "Number of plasmid walks created per node: $number_iterations\n"
   echo -e "Threshold of gplas scores: $filt_gplas\n"
   echo -e "\n"
 
-  echo -e "Your results are in results/ and path/\n"
+  echo -e "Your results are in results/ and walks/\n"
   echo -e "We hope it helps your research, thanks for using gplas!\n"
   echo -e "If you have used plasflow as a classifier please cite:
   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321"
