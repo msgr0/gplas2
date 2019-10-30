@@ -111,7 +111,8 @@ for(iteration in 1:length(starting_nodes))
 total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% starting_nodes)
 total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% starting_nodes)
 total_pairs <- subset(total_pairs, as.character(total_pairs$Connecting_node) != as.character(total_pairs$Starting_node))
-total_pairs <- subset(total_pairs, total_pairs$weight > 1)
+total_pairs$frequency <- total_pairs$weight/number_iterations
+total_pairs <- subset(total_pairs, total_pairs$frequency > 0.10)
 
 ## Looking back in the solutions if there are circular graphs
 
@@ -142,7 +143,8 @@ for(combination in 1:nrow(no_duplicated))
   {
     df_test <- data.frame(Starting_node = combi[1],
                           Connecting_node = combi[2],
-                          weight = nrow(total_ocurrences))
+                          weight = nrow(total_ocurrences),
+                          frequency = nrow(total_ocurrences)/number_iterations)
     
     total_pairs <- rbind(total_pairs, df_test)
   }
