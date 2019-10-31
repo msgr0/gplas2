@@ -175,7 +175,7 @@ graph_viz <- ggraph(graph_pairs, layout = 'nicely') +
 mcl_input <- as_adj(graph_pairs)
 
 
-results_mcl <- mcl(x = mcl_input, addLoops = FALSE, allow1 = TRUE)
+results_mcl <- mcl(x = mcl_input, addLoops = TRUE, allow1 = TRUE, ESM = TRUE)
 
 results_subgraph <- data.frame(number = rownames(mcl_input),
                                Component = results_mcl$Cluster)
