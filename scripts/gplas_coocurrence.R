@@ -27,6 +27,8 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 iterations <- snakemake@params[["iterations"]]
 
+edge_threshold <- as.numeric(as.character(snakemake@params[["edge_gplas"]]))
+
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
 
@@ -112,7 +114,7 @@ total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% starting_nodes
 total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% starting_nodes)
 total_pairs <- subset(total_pairs, as.character(total_pairs$Connecting_node) != as.character(total_pairs$Starting_node))
 total_pairs$frequency <- total_pairs$weight/number_iterations
-total_pairs <- subset(total_pairs, total_pairs$frequency > 0.10)
+total_pairs <- subset(total_pairs, total_pairs$frequency > edge_threshold)
 
 ## Looking back in the solutions if there are circular graphs
 

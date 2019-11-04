@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:c:t:x:r:f:h" opt; do
+while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
@@ -28,6 +28,8 @@ while getopts ":i:n:s:c:t:x:r:f:h" opt; do
    echo -e "\t -x \t Optional: Number of times gplas finds plasmid walks per each plasmid starting node. Integer value ranging from 1 to infinite.
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
+                 Default: 0.1\n"
+   echo -e "\t -e \t Optional: Minimum frequency of an edge to be considered in the plasmidome network. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
    echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
@@ -57,6 +59,9 @@ while getopts ":i:n:s:c:t:x:r:f:h" opt; do
      ;;
    f)
      filt_gplas=$OPTARG
+     ;;
+   e)
+     edge_gplas=$OPTARG
      ;;
    r)
      reference=$OPTARG
@@ -174,6 +179,15 @@ else
     echo -e "Using the following gplas filtering threshold score:" $filt_gplas "\n"
 fi
 
+if [ -z "$edge_gplas" ];
+then
+    edge_gplas=0.1
+else
+    echo -e "Using the following minimum frequency to select an edge:" $edge_gplas "\n"
+fi
+
+
+
 if [ -z "$number_iterations" ];
 then
     echo -e "You did not pass the number of times to look for walks based on each plasmid seed, using 20 as default\n"
@@ -259,6 +273,7 @@ then
   echo -e "Threshold for predicting plasmid-derived contigs: $threshold_prediction\n"
   echo -e "Number of plasmid walks created per node: $number_iterations\n"
   echo -e "Threshold of gplas scores: $filt_gplas\n"
+  echo -e "Minimum frequency to consider an edge: $edge_gplas\n"
   echo -e "\n"
 
   echo -e "Your results are in results/ and walks/\n"
