@@ -13,7 +13,7 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
-   echo -e "Welcome to the user guide of gplas:\n"
+   echo -e "Welcome to the user guide of gplas (version 0.5.0):\n"
    echo -e "Basic usage example: ./gplas.sh -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'\n"
    echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format\n"
    echo -e "Classifier:\n \t -c \t Mandatory: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'\n"
