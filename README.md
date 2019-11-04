@@ -123,7 +123,7 @@ species.
     ## 
     ## You did not indicate a threshold prediction. Using 0.5 because you are using mlplasmids
     ## 
-    ## You did not pass the number of times to look for paths based on each plasmid seed, using 20 as default
+    ## You did not pass the number of times to look for walks based on each plasmid seed, using 20 as default
     ## 
     ## ##################################################################
     ## Conda is present
@@ -147,51 +147,51 @@ species.
     ##  1   mlplasmids
     ##  6
     ## 
-    ## [Mon Sep 23 08:54:07 2019]
-    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep 23 08:54:11 2019]
-    ## Finished job 5.
-    ## 1 of 6 steps (17%) done
-    ## 
-    ## [Mon Sep 23 08:54:11 2019]
+    ## [Mon Nov  4 11:26:54 2019]
     ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
     ## 
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep 23 08:54:14 2019]
+    ## [Mon Nov  4 11:27:17 2019]
     ## Finished job 1.
+    ## 1 of 6 steps (17%) done
+    ## 
+    ## [Mon Nov  4 11:27:17 2019]
+    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
+    ## 
+    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
+    ## [Mon Nov  4 11:27:24 2019]
+    ## Finished job 5.
     ## 2 of 6 steps (33%) done
     ## 
-    ## [Mon Sep 23 08:54:14 2019]
+    ## [Mon Nov  4 11:27:24 2019]
     ## Job 3: Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes
     ## 
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Mon Sep 23 08:54:29 2019]
+    ## [Mon Nov  4 11:28:01 2019]
     ## Finished job 3.
     ## 3 of 6 steps (50%) done
     ## 
-    ## [Mon Sep 23 08:54:29 2019]
+    ## [Mon Nov  4 11:28:01 2019]
     ## Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Mon Sep 23 08:54:38 2019]
+    ## [Mon Nov  4 11:28:22 2019]
     ## Finished job 2.
     ## 4 of 6 steps (67%) done
     ## 
-    ## [Mon Sep 23 08:54:38 2019]
-    ## Job 4: Searching for plasmid-like paths using a greedy approach
+    ## [Mon Nov  4 11:28:22 2019]
+    ## Job 4: Searching for plasmid-like walks using a greedy approach
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
     ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
     ## WARNING: ignoring environment value of R_HOME
-    ## [Mon Sep 23 08:55:11 2019]
+    ## [Mon Nov  4 11:29:03 2019]
     ## Finished job 4.
     ## 5 of 6 steps (83%) done
     ## 
-    ## [Mon Sep 23 08:55:11 2019]
+    ## [Mon Nov  4 11:29:03 2019]
     ## Job 0: Creating a co-occurrence network and selecting significant associations between nodes.
     ## 
     ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
@@ -201,10 +201,10 @@ species.
     ## Warning message:
     ## In mapply(FUN = f, ..., SIMPLIFY = FALSE) :
     ##   longer argument not a multiple of length of shorter
-    ## [Mon Sep 23 08:55:24 2019]
+    ## [Mon Nov  4 11:29:23 2019]
     ## Finished job 0.
     ## 6 of 6 steps (100%) done
-    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-09-23T085407.732464.snakemake.log
+    ## Complete log: /home/sergi/gplas/.snakemake/log/2019-11-04T112654.225651.snakemake.log
     ##   _______ .______    __           ___           _______.
     ##  /  _____||   _  \  |  |         /   \         /       |
     ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
@@ -223,13 +223,15 @@ species.
     ## 
     ## Threshold for predicting plasmid-derived contigs: 0.5
     ## 
-    ## Number of plasmid paths created per node: 20
+    ## Number of plasmid walks created per node: 20
     ## 
     ## Threshold of gplas scores: 0.1
     ## 
+    ## Minimum frequency to consider an edge: 0.1
     ## 
     ## 
-    ## Your results are in results/ and path/
+    ## 
+    ## Your results are in results/ and walks/
     ## 
     ## We hope it helps your research, thanks for using gplas!
     ## 
@@ -323,7 +325,7 @@ grep '>' results/usingmlplasmids*.fasta
     ## >S57_LN:i:2626_dp:f:0.9929149754371588
     ## >S60_LN:i:1589_dp:f:1.0577429501871556
 
-### paths/\*solutions.csv
+### walks/\*solutions.csv
 
 gplas generates plasmid-like paths per each plasmid starting node. These
 paths are used later to construct the co-occurrence networks but they
@@ -339,7 +341,7 @@ sequence in different ways generating different plasmid-like
     paths.
 
 ``` bash
-head -n 10 paths/usingmlplasmids_solutions.csv
+head -n 10 walks/usingmlplasmids_solutions.csv
 ```
 
     ## 18+,76-,102+,33+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,116+,61-,88-,89+,69-,96-,119+,64-,116+,61-,88-,90+,69-,100+,119+,64-,116+,63+,115-,64+,119-,100-,69+
@@ -387,6 +389,8 @@ Optional arguments:
     starting node. Integer value ranging from 1 to infinite. Default: 20
   - **-f**: Gplas filtering threshold score to reject possible outcoming
     edges. Integer value ranging from 0 to 1. Default: 0.1
+  - **-e**: Minimum frequency of an edge to be considered in the
+    plasmidome network. Integer value ranging from 0 to 1. Default: 0.1
 
 For benchmarking purposes you can pass a complete genome to gplas and
 will generate a precision and completeness. Using this you can assess
@@ -435,10 +439,13 @@ have generated long-reads.
     ##                  Default mlplasmids threshold: 0.5
     ##                  Default plasflow threshold: 0.7
     ## 
-    ##   -x      Optional: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite.
+    ##   -x      Optional: Number of times gplas finds plasmid walks per each plasmid starting node. Integer value ranging from 1 to infinite.
     ##                  Default: 20
     ## 
     ##   -f      Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
+    ##                  Default: 0.1
+    ## 
+    ##   -e      Optional: Minimum frequency of an edge to be considered in the plasmidome network. Integer value ranging from 0 to 1.
     ##                  Default: 0.1
     ## 
     ## Benchmarking purposes: 

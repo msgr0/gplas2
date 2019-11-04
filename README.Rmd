@@ -132,7 +132,7 @@ Fasta files with the nodes belonging to each predicted component.
 grep '>' results/usingmlplasmids*.fasta
 ```
 
-### paths/*solutions.csv
+### walks/*solutions.csv
 
 gplas generates plasmid-like paths per each plasmid starting node. These paths are used later to construct the co-occurrence networks but they can also be useful to observe all the different paths starting from a single node. 
 These paths can be directly given to Bandage to visualize and manually inspect a path. 
@@ -142,7 +142,7 @@ hese paths may contain inversions and rearrangements since repeats units such as
 In these cases, gplas can traverse the sequence in different ways generating different plasmid-like paths. 
 
 ```{bash}
-head -n 10 paths/usingmlplasmids_solutions.csv
+head -n 10 walks/usingmlplasmids_solutions.csv
 ```
 
 For example, we can inspect in Bandage the path: 18+,76-,52+,94+,57-,77+,18+ 
@@ -171,6 +171,7 @@ Optional arguments:
 - **-t**: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. Default mlplasmids threshold: 0.5 Default plasflow threshold: 0.7
 - **-x**: Number of times gplas finds plasmid paths per each plasmid starting node. Integer value ranging from 1 to infinite. Default: 20
 - **-f**: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1. Default: 0.1
+- **-e**: Minimum frequency of an edge to be considered in the plasmidome network. Integer value ranging from 0 to 1. Default: 0.1
 
 For benchmarking purposes you can pass a complete genome to gplas and will generate a precision and completeness. Using this you can assess the performance of gplas on a small set of genomes in which perhaps you have generated long-reads. 
 
