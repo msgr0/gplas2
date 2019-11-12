@@ -53,7 +53,6 @@ max_nodes <- max(count.fields(input_solutions, sep = ","))
 
 solutions <- read.table(input_solutions ,sep=",",fill=TRUE,col.names=1:max_nodes)
 
-
 all_nodes <- NULL
   for(solution in 1:nrow(solutions))
   {
@@ -82,7 +81,7 @@ for(row in 1:nrow(co_ocurrence))
   co_ocurrence[row,] <- presence_absence
 }
 
-co_ocurrence <- apply(co_ocurrence, 2, as.integer)
+suppressMessages(co_ocurrence <- apply(co_ocurrence, 2, as.integer))
 
 starting_nodes <- subset(unique_nodes, unique_nodes %in% unique(solutions[,1]))
 
@@ -172,8 +171,6 @@ graph_viz <- ggraph(graph_pairs, layout = 'nicely') +
   geom_node_text(aes(label = name), size = 7.0) +
   geom_edge_loop()
 
-#mcl_input <- as_adj(graph_pairs,attr="weight")
-
 mcl_input <- as_adj(graph_pairs)
 
 
@@ -231,7 +228,7 @@ for(component in unique(df_nodes$Component))
   filename <- paste('results/', component_complete_name, sep = '')
   filename <- paste(filename,component, sep = '_')
   filename <- paste(filename,'.fasta',sep = '')
-  write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename)
+  suppressWarnings(write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename))
 
 }
 

@@ -285,7 +285,7 @@ then
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
-  echo -e "Preprint of gplas coming soon, hasta la vista!"
+  echo -e "gplas version 0.5.0 - Preprint of gplas coming soon, hasta la vista!"
 else
   echo -e "Looks like something went wrong!"
 fi
