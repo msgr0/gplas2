@@ -235,8 +235,11 @@ fi
 
 
 echo -e "Creating (only the first-time) a conda environment to install and run snakemake"
-source activate gplas || conda create --name gplas --file spec-snakemake.txt
-source activate gplas
+
+eval "$(conda shell.bash hook)"
+
+conda activate gplas || conda create --name gplas --file spec-snakemake.txt
+conda activate gplas
 
 
 if [ "$classifier" == "mlplasmids" ];
