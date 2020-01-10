@@ -27,8 +27,6 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 iterations <- snakemake@params[["iterations"]]
 
-edge_threshold <- as.numeric(as.character(snakemake@params[["edge_gplas"]]))
-
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
 
@@ -87,33 +85,27 @@ starting_nodes <- subset(unique_nodes, unique_nodes %in% unique(solutions[,1]))
 
 number_iterations <- as.numeric(iterations)
 
-count_left <- 1
-
-count_right <- number_iterations
-
 total_pairs <- NULL
 
-for(iteration in 1:length(starting_nodes))
+scalar1 <- function(x) {x / sqrt(sum(x^2))}
+
+search_solutions <- as.data.frame(co_ocurrence)
+
+for(node in starting_nodes)
 {
+  index_col_node <-  which(colnames(search_solutions) == node)
+  presence_node <- subset(search_solutions, search_solutions[index_col_node] == 1)
+  index_presence_node <-  which(colnames(presence_node) == node)
+  
+  presence_node[index_presence_node] <- NULL
+  sumatory <- colSums(presence_node)
+  df_presence_absence <- data.frame(Starting_node = node, 
+                                    Connecting_node = colnames(presence_node),
+                                    weight = sumatory)
+  
+  total_pairs <- rbind(total_pairs, df_presence_absence)
+}
 
-  node_sol <- co_ocurrence[c(count_left:count_right),]
-  sumatory <- colSums(node_sol)
-  df_test <- data.frame(Starting_node = solutions[count_left,1], 
-                        Connecting_node = colnames(node_sol),
-                        weight = sumatory)
-  total_pairs <- rbind(total_pairs, df_test)
-  
-  count_left <- count_left + number_iterations
-  count_right <- count_right + number_iterations
-  
-  
-  }
-
-total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% starting_nodes)
-total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% starting_nodes)
-total_pairs <- subset(total_pairs, as.character(total_pairs$Connecting_node) != as.character(total_pairs$Starting_node))
-total_pairs$frequency <- total_pairs$weight/number_iterations
-total_pairs <- subset(total_pairs, total_pairs$frequency > edge_threshold)
 
 ## Looking back in the solutions if there are circular graphs
 
@@ -124,7 +116,7 @@ for(solution in 1:nrow(solutions))
   iteration <- t(iteration)
   nodes <- as.character(iteration[,1])
   nodes <- nodes[nodes != '']
-  if(length(nodes) > 1 & length(nodes) < 20 & nodes[1] == nodes[length(nodes)])
+  if(length(nodes) > 1 & nodes[1] == nodes[length(nodes)])
   {
     circular_sequences <- rbind(circular_sequences, c(nodes[1],nodes[length(nodes)]))
   }
@@ -144,8 +136,7 @@ for(combination in 1:nrow(no_duplicated))
   {
     df_test <- data.frame(Starting_node = combi[1],
                           Connecting_node = combi[2],
-                          weight = nrow(total_ocurrences),
-                          frequency = nrow(total_ocurrences)/number_iterations)
+                          weight = nrow(total_ocurrences))
     
     total_pairs <- rbind(total_pairs, df_test)
   }
@@ -158,29 +149,247 @@ total_pairs$Starting_node <- gsub(pattern = '\\-', replacement = '', x = total_p
 total_pairs$Connecting_node <- gsub(pattern = '\\+', replacement = '', x = total_pairs$Connecting_node)
 total_pairs$Connecting_node <- gsub(pattern = '\\-', replacement = '', x = total_pairs$Connecting_node)
 
+total_pairs <- subset(total_pairs,total_pairs$weight > 1)
 
-graph_pairs <- graph_from_data_frame(total_pairs, directed = FALSE)
 
-#E(graph_pairs)$width <- E(graph_pairs)$weight
+complete_node_info <- NULL
+
+for(node in unique(total_pairs$Starting_node))
+{
+  first_node <- subset(total_pairs, total_pairs$Starting_node %in% node)
+  particular_node <- NULL
+  for(connecting_node in unique(first_node$Connecting_node))
+  {
+    first_second_nodes <- subset(first_node, first_node$Connecting_node %in% connecting_node)
+    total_weight <- sum(first_second_nodes$weight)
+    info_node <- data.frame(Starting_node = unique(first_second_nodes$Starting_node),
+                            Connecting_node = unique(first_second_nodes$Connecting_node),
+                            weight = total_weight)
+    particular_node <- rbind(particular_node, info_node)
+  }
+  particular_node$scaled_weight <- scalar1(particular_node$weight)
+  complete_node_info <- rbind(complete_node_info, particular_node)
+}
+
+
+total_pairs <- complete_node_info
+
+initial_nodes <- gsub(pattern = '\\+', replacement = '', x = starting_nodes)
+initial_nodes <- gsub(pattern = '\\-', replacement = '', x = initial_nodes)
+
+total_pairs$Starting_node <- as.character(total_pairs$Starting_node)
+total_pairs$Connecting_node <- as.character(total_pairs$Connecting_node)
+
+total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% initial_nodes)
+total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_nodes)
+
+weight_graph <- data.frame(From_to = total_pairs$Starting_node,
+                           To_from = total_pairs$Connecting_node,
+                           weight = total_pairs$scaled_weight)
+
+graph_pairs <- graph_from_data_frame(weight_graph, directed = FALSE)
+is.weighted(graph_pairs)
 
 V(graph_pairs)$name <- names(as.table(V(graph_pairs)))
+E(graph_pairs)$width <- E(graph_pairs)$weight*20
 
-graph_viz <- ggraph(graph_pairs, layout = 'nicely') + 
-  geom_edge_link() +
-  geom_node_point(size = 1.0) +
-  geom_node_text(aes(label = name), size = 7.0) +
-  geom_edge_loop()
+# Simplifying the graph 
 
-mcl_input <- as_adj(graph_pairs)
+no_loops_graph <- igraph::simplify(graph_pairs, remove.multiple=FALSE)
+
+components_graph <- decompose(no_loops_graph, mode = c("weak"), max.comps = NA,
+          min.vertices = 2)
+
+partitioning_components <- function(graph)
+{
+
+  # Spinglass algorithm
+  graph_spin <- cluster_spinglass(graph)
+
+  
+  # Walktrap algorithm 
+  graph_walktrap <- cluster_walktrap(graph)
+  
+  # Leading eigen values 
+  
+  graph_eigen <- cluster_leading_eigen(graph)
+
+  
+  # Louvain method 
+  
+  graph_louvain <- cluster_louvain(graph)
+
+  
+  # Community detection based on propagating labels 
+  
+  graph_propag <- cluster_label_prop(graph)
+  
+  partition_info <<- data.frame(Algorithm = c('Spinglass', 'Walktrap','Leading-eigen','Louvain','Propagating-labels'),
+                               Modularity = c(modularity(graph_spin), 
+                                              modularity(graph_walktrap), 
+                                              modularity(graph_eigen), 
+                                              modularity(graph_louvain),
+                                              modularity(graph_propag)))
+  
+}
+
+complete_partition_info <- NULL
 
 
-results_mcl <- mcl(x = mcl_input, addLoops = TRUE, allow1 = TRUE, ESM = TRUE)
+info_comp_member <- components(no_loops_graph)$membership
+original_components <- unique(info_comp_member)
+info_comp_size <- components(no_loops_graph)$csize
 
-results_subgraph <- data.frame(number = rownames(mcl_input),
-                               Component = results_mcl$Cluster)
+node_and_component <- data.frame(Node = names(info_comp_member),
+                        Original_component = as.character(info_comp_member))
 
 
-suppressMessages(ggsave(filename = snakemake@output[["plot_graph"]], plot = graph_viz))
+information_components <- data.frame(Original_component = original_components,
+                                     Size = info_comp_size)
+
+full_info_components <- merge(node_and_component, information_components, by = 'Original_component')
+
+for(component in 1:length(components_graph))
+{
+  subgraph <- components_graph[[component]]
+  partitioning_components(subgraph)
+  first_node <- names(V(subgraph))[1]
+
+  
+  info_first_node <- subset(full_info_components, full_info_components$Node == first_node)
+  
+  partition_info$Original_component <- info_first_node$Original_component
+  complete_partition_info <- rbind(complete_partition_info, partition_info)
+    
+}
+
+complete_partition_info$Decision <- ifelse(complete_partition_info$Modularity >= 0.2, 'Split', 'No_split')
+
+singletons_component <- which((components(no_loops_graph)$csize == 1) == TRUE)
+
+if(length(singletons_component) > 0)
+{
+  df_singletons <- data.frame(Algorithm = 'Independent-single_component', 
+                              Modularity = 0, 
+                              Original_component = singletons_component,
+                              Decision = 'No_split')
+  
+  complete_partition_info <- rbind(complete_partition_info, df_singletons)
+}
+
+contigs_membership <- NULL
+internal_component <- 1
+
+complete_partition_info <- complete_partition_info[order(complete_partition_info$Original_component),]
+
+for(component in unique(complete_partition_info$Original_component))
+{
+  decision_comp <- subset(complete_partition_info, complete_partition_info$Original_component == component)
+  
+  
+  if(decision_comp$Algorithm[1] != 'Independent-single_component')
+  {
+    split_decision <- nrow(subset(decision_comp, decision_comp$Decision == 'Split'))
+    no_split_decision <- nrow(subset(decision_comp, decision_comp$Decision == 'No_split'))
+    if(split_decision > no_split_decision)
+    {
+      algorithm_to_split <- subset(decision_comp, decision_comp$Modularity == max(decision_comp$Modularity))
+      algorithm <- as.character(algorithm_to_split$Algorithm[1])
+      
+      if(algorithm == 'Spinglass')
+      {
+        graph_spin <- cluster_spinglass(components_graph[[internal_component]])
+        spl_membership <- graph_spin$membership
+        spl_names <- graph_spin$names
+      }
+      if(algorithm == 'Walktrap')
+      {
+        graph_walktrap <- walktrap.community(components_graph[[internal_component]])
+        spl_membership <- graph_walktrap$membership
+        spl_names <- graph_walktrap$names
+      }
+      if(algorithm == 'Leading-eigen')
+      {
+        graph_eigen <- cluster_leading_eigen(components_graph[[internal_component]])
+        spl_membership <- graph_eigen$membership
+        spl_names <- graph_eigen$names
+      }
+      if(algorithm == 'Louvain')
+      {
+        graph_louvain <- cluster_louvain(components_graph[[internal_component]])
+        spl_membership <- graph_louvain$membership
+        spl_names <- graph_louvain$names
+      }
+      if(algorithm == 'Propagating-labels')
+      {
+        graph_propag <- cluster_label_prop(components_graph[[internal_component]])
+        spl_membership <- graph_propag$membership
+        spl_names <- graph_propag$names
+      }
+      
+      info_decision_component <- data.frame(Algorithm = algorithm,
+                                            Original_component = component,
+                                            Bin = spl_membership, 
+                                            Contig = spl_names)
+      
+      
+      contigs_membership <- rbind(contigs_membership, info_decision_component)
+
+    }
+    else
+    {
+      nodes_component <- subset(full_info_components, full_info_components$Original_component == component)
+      info_decision_component <- data.frame(Algorithm = 'Not_split_component',
+                                            Original_component = component,
+                                            Bin = 1, 
+                                            Contig = nodes_component$Node)
+      contigs_membership <- rbind(contigs_membership, info_decision_component)
+    }
+    internal_component <- internal_component + 1
+  }
+  else
+  {
+    nodes_component <- subset(full_info_components, full_info_components$Original_component == component)
+    
+    info_decision_component <- data.frame(Algorithm = 'Independent-single_component',
+                                          Original_component = component,
+                                          Bin = 1, 
+                                          Contig = nodes_component$Node)
+    contigs_membership <- rbind(contigs_membership, info_decision_component)
+  }
+  
+}
+
+contigs_membership$Cluster <- paste(contigs_membership$Original_component, contigs_membership$Bin, sep = '-')
+
+contigs_membership <- contigs_membership[order(contigs_membership$Cluster),]
+
+contigs_membership$Final_cluster <- contigs_membership$Cluster
+
+for(number in 1: length(unique(contigs_membership$Final_cluster)))
+{
+  cluster_name <- unique(contigs_membership$Cluster)[number]
+  contigs_membership$Final_cluster <- gsub(pattern = cluster_name, replacement = number, x = contigs_membership$Final_cluster)
+}
+
+
+set_colors <- c("lightblue","#d49f36","#507f2d","#84b67c","#a06fda","#df462a","#5a51dc","#5b83db","#c76c2d","#4f49a3","#552095","#82702d","#dd6bbb","#334c22","#d83979","#55baad","#dc4555","#62aad3","#8c3025","#417d61","#862977","#bba672","#403367","#da8a6d","#a79cd4","#71482c","#c689d0","#6b2940","#d593a7","#895c8b","#bd5975")
+
+contigs_membership$Color <- set_colors[as.numeric(contigs_membership$Final_cluster)]
+
+order_contigs <- names(V(no_loops_graph))
+
+contigs_membership <- contigs_membership[match(order_contigs, as.character(contigs_membership$Contig)),]
+
+V(no_loops_graph)$color <- contigs_membership$Color
+
+
+png(filename=snakemake@output[["plot_graph"]])
+plot.igraph(no_loops_graph)
+dev.off()
+
+results_subgraph <- data.frame(number = contigs_membership$Contig,
+                               Component = contigs_membership$Final_cluster)
 
 
 pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
