@@ -29,8 +29,6 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
-   echo -e "\t -e \t Optional: Minimum frequency of an edge to be considered in the plasmidome network. Integer value ranging from 0 to 1.
-                 Default: 0.1\n"
    echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
                  for your chromosome and plasmids. Fasta file format"
@@ -106,8 +104,6 @@ then
   fi
 fi
 
-
-
 if [ "$classifier" == "mlplasmids" ];
 then
   if [ -z "$species" ];
@@ -119,16 +115,18 @@ then
   fi
 fi
 
-
+list_species=(Enterococcus_faecium Klebsiella_pneumoniae Escherichia_coli);
 
 if [ "$classifier" == "mlplasmids" ];
 then
-  if [ -z "$species" ];
-   then
-    ./gplas.sh -h
-    echo -e "\n Error: Please indicate one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'.\n"
-    exit
-   fi
+  if [[ " "${list_species[@]}" " == *" "$species" "* ]] ;then
+      echo "$species: ok"
+  else
+      echo -e "Ups! Something went wrong\n"
+      echo -e "The provided species:" "$species" "is not included in mlplasmids. Valid species names are (please note the underscore!):\n"
+      echo "${list_species[@]/%/,}"
+      exit
+  fi
 fi
 
 echo -e "\n"
@@ -152,7 +150,7 @@ fi
 
 if [ -z "$name" ];
 then
-    echo -e "You did not pass an output name. Your results will be named as 'unnamed''\n"
+    echo -e "You did not pass an output name. Your results will be named as 'unnamed' \n"
     name="unnamed"
 else
   echo -e "Your results will be named " $name "\n"
@@ -185,8 +183,6 @@ then
 else
     echo -e "Using the following minimum frequency to select an edge:" $edge_gplas "\n"
 fi
-
-
 
 if [ -z "$number_iterations" ];
 then
