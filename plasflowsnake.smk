@@ -115,7 +115,7 @@ rule gplas_coocurr:
     conda:
         "envs/r_packages.yaml"
     message:
-        "Creating a co-occurrence network and selecting significant associations between nodes."
+        "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
         "scripts/gplas_coocurrence.R"
 
