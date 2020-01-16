@@ -115,12 +115,12 @@ then
   fi
 fi
 
-list_species=(Enterococcus_faecium Klebsiella_pneumoniae Escherichia_coli);
+list_species=(Enterococcus faecium Klebsiella pneumoniae Escherichia coli);
 
 if [ "$classifier" == "mlplasmids" ];
 then
   if [[ " "${list_species[@]}" " == *" "$species" "* ]] ;then
-      echo "$species: ok"
+      echo ""
   else
       echo -e "Ups! Something went wrong\n"
       echo -e "The provided species:" "$species" "is not included in mlplasmids. Valid species names are (please note the underscore!):\n"
@@ -245,8 +245,8 @@ then
       snakemake --unlock --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
       snakemake --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
-      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
+      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
   fi
 else
   if [ "$reference" == "No reference provided" ];
@@ -254,8 +254,8 @@ else
       snakemake --unlock --use-conda -s plasflowsnake.smk results/"$name"_results.tab
       snakemake --use-conda -s plasflowsnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
-      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
+      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
   fi
 fi
 
@@ -284,7 +284,7 @@ then
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
-  echo -e "gplas version 0.5.0 - Preprint of gplas coming soon, hasta la vista!"
+  echo -e "gplas version 0.6.0 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1"
 else
   echo -e "Looks like something went wrong!"
 fi
