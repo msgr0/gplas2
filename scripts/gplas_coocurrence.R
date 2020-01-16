@@ -433,13 +433,17 @@ df_nodes <- merge(df_nodes, full_info_assigned, by = 'Contig_name')
 for(component in unique(df_nodes$Component))
 {
   nodes_component <- subset(df_nodes, df_nodes$Component == component)
-  component_complete_name <- paste(snakemake@params[["sample"]], 'component', sep = '_')
+  component_complete_name <- paste(snakemake@params[["sample"]], 'bin', sep = '_')
   filename <- paste('results/', component_complete_name, sep = '')
   filename <- paste(filename,component, sep = '_')
   filename <- paste(filename,'.fasta',sep = '')
   suppressWarnings(write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename))
 
 }
+
+
+colnames(full_info_assigned)[8] <- 'Bin'
+colnames(results_subgraph)[2] <- 'Bin'
 
 suppressWarnings(write.table(x = full_info_assigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
 suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
