@@ -10,7 +10,6 @@ suppressMessages(library(cooccur))
 suppressMessages(library(ggrepel))
 suppressMessages(library(Biostrings))
 suppressMessages(library(seqinr))
-suppressMessages(library(MCL))
 
 # Inputs
 
@@ -25,22 +24,7 @@ input_solutions <- snakemake@input[["solutions"]]
 classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 iterations <- snakemake@params[["iterations"]]
-
-# Debugging 
-
-# path_nodes <- '/home/sergi/gplas/gplas_input/ff_raw_counts_E4239_ml_raw_nodes.fasta'
-# path_links <- '/home/sergi/gplas/coverage/ff_raw_counts_E4239_ml_clean_links.tab'
-# path_prediction <- '/home/sergi/gplas/mlplasmids_prediction/ff_raw_counts_E4239_ml_plasmid_prediction.tab'
-# path_graph_contigs <- '/home/sergi/gplas/coverage/ff_raw_counts_E4239_ml_graph_contigs.tab'
-# path_graph_repeats <- '/home/sergi/gplas/coverage/ff_raw_counts_E4239_ml_repeats_graph.tab'
-# path_init_nodes <- '/home/sergi/gplas/coverage/ff_raw_counts_E4239_ml_initialize_nodes.tab'
-# path_cov_variation <- '/home/sergi/gplas/coverage/ff_raw_counts_E4239_ml_estimation.txt'
-# input_solutions <- '/home/sergi/gplas/walks/ff_raw_counts_E4239_ml_solutions.csv'
-# classifier <- 'mlplasmids'
-# threshold <- 0.5
-# iterations <- 20
-
-
+modularity_threshold <- snakemake@params[["modularity_threshold"]]
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -236,6 +220,8 @@ weight_graph <- data.frame(From_to = as.character(str_split_fixed(string = singl
                            To_from = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,2]),
                            weight = single_edge_counting$Weight)
 
+weight_graph
+
 total_scaled_weight <- NULL
 
 full_graph_info <- NULL
@@ -244,24 +230,28 @@ for(node in unique(weight_graph$From_to))
 {
   df_node <<- subset(weight_graph, weight_graph$From_to == node)
   scaled_weight <- scalar1(df_node$weight)
-  df_node$scaled_weight <- scaled_weight 
+  df_node$scaled_weight <- scaled_weight
   full_graph_info <- rbind(full_graph_info, df_node)
 }
 
-full_graph_info
-
 full_graph_info$weight <- full_graph_info$scaled_weight
 
-graph_pairs <- graph_from_data_frame(full_graph_info, directed = FALSE)
-is.weighted(graph_pairs)
+weight_graph$width <- full_graph_info$scaled_weight*5
 
-E(graph_pairs)$width <- full_graph_info$scaled_weight
+graph_pairs <- graph_from_data_frame(weight_graph, directed = FALSE)
+
+### Important: Only for viz purposes 
+
+viz_graph <- weight_graph
+viz_graph$weight <- NULL
+graph_viz <- graph_from_data_frame(viz_graph, directed = FALSE)
+graph_viz <- igraph::simplify(graph_viz, remove.multiple=FALSE)
 
 # Simplifying the graph 
 
 no_loops_graph <- igraph::simplify(graph_pairs, remove.multiple=FALSE)
 
-no_graph_pairs <- no_loops_graph
+
 
 
 # Starting taking the decision whether to perform a partition or not 
@@ -294,11 +284,10 @@ partitioning_components <- function(graph)
   
   graph_propag <- cluster_label_prop(graph)
   
-  partition_info <<- data.frame(Algorithm = c('Walktrap','Leading-eigen','Louvain','Propagating-labels'),
+  partition_info <<- data.frame(Algorithm = c('Walktrap','Leading-eigen','Louvain'),
                                 Modularity = c(modularity(graph_walktrap), 
                                                modularity(graph_eigen), 
-                                               modularity(graph_louvain),
-                                               modularity(graph_propag)))
+                                               modularity(graph_louvain)))
   
 }
 
@@ -334,7 +323,9 @@ for(component in 1:length(components_graph))
 
 complete_partition_info$Modularity <- round(complete_partition_info$Modularity,2)
 
-complete_partition_info$Decision <- ifelse(complete_partition_info$Modularity >= 0.2, 'Split', 'No_split')
+modularity_threshold <- as.numeric(modularity_threshold)
+
+complete_partition_info$Decision <- ifelse(complete_partition_info$Modularity >= modularity_threshold, 'Split', 'No_split')
 
 singletons_component <- which((components(no_loops_graph)$csize == 1) == TRUE)
 
@@ -347,6 +338,8 @@ if(length(singletons_component) > 0)
   
   complete_partition_info <- rbind(complete_partition_info, df_singletons)
 }
+
+complete_partition_info
 
 contigs_membership <- NULL
 internal_component <- 1
@@ -442,16 +435,14 @@ set_colors <- c("lightblue","#d49f36","#507f2d","#84b67c","#a06fda","#df462a","#
 
 contigs_membership$Color <- set_colors[as.numeric(contigs_membership$Final_cluster)]
 
-order_contigs <- names(V(no_graph_pairs))
+order_contigs <- names(V(graph_viz))
 
 contigs_membership <- contigs_membership[match(order_contigs, as.character(contigs_membership$Contig)),]
 
-E(no_graph_pairs)$width <- full_graph_info$scaled_weight*5
-
-V(no_graph_pairs)$color <- contigs_membership$Color
+V(graph_viz)$color <- contigs_membership$Color
 
 png(filename=snakemake@output[["plot_graph"]],width = 700, height = 700)
-plot.igraph(no_graph_pairs)
+plot.igraph(graph_viz)
 dev.off()
 
 

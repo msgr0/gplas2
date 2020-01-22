@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
+while getopts ":i:n:s:c:t:x:r:f:e:q:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
@@ -29,6 +29,8 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
+   echo -e "\t -q \t Optional: Modularity threshold to split components present in the plasmidome network. Integer value ranging from 0 to 1
+                 Default: 0.2\n"
    echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
                  for your chromosome and plasmids. Fasta file format"
@@ -60,6 +62,9 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
      ;;
    e)
      edge_gplas=$OPTARG
+     ;;
+   q)
+     modularity_threshold=$OPTARG
      ;;
    r)
      reference=$OPTARG
@@ -192,6 +197,13 @@ else
   echo -e "You indicated a number of iterations of:" $number_iterations "\n"
 fi
 
+if [ -z "$modularity_threshold" ];
+then
+    modularity_threshold=0.2
+else
+    echo -e "Using the following gplas filtering threshold score:" $modularity_threshold "\n"
+fi
+
 if [ -z "$reference" ];
 then
     reference="No reference provided"
@@ -273,6 +285,7 @@ then
   echo -e "Number of plasmid walks created per node: $number_iterations\n"
   echo -e "Threshold of gplas scores: $filt_gplas\n"
   echo -e "Minimum frequency to consider an edge: $edge_gplas\n"
+  echo -e "Modularity threshold used to partition the network: $modularity_threshold\n"
   echo -e "\n"
 
   echo -e "Your results are in results/ and walks/\n"
@@ -284,7 +297,7 @@ then
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
-  echo -e "gplas version 0.6.0 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1"
+  echo -e "gplas version 0.6.1 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1"
 else
   echo -e "Looks like something went wrong!"
 fi

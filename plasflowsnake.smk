@@ -104,14 +104,15 @@ rule gplas_coocurr:
         solutions="walks/{sample}_solutions.csv"
     output:
         plot_graph="results/{sample}_plasmidome_network.png",
-        components="results/{sample}_components.tab",
+        components="results/{sample}_bins.tab",
         results="results/{sample}_results.tab"
     params:
         threshold = config["threshold_prediction"],
         classifier = config["classifier"],
         iterations = config["number_iterations"],
         edge_gplas = config["edge_gplas"],
-        sample = config["name"]
+        sample = config["name"],
+        modularity_threshold = config["modularity_threshold"]
     conda:
         "envs/r_packages.yaml"
     message:
@@ -152,10 +153,9 @@ rule gplas_evaluation:
         initialize_nodes="coverage/{sample}_initialize_nodes.tab",
         alignments="evaluation/{sample}_alignment_test.txt",
         solutions="walks/{sample}_solutions.csv",
-        components="results/{sample}_components.tab"
+        components="results/{sample}_bins.tab"
     output:
-        completeness="evaluation/{sample}_completeness.tab",
-        precision="evaluation/{sample}_precision.tab"
+        metrics="evaluation/{sample}_metrics.tab"
     conda:
         "envs/r_packages.yaml"
     params:
