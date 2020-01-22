@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
+while getopts ":i:n:s:c:t:x:r:f:e:q:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
@@ -29,8 +29,8 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
-   echo -e "\t -e \t Optional: Minimum frequency of an edge to be considered in the plasmidome network. Integer value ranging from 0 to 1.
-                 Default: 0.1\n"
+   echo -e "\t -q \t Optional: Modularity threshold to split components present in the plasmidome network. Integer value ranging from 0 to 1
+                 Default: 0.2\n"
    echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
                  for your chromosome and plasmids. Fasta file format"
@@ -62,6 +62,9 @@ while getopts ":i:n:s:c:t:x:r:f:e:h" opt; do
      ;;
    e)
      edge_gplas=$OPTARG
+     ;;
+   q)
+     modularity_threshold=$OPTARG
      ;;
    r)
      reference=$OPTARG
@@ -106,8 +109,6 @@ then
   fi
 fi
 
-
-
 if [ "$classifier" == "mlplasmids" ];
 then
   if [ -z "$species" ];
@@ -119,16 +120,18 @@ then
   fi
 fi
 
-
+list_species=(Enterococcus faecium Klebsiella pneumoniae Escherichia coli);
 
 if [ "$classifier" == "mlplasmids" ];
 then
-  if [ -z "$species" ];
-   then
-    ./gplas.sh -h
-    echo -e "\n Error: Please indicate one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'.\n"
-    exit
-   fi
+  if [[ " "${list_species[@]}" " == *" "$species" "* ]] ;then
+      echo ""
+  else
+      echo -e "Ups! Something went wrong\n"
+      echo -e "The provided species:" "$species" "is not included in mlplasmids. Valid species names are (please note the underscore!):\n"
+      echo "${list_species[@]/%/,}"
+      exit
+  fi
 fi
 
 echo -e "\n"
@@ -152,7 +155,7 @@ fi
 
 if [ -z "$name" ];
 then
-    echo -e "You did not pass an output name. Your results will be named as 'unnamed''\n"
+    echo -e "You did not pass an output name. Your results will be named as 'unnamed' \n"
     name="unnamed"
 else
   echo -e "Your results will be named " $name "\n"
@@ -186,14 +189,19 @@ else
     echo -e "Using the following minimum frequency to select an edge:" $edge_gplas "\n"
 fi
 
-
-
 if [ -z "$number_iterations" ];
 then
     echo -e "You did not pass the number of times to look for walks based on each plasmid seed, using 20 as default\n"
     number_iterations=20
 else
   echo -e "You indicated a number of iterations of:" $number_iterations "\n"
+fi
+
+if [ -z "$modularity_threshold" ];
+then
+    modularity_threshold=0.2
+else
+    echo -e "Using the following gplas filtering threshold score:" $modularity_threshold "\n"
 fi
 
 if [ -z "$reference" ];
@@ -235,8 +243,11 @@ fi
 
 
 echo -e "Creating (only the first-time) a conda environment to install and run snakemake"
-source activate gplas || conda create --name gplas --file spec-snakemake.txt
-source activate gplas
+
+eval "$(conda shell.bash hook)"
+
+conda activate gplas || conda create --name gplas --file spec-snakemake.txt
+conda activate gplas
 
 
 if [ "$classifier" == "mlplasmids" ];
@@ -246,8 +257,8 @@ then
       snakemake --unlock --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
       snakemake --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
-      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_completeness.tab
+      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
   fi
 else
   if [ "$reference" == "No reference provided" ];
@@ -255,8 +266,8 @@ else
       snakemake --unlock --use-conda -s plasflowsnake.smk results/"$name"_results.tab
       snakemake --use-conda -s plasflowsnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
-      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_completeness.tab
+      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
   fi
 fi
 
@@ -274,6 +285,7 @@ then
   echo -e "Number of plasmid walks created per node: $number_iterations\n"
   echo -e "Threshold of gplas scores: $filt_gplas\n"
   echo -e "Minimum frequency to consider an edge: $edge_gplas\n"
+  echo -e "Modularity threshold used to partition the network: $modularity_threshold\n"
   echo -e "\n"
 
   echo -e "Your results are in results/ and walks/\n"
@@ -285,7 +297,7 @@ then
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
-  echo -e "gplas version 0.5.0 - Preprint of gplas coming soon, hasta la vista!"
+  echo -e "gplas version 0.6.1 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1"
 else
   echo -e "Looks like something went wrong!"
 fi

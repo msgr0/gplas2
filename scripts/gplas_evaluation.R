@@ -30,6 +30,28 @@ number_iterations <- snakemake@params[["iterations"]]
 species <- snakemake@params[["species"]]
 sample <- snakemake@params[["name"]]
 
+
+# # Checking the evaluation 
+# 
+# path_nodes <- '/home/sergi/gplas/gplas_input/SAMN10819804_pflow_raw_nodes.fasta'
+# path_reference <- '/home/sergi/gplas/independent_set/SAMN10819804/assembly.fasta'
+# path_links <- '/home/sergi/gplas/coverage/SAMN10819804_pflow_clean_links.tab'
+# path_prediction <- '/home/sergi/gplas/plasflow_prediction/SAMN10819804_pflow_plasmid_prediction.tab'
+# path_graph_contigs <- '/home/sergi/gplas/coverage/SAMN10819804_pflow_graph_contigs.tab'
+# path_graph_repeats <- '/home/sergi/gplas/coverage/SAMN10819804_pflow_repeats_graph.tab'
+# path_init_nodes <- '/home/sergi/gplas/coverage/SAMN10819804_pflow_initialize_nodes.tab'
+# path_cov_variation <- '/home/sergi/gplas/coverage/SAMN10819804_pflow_estimation.txt'
+# input_solutions <- '/home/sergi/gplas/walks/SAMN10819804_pflow_solutions.csv'
+# path_alignments <- '/home/sergi/gplas/evaluation/SAMN10819804_pflow_alignment_test.txt'
+# path_components <- '/home/sergi/gplas/results/SAMN10819804_pflow_components.tab'
+# 
+# classifier <- 'plasflow'
+# number_iterations <- 20
+# species <- 'unknown'
+# sample <- 'SAMN10819804'
+# 
+
+
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
 
@@ -148,7 +170,7 @@ stats_gold_standard <- gold_standard %>%
 colnames(stats_gold_standard) <- c('Type','Reference_sum_bp','Reference_sum_contigs')
 
 
-# Creating a dataframe to merge the quast mapping against the prediction from plasgraph. We need to include the directionality of the contigs 
+# Creating a dataframe to merge the quast mapping against the prediction from gplas We need to include the directionality of the contigs 
 
 contigs_reference_genome <- gold_standard %>%
   group_by(Type) %>%
@@ -178,8 +200,6 @@ results_subgraph <- read.table(file = path_components)
 colnames(results_subgraph) <- c('Contig_number','Component')
 
 results <- merge(results_subgraph, gold_standard, by = 'Contig_number')
-
-#colnames(results)[c(9,10)] <- c('Reference_sum_bp','Reference_sum_contigs')
 
 singletons <- initialize_nodes[! initialize_nodes %in% results_subgraph$Contig_number]
 
@@ -300,149 +320,164 @@ for(component in unique(reference_component$Component))
   suppressWarnings(completeness_df <- rbind(completeness_df, completeness_info))
 }
 
-write.table(x = completeness_df, 
-            file = snakemake@output[["completeness"]],
+metrics_components <- completeness_df
+metrics_components$contigs_ref_component <- as.numeric(as.character(metrics_components$contigs_ref_component))
+metrics_components$contigs_reference <- as.numeric(as.character(metrics_components$contigs_reference))
+metrics_components$total_contigs <- as.numeric(as.character(metrics_components$total_contigs))
+metrics_components$Precision_contigs <- metrics_components$contigs_ref_component/metrics_components$total_contigs
+
+metrics_components$bp_ref_component <- as.numeric(as.character(metrics_components$bp_ref_component))
+metrics_components$bp_reference <- as.numeric(as.character(metrics_components$bp_reference))
+metrics_components$total_bp <- as.numeric(as.character(metrics_components$total_bp))
+metrics_components$Precision_bp <- metrics_components$bp_ref_component/metrics_components$total_bp
+
+
+
+write.table(x = metrics_components, 
+            file = snakemake@output[["metrics"]],
             append = TRUE, 
             row.names = FALSE, 
             quote = FALSE, 
-            col.names = FALSE)
-
-truth_set <- subset(truth_set, !truth_set$Contig_number %in% c('representation',''))
-
-all_truth <- NULL
-
-for(seed in truth_set$Contig_number)
-{
-  contig_seed <<- subset(truth_set, truth_set$Contig_number == seed)
-  other_contigs <<- subset(truth_set, truth_set$Contig_number != seed)
-  
-  evaluation <- data.frame(Contig_number = seed,
-                           Pair_contig = other_contigs$Contig_number,
-                           Contig_number_type = contig_seed$Type,
-                           Pair_contig_type = other_contigs$Type)
-  
-  
-  evaluation$Truth <- ifelse(as.character(evaluation$Contig_number_type) == as.character(evaluation$Pair_contig_type), 'Same','Different')
-  
-  all_truth <- rbind(all_truth, evaluation)
-}
-
-collection_pairs <- NULL
-
-for(seed in 1:nrow(all_truth))
-{
-  info_row <- all_truth[seed,]
-  first_node <- as.numeric(as.character(info_row$Contig_number))
-  second_node <- as.numeric(as.character(info_row$Pair_contig))
-  
-  if(second_node < first_node)
-  {
-    contig_pair <- paste(second_node,first_node, sep = '-')
-  }
-  else
-  {
-    contig_pair <- paste(first_node,second_node, sep = '-')
-  }
-  
-  collection_pairs <- append(collection_pairs, values = contig_pair, after = length(collection_pairs))
-  
-}
-
-all_truth$Contig_pair <- collection_pairs
-
-all_truth <- all_truth[!duplicated(all_truth$Contig_pair),]
-
-## Extracting the number of connections from each plasmid and chromosome
-
-true_connections <- subset(all_truth, all_truth$Contig_number_type == all_truth$Pair_contig_type)
-
-count_true_connections <- true_connections %>%
-  group_by(Contig_number_type) %>%
-  count()
-
-all_evaluation <- NULL
-
-for(seed in results_subgraph$Contig_number)
-{
-  contig_seed <- subset(results_subgraph, results_subgraph$Contig_number == seed)
-  other_contigs <- subset(results_subgraph, results_subgraph$Contig_number != seed)
-  
-  evaluation <- data.frame(Contig_number = seed,
-                           Pair_contig = other_contigs$Contig_number,
-                           Contig_number_component = contig_seed$Component,
-                           Pair_contig_component = other_contigs$Component)
-  
-  
-  evaluation$Prediction <- ifelse(as.character(evaluation$Contig_number_component) == as.character(evaluation$Pair_contig_component), 'Same','Different')
-  
-  all_evaluation <- rbind(all_evaluation, evaluation)
-}
-
-all_evaluation$Contig_pair <- paste(all_evaluation$Contig_number, all_evaluation$Pair_contig, sep = '-' )
-
-
-# Creating a confusion matrix 
-
-eval_truth <<- merge(all_evaluation, all_truth, by = 'Contig_pair')
-
-eval_truth$Evaluation <- ifelse(eval_truth$Truth == eval_truth$Prediction, 'Positive', 'Negative')
-
-positive_eval_truth <- subset(eval_truth, eval_truth$Evaluation == 'Positive')
-positive_eval_truth$Evaluation <- ifelse(positive_eval_truth$Truth == 'Same', 'True_positive','True_negative')
-
-negative_eval_truth <- subset(eval_truth, eval_truth$Evaluation == 'Negative')
-negative_eval_truth$Evaluation <- ifelse(negative_eval_truth$Truth == 'Different', 'False_positive','False_negative')
-
-eval_truth <- rbind(positive_eval_truth, negative_eval_truth)
-
-purity_components <- eval_truth %>% 
-  group_by(eval_truth$Contig_number_component, eval_truth$Evaluation) %>%
-  count(Pair_contig_component)
-
-purity_components <- subset(purity_components, purity_components$`eval_truth$Evaluation` %in% c('True_positive','False_positive'))
-
-precision_components <- NULL
-
-for(component in unique(purity_components$Pair_contig_component))
-{
-  component_df <- subset(purity_components, purity_components$Pair_contig_component == component)
-  test <<- subset(component_df, component_df$`eval_truth$Evaluation` == 'True_positive')
-  
-  tp_component <- subset(component_df$n, component_df$`eval_truth$Evaluation` == 'True_positive')
-  fp_component <- subset(component_df$n, component_df$`eval_truth$Evaluation` == 'False_positive')
-  
-  if(identical(fp_component, integer(0)))
-  {
-    fp_component <- 0
-  }
-  
-  if(identical(tp_component, integer(0)))
-  {
-    tp_component <- 0
-  }
-  
-  precision <- tp_component/(tp_component+fp_component)
-  
-  record_results <- data.frame( sample = sample,
-                                species = species,
-                                classifier = classifier, 
-                                factor = 1.0,
-                                number_iterations = number_iterations,
-                                variation = max_variation,
-                                component = component, 
-                                tp_component = tp_component,
-                                fp_component = fp_component,
-                                precision = precision)
-  
-  
-  precision_components <- rbind(precision_components, record_results)
-  
-}
-
-write.table(x = precision_components, 
-            file = snakemake@output[["precision"]],
-            append = TRUE, 
-            row.names = FALSE, 
-            quote = FALSE, 
-            col.names = FALSE)
-
+            col.names = TRUE)
+# 
+# truth_set <- subset(truth_set, !truth_set$Contig_number %in% c('representation',''))
+# 
+# all_truth <- NULL
+# 
+# for(seed in truth_set$Contig_number)
+# {
+#   contig_seed <<- subset(truth_set, truth_set$Contig_number == seed)
+#   other_contigs <<- subset(truth_set, truth_set$Contig_number != seed)
+#   
+#   evaluation <- data.frame(Contig_number = seed,
+#                            Pair_contig = other_contigs$Contig_number,
+#                            Contig_number_type = contig_seed$Type,
+#                            Pair_contig_type = other_contigs$Type)
+#   
+#   
+#   evaluation$Truth <- ifelse(as.character(evaluation$Contig_number_type) == as.character(evaluation$Pair_contig_type), 'Same','Different')
+#   
+#   all_truth <- rbind(all_truth, evaluation)
+# }
+# 
+# collection_pairs <- NULL
+# 
+# for(seed in 1:nrow(all_truth))
+# {
+#   info_row <- all_truth[seed,]
+#   first_node <- as.numeric(as.character(info_row$Contig_number))
+#   second_node <- as.numeric(as.character(info_row$Pair_contig))
+#   
+#   if(second_node < first_node)
+#   {
+#     contig_pair <- paste(second_node,first_node, sep = '-')
+#   }
+#   else
+#   {
+#     contig_pair <- paste(first_node,second_node, sep = '-')
+#   }
+#   
+#   collection_pairs <- append(collection_pairs, values = contig_pair, after = length(collection_pairs))
+#   
+# }
+# 
+# all_truth$Contig_pair <- collection_pairs
+# 
+# all_truth <- all_truth[!duplicated(all_truth$Contig_pair),]
+# 
+# ## Extracting the number of connections from each plasmid and chromosome
+# 
+# true_connections <- subset(all_truth, all_truth$Contig_number_type == all_truth$Pair_contig_type)
+# 
+# count_true_connections <- true_connections %>%
+#   group_by(Contig_number_type) %>%
+#   count()
+# 
+# all_evaluation <- NULL
+# 
+# for(seed in results_subgraph$Contig_number)
+# {
+#   contig_seed <- subset(results_subgraph, results_subgraph$Contig_number == seed)
+#   other_contigs <- subset(results_subgraph, results_subgraph$Contig_number != seed)
+#   
+#   evaluation <- data.frame(Contig_number = seed,
+#                            Pair_contig = other_contigs$Contig_number,
+#                            Contig_number_component = contig_seed$Component,
+#                            Pair_contig_component = other_contigs$Component)
+#   
+#   
+#   evaluation$Prediction <- ifelse(as.character(evaluation$Contig_number_component) == as.character(evaluation$Pair_contig_component), 'Same','Different')
+#   
+#   all_evaluation <- rbind(all_evaluation, evaluation)
+# }
+# 
+# all_evaluation$Contig_pair <- paste(all_evaluation$Contig_number, all_evaluation$Pair_contig, sep = '-' )
+# 
+# 
+# # Creating a confusion matrix 
+# 
+# eval_truth <<- merge(all_evaluation, all_truth, by = 'Contig_pair')
+# 
+# eval_truth$Evaluation <- ifelse(eval_truth$Truth == eval_truth$Prediction, 'Positive', 'Negative')
+# 
+# positive_eval_truth <- subset(eval_truth, eval_truth$Evaluation == 'Positive')
+# positive_eval_truth$Evaluation <- ifelse(positive_eval_truth$Truth == 'Same', 'True_positive','True_negative')
+# 
+# negative_eval_truth <- subset(eval_truth, eval_truth$Evaluation == 'Negative')
+# negative_eval_truth$Evaluation <- ifelse(negative_eval_truth$Truth == 'Different', 'False_positive','False_negative')
+# 
+# eval_truth <- rbind(positive_eval_truth, negative_eval_truth)
+# 
+# purity_components <- eval_truth %>% 
+#   group_by(eval_truth$Contig_number_component, eval_truth$Evaluation) %>%
+#   count(Pair_contig_component)
+# 
+# purity_components <- subset(purity_components, purity_components$`eval_truth$Evaluation` %in% c('True_positive','False_positive'))
+# 
+# 
+# 
+# precision_components <- NULL
+# 
+# for(component in unique(purity_components$Pair_contig_component))
+# {
+#   component_df <- subset(purity_components, purity_components$Pair_contig_component == component)
+#   test <<- subset(component_df, component_df$`eval_truth$Evaluation` == 'True_positive')
+#   
+#   tp_component <- subset(component_df$n, component_df$`eval_truth$Evaluation` == 'True_positive')
+#   fp_component <- subset(component_df$n, component_df$`eval_truth$Evaluation` == 'False_positive')
+#   
+#   if(identical(fp_component, integer(0)))
+#   {
+#     fp_component <- 0
+#   }
+#   
+#   if(identical(tp_component, integer(0)))
+#   {
+#     tp_component <- 0
+#   }
+#   
+#   precision <- tp_component/(tp_component+fp_component)
+#   
+#   record_results <- data.frame( sample = sample,
+#                                 species = species,
+#                                 classifier = classifier, 
+#                                 factor = 1.0,
+#                                 number_iterations = number_iterations,
+#                                 variation = max_variation,
+#                                 component = component, 
+#                                 tp_component = tp_component,
+#                                 fp_component = fp_component,
+#                                 precision = precision)
+#   
+#   
+#   precision_components <- rbind(precision_components, record_results)
+#   
+# }
+# 
+# write.table(x = precision_components, 
+#             file = snakemake@output[["precision"]],
+#             append = TRUE, 
+#             row.names = FALSE, 
+#             quote = FALSE, 
+#             col.names = TRUE)
+# 

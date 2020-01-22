@@ -10,4 +10,5 @@ classifier: "${classifier}"
 filt_gplas: "${filt_gplas}"
 edge_gplas: "${edge_gplas}"
 name: "${name}"
+modularity_threshold: "${modularity_threshold}"
 EOF
