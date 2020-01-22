@@ -219,9 +219,6 @@ single_edge_counting <- weight_counting %>%
 weight_graph <- data.frame(From_to = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,1]),
                            To_from = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,2]),
                            weight = single_edge_counting$Weight)
-
-weight_graph
-
 total_scaled_weight <- NULL
 
 full_graph_info <- NULL
@@ -250,8 +247,6 @@ graph_viz <- igraph::simplify(graph_viz, remove.multiple=FALSE)
 # Simplifying the graph 
 
 no_loops_graph <- igraph::simplify(graph_pairs, remove.multiple=FALSE)
-
-
 
 
 # Starting taking the decision whether to perform a partition or not 
