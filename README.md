@@ -4,9 +4,8 @@ Changelog: +Acinetobacter_baumannii model
 
 # Introduction
 
-gplas is a tool to bin plasmid-predicted contigs based on sequence
-composition, coverage and assembly graph information. Gplas is a new
-tool that extends the possibility of accurately binning predicted
+Gplas is a tool to bin plasmid-predicted contigs based on sequence
+composition, coverage and assembly graph information. It extends the possibility of accurately binning predicted
 plasmid contigs into several discrete plasmid components.
 
 ![](figures/logo.png)<!-- -->
@@ -16,7 +15,7 @@ plasmid contigs into several discrete plasmid components.
 ``` bash
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
+./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Acinetobacter_baumannii' -n 'installation'
 ```
 
 First-time installation can take some time depending on your internet
