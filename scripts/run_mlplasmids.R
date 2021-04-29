@@ -3,12 +3,23 @@
 # GUI or R directly.
 # It checks to see if the required tools are installed (devtools, mlplasmids)
 
-install.packages(“git2r”)
 
 if(!"devtools" %in% rownames(installed.packages())) {
     print("Installing devtools...")
     install.packages("devtools", repos='http://cran.us.r-project.org')
 }
+
+
+##only needed for branch download
+if(!"git2r" %in% rownames(installed.packages())) {
+    print("Installing git2r...")
+    install.packages("git2r", repos='http://cran.us.r-project.org')
+} else {
+  remove.packages("git2r")
+  print("Re-installing git2r")
+  install.packages("git2r", repos='http://cran.us.r-project.org')
+}
+##ends here
 
 if(!"Biostrings" %in% rownames(installed.packages())) {
     print("Installing Biostrings...")
@@ -20,6 +31,7 @@ if(!"mlplasmids" %in% rownames(installed.packages())) {
 
  # devtools::install_git("https://gitlab.com/sirarredondo/mlplasmids",
   #                      repos='http://cran.us.r-project.org')
+
   devtools::install_git("https://gitlab.com/mmb-umcu/mlplasmids.git",ref="new_models")
 } else {
   remove.packages("mlplasmids") 
@@ -28,7 +40,6 @@ if(!"mlplasmids" %in% rownames(installed.packages())) {
 }
 
 
-}
 suppressMessages(library(mlplasmids))
 
 usage =  "USAGE: Rscript run_mlplasmids.R ./path/to/assembly.fasta ./path/to/output.tab [prob_threshold] [species]"
