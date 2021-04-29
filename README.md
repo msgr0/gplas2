@@ -1,5 +1,6 @@
 gplas: binning plasmid-predicted contigs
 ================
+Changelog: +Acinetobacter_baumannii model
 
 # Introduction
 
@@ -380,7 +381,7 @@ Mandatory arguments:
   - **-s**: Only applicable if mlplasmids is chosen. Bacterial species
     from the graph file. If you have specified mlplasmids as classifier
     you need to provide one of the following bacterial species:
-    ‘Enterococcus_faecium’,‘Klebsiella_pneumoniae’, 'Acinetobacter_baumanii' or ‘Escherichia_coli’
+    ‘Enterococcus_faecium’,‘Klebsiella_pneumoniae’, 'Acinetobacter_baumannii' or ‘Escherichia_coli’
 
 Optional arguments:
 
