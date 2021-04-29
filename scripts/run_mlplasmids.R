@@ -3,6 +3,8 @@
 # GUI or R directly.
 # It checks to see if the required tools are installed (devtools, mlplasmids)
 
+install.packages(“git2r”)
+
 if(!"devtools" %in% rownames(installed.packages())) {
     print("Installing devtools...")
     install.packages("devtools", repos='http://cran.us.r-project.org')
@@ -16,8 +18,16 @@ if(!"Biostrings" %in% rownames(installed.packages())) {
 if(!"mlplasmids" %in% rownames(installed.packages())) {
   print("Installing mlplasmids; please be patient, as this involves downloading a large dataset...")
 
-  devtools::install_git("https://gitlab.com/sirarredondo/mlplasmids",
-                        repos='http://cran.us.r-project.org')
+ # devtools::install_git("https://gitlab.com/sirarredondo/mlplasmids",
+  #                      repos='http://cran.us.r-project.org')
+  devtools::install_git("https://gitlab.com/mmb-umcu/mlplasmids.git",ref="new_models")
+} else {
+  remove.packages("mlplasmids") 
+  print("Re-Installing mlplasmids; please be patient, as this involves downloading a large dataset...")
+  devtools::install_git("https://gitlab.com/mmb-umcu/mlplasmids.git",ref="new_models")
+}
+
+
 }
 suppressMessages(library(mlplasmids))
 
