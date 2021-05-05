@@ -9,18 +9,6 @@ if(!"devtools" %in% rownames(installed.packages())) {
     install.packages("devtools", repos='http://cran.us.r-project.org')
 }
 
-
-##only needed for branch download
-if(!"git2r" %in% rownames(installed.packages())) {
-    print("Installing git2r...")
-    install.packages("git2r", repos='http://cran.us.r-project.org')
-} else {
-  remove.packages("git2r")
-  print("Re-installing git2r")
-  install.packages("git2r", repos='http://cran.us.r-project.org')
-}
-##ends here
-
 if(!"Biostrings" %in% rownames(installed.packages())) {
     print("Installing Biostrings...")
     source("https://bioconductor.org/biocLite.R")
@@ -36,7 +24,7 @@ if(!"mlplasmids" %in% rownames(installed.packages())) {
 } else {
   remove.packages("mlplasmids") 
   print("Re-Installing mlplasmids; please be patient, as this involves downloading a large dataset...")
-  devtools::install_git("https://gitlab.com/mmb-umcu/mlplasmids.git",ref="new_models")
+  devtools::install_git("https://gitlab.com/mmb-umcu/mlplasmids.git")
 }
 
 
