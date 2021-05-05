@@ -443,9 +443,8 @@ dev.off()
 
 results_subgraph <- data.frame(number = contigs_membership$Contig,
                                Component = contigs_membership$Final_cluster)
-
-
-pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
+ 
+pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' | clean_pred$Prediction == 'plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
 
 raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
 pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
