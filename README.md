@@ -99,34 +99,35 @@ species.
 ``` bash
 ./gplas.sh -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
 ```
- ....
-  _______ .______    __           ___           _______.
- /  _____||   _  \  |  |         /   \         /       |
-|  |  __  |  |_)  | |  |        /  ^  \       |   (----`
-|  | |_ | |   ___/  |  |       /  /_\  \       \   \    
-|  |__| | |  |      |  `----. /  _____  \  .----)   |   
- \______| | _|      |_______|/__/     \__\ |_______/    
+     ....
+     ####
+      _______ .______    __           ___           _______.
+     /  _____||   _  \  |  |         /   \         /       |
+    |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
+    |  | |_ | |   ___/  |  |       /  /_\  \       \   \    
+    |  |__| | |  |      |  `----. /  _____  \  .----)   |   
+     \______| | _|      |_______|/__/     \__\ |_______/    
+    
+    
+    Congratulations! Prediction succesfully done.
+    
+    Input graph: test/abaumannii_graph.gfa 
+    
+    Bacterial species:  'Acinetobacter baumannii' 
 
-
-Congratulations! Prediction succesfully done.
-
-Input graph: test/abaumannii_graph.gfa 
-
-Bacterial species:  'Acinetobacter baumannii' 
-
-Classifier: mlplasmids 
-
-Threshold for predicting plasmid-derived contigs: 0.7
-
-Number of plasmid walks created per node: 20
-
-Threshold of gplas scores: 0.1
-
-Minimum frequency to consider an edge: 0.1
-
-Modularity threshold used to partition the network: 0.2
-
-Your results are in results/ and walks/
+    Classifier: mlplasmids 
+    
+    Threshold for predicting plasmid-derived contigs: 0.7
+    
+    Number of plasmid walks created per node: 20
+    
+    Threshold of gplas scores: 0.1
+    
+    Minimum frequency to consider an edge: 0.1
+    
+    Modularity threshold used to partition the network: 0.2
+    
+    Your results are in results/ and walks/
 
 
 
