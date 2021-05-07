@@ -97,237 +97,38 @@ You can use plasflow as a classifier if you have a different bacterial
 species.
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
+./gplas.sh -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
 ```
+ ....
+  _______ .______    __           ___           _______.
+ /  _____||   _  \  |  |         /   \         /       |
+|  |  __  |  |_)  | |  |        /  ^  \       |   (----`
+|  | |_ | |   ___/  |  |       /  /_\  \       \   \    
+|  |__| | |  |      |  `----. /  _____  \  .----)   |   
+ \______| | _|      |_______|/__/     \__\ |_______/    
 
-    ## 
-    ## 
-    ## 
-    ##   _______ .______    __           ___           _______.
-    ##  /  _____||   _  \  |  |         /   \         /       |
-    ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
-    ## |  | |_ | |   ___/  |  |       /  /_\  \       \   \    
-    ## |  |__| | |  |      |  `----. /  _____  \  .----)   |   
-    ##  \______| | _|      |_______|/__/     \__\ |_______/    
-    ## 
-    ## 
-    ## ##################################################################
-    ## 
-    ## 
-    ## This is your input graph: test/faecium_graph.gfa 
-    ## 
-    ## This is the bacterial species that you have indicated: Enterococcus faecium 
-    ## 
-    ## Your results will be named  my_isolate 
-    ## 
-    ## You did not indicate a threshold prediction. Using 0.5 because you are using mlplasmids
-    ## 
-    ## You did not pass the number of times to look for walks based on each plasmid seed, using 20 as default
-    ## 
-    ## ##################################################################
-    ## Conda is present
-    ## 
-    ## Creating (only the first-time) a conda environment to install and run snakemake
-    ## The flag 'directory' used in rule awk_parsing_alignment is only valid for outputs, not inputs.
-    ## Building DAG of jobs...
-    ## Unlocking working directory.
-    ## The flag 'directory' used in rule awk_parsing_alignment is only valid for outputs, not inputs.
-    ## Building DAG of jobs...
-    ## Using shell: /bin/bash
-    ## Provided cores: 1
-    ## Rules claiming more threads will be scaled down.
-    ## Job counts:
-    ##  count   jobs
-    ##  1   awk_links
-    ##  1   awk_nodes
-    ##  1   gplas_coocurr
-    ##  1   gplas_coverage
-    ##  1   gplas_paths
-    ##  1   mlplasmids
-    ##  6
-    ## 
-    ## [Wed Jan 22 13:56:34 2020]
-    ## Job 1: Extracting the nodes from the graph test/faecium_graph.gfa
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Wed Jan 22 13:56:38 2020]
-    ## Finished job 1.
-    ## 1 of 6 steps (17%) done
-    ## 
-    ## [Wed Jan 22 13:56:38 2020]
-    ## Job 5: Extracting the links from the graph test/faecium_graph.gfa
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Wed Jan 22 13:56:41 2020]
-    ## Finished job 5.
-    ## 2 of 6 steps (33%) done
-    ## 
-    ## [Wed Jan 22 13:56:41 2020]
-    ## Job 3: Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running mlplasmids, installation can take a few minutes
-    ## 
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## [Wed Jan 22 13:56:54 2020]
-    ## Finished job 3.
-    ## 3 of 6 steps (50%) done
-    ## 
-    ## [Wed Jan 22 13:56:54 2020]
-    ## Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
-    ## 
-    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## WARNING: ignoring environment value of R_HOME
-    ## [Wed Jan 22 13:57:07 2020]
-    ## Finished job 2.
-    ## 4 of 6 steps (67%) done
-    ## 
-    ## [Wed Jan 22 13:57:07 2020]
-    ## Job 4: Searching for plasmid-like walks using a greedy approach
-    ## 
-    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## WARNING: ignoring environment value of R_HOME
-    ## [Wed Jan 22 13:57:50 2020]
-    ## Finished job 4.
-    ## 5 of 6 steps (83%) done
-    ## 
-    ## [Wed Jan 22 13:57:50 2020]
-    ## Job 0: Generating weights for the set of new edges connecting plasmid unitigs
-    ## 
-    ## R script job uses conda environment but R_LIBS environment variable is set. This is likely not intended, as R_LIBS can interfere with R packages deployed via conda. Consider running `unset R_LIBS` or remove it entirely before executing Snakemake.
-    ## Activating conda environment: /home/sergi/gplas/.snakemake/conda/70552874
-    ## WARNING: ignoring environment value of R_HOME
-    ## NULL
-    ##       Algorithm Modularity Original_component Decision
-    ## 1      Walktrap       0.13                  1 No_split
-    ## 2 Leading-eigen       0.13                  1 No_split
-    ## 3       Louvain       0.13                  1 No_split
-    ## null device 
-    ##           1 
-    ## [Wed Jan 22 13:58:04 2020]
-    ## Finished job 0.
-    ## 6 of 6 steps (100%) done
-    ## Complete log: /home/sergi/gplas/.snakemake/log/2020-01-22T135633.934474.snakemake.log
-    ##   _______ .______    __           ___           _______.
-    ##  /  _____||   _  \  |  |         /   \         /       |
-    ## |  |  __  |  |_)  | |  |        /  ^  \       |   (----`
-    ## |  | |_ | |   ___/  |  |       /  /_\  \       \   \    
-    ## |  |__| | |  |      |  `----. /  _____  \  .----)   |   
-    ##  \______| | _|      |_______|/__/     \__\ |_______/    
-    ## 
-    ## 
-    ## Congratulations! Prediction succesfully done.
-    ## 
-    ## Input graph: test/faecium_graph.gfa 
-    ## 
-    ## Bacterial species:  'Enterococcus faecium' 
-    ## 
-    ## Classifier: mlplasmids 
-    ## 
-    ## Threshold for predicting plasmid-derived contigs: 0.5
-    ## 
-    ## Number of plasmid walks created per node: 20
-    ## 
-    ## Threshold of gplas scores: 0.1
-    ## 
-    ## Minimum frequency to consider an edge: 0.1
-    ## 
-    ## Modularity threshold used to partition the network: 0.2
-    ## 
-    ## 
-    ## 
-    ## Your results are in results/ and walks/
-    ## 
-    ## We hope it helps your research, thanks for using gplas!
-    ## 
-    ## If you have used plasflow as a classifier please cite:
-    ##   Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
-    ## 
-    ## 
-    ## If you have used mlplasmids as a classifier please cite:
-    ##   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
-    ## 
-    ## 
-    ## gplas version 0.6.1 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1
 
-## Main output files
+Congratulations! Prediction succesfully done.
 
-Gplas will create a folder called ‘results’ with the following files:
+Input graph: test/abaumannii_graph.gfa 
 
-``` bash
-ls results/my_isolate*
-```
+Bacterial species:  'Acinetobacter baumannii' 
 
-    ## results/my_isolate_bin_1.fasta
-    ## results/my_isolate_bins.tab
-    ## results/my_isolate_plasmidome_network.png
-    ## results/my_isolate_results.tab
+Classifier: mlplasmids 
 
-### results/\*results.tab
+Threshold for predicting plasmid-derived contigs: 0.7
 
-Tab delimited file containing the prediction given by mlplasmids or
-plasflow together with the bin prediction by gplas. The file contains
-the following information: contig number, probability of being
-chromosome-derived, probability of being plasmid-derived, class
-prediction, contig name, k-mer coverage, length, bin
-assigned.
+Number of plasmid walks created per node: 20
 
-| number | Contig\_name                             | Prob\_Chromosome | Prob\_Plasmid | Prediction | length | coverage | Bin |
-| -----: | :--------------------------------------- | ---------------: | ------------: | :--------- | -----: | -------: | --: |
-|     18 | S18\_LN:i:54155\_dp:f:1.0514645940835776 |             0.01 |          0.99 | Plasmid    |  54155 |     1.05 |   1 |
-|     31 | S31\_LN:i:21202\_dp:f:1.194722937126809  |             0.15 |          0.85 | Plasmid    |  21202 |     1.19 |   1 |
-|     33 | S33\_LN:i:18202\_dp:f:1.1628830074648842 |             0.40 |          0.60 | Plasmid    |  18202 |     1.16 |   1 |
-|     46 | S46\_LN:i:8487\_dp:f:1.2210058174026983  |             0.03 |          0.97 | Plasmid    |   8487 |     1.22 |   1 |
-|     47 | S47\_LN:i:8177\_dp:f:0.9996798934685464  |             0.04 |          0.96 | Plasmid    |   8177 |     1.00 |   1 |
-|     50 | S50\_LN:i:4993\_dp:f:1.1698997426343487  |             0.02 |          0.98 | Plasmid    |   4993 |     1.17 |   1 |
-|     52 | S52\_LN:i:4014\_dp:f:0.9783821389091624  |             0.03 |          0.97 | Plasmid    |   4014 |     0.98 |   1 |
-|     54 | S54\_LN:i:3077\_dp:f:1.1553028848000615  |             0.08 |          0.92 | Plasmid    |   3077 |     1.16 |   1 |
-|     57 | S57\_LN:i:2626\_dp:f:0.9929149754371588  |             0.03 |          0.97 | Plasmid    |   2626 |     0.99 |   1 |
-|     60 | S60\_LN:i:1589\_dp:f:1.0577429501871556  |             0.00 |          1.00 | Plasmid    |   1589 |     1.06 |   1 |
+Threshold of gplas scores: 0.1
 
-### results/\*components.tab
+Minimum frequency to consider an edge: 0.1
 
-Tab delimited file containing the bin prediction reported by gplas with
-the following information: contig number, bin assignation
+Modularity threshold used to partition the network: 0.2
 
-| number | Bin |
-| -----: | --: |
-|     18 |   1 |
-|     33 |   1 |
-|     31 |   1 |
-|     47 |   1 |
-|     46 |   1 |
-|     50 |   1 |
-|     52 |   1 |
-|     57 |   1 |
-|     54 |   1 |
-|     60 |   1 |
+Your results are in results/ and walks/
 
-### results/\*plasmidome\_network.png
 
-Png file of the plasmidome network generated by gplas after creating an
-undirected graph from edges between plasmid unitigs co-existing in the
-walks created by gplas.
-
-![](results/my_isolate_plasmidome_network.png)<!-- -->
-
-### results/\*components.fasta
-
-Fasta files with the nodes belonging to each predicted component.
-
-``` bash
-grep '>' results/my_isolate*.fasta
-```
-
-    ## >S18_LN:i:54155_dp:f:1.0514645940835776
-    ## >S31_LN:i:21202_dp:f:1.194722937126809
-    ## >S33_LN:i:18202_dp:f:1.1628830074648842
-    ## >S46_LN:i:8487_dp:f:1.2210058174026983
-    ## >S47_LN:i:8177_dp:f:0.9996798934685464
-    ## >S50_LN:i:4993_dp:f:1.1698997426343487
-    ## >S52_LN:i:4014_dp:f:0.9783821389091624
-    ## >S54_LN:i:3077_dp:f:1.1553028848000615
-    ## >S57_LN:i:2626_dp:f:0.9929149754371588
-    ## >S60_LN:i:1589_dp:f:1.0577429501871556
 
 ### walks/\*solutions.csv
 
