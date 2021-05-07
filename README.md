@@ -15,7 +15,7 @@ plasmid contigs into several discrete plasmid components.
 ``` bash
 git clone https://gitlab.com/sirarredondo/gplas.git
 cd gplas
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'installation'
+./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
 
 First-time installation can take some time depending on your internet
