@@ -72,10 +72,11 @@ Following this, it will install the tools that we use to predict plasmid-derived
 Gplas only requires a single argument **'-i'** corresponding to an assembly graph in gfa format. Such an assembly graph can be obtained with [SPAdes genome assembler](https://github.com/ablab/spades).
 You need to specify which classifier gplas is going to use, mlplasmids or plasflow, with the argument **'-c'**
 
-If you choose mlplasmids for the prediction, there is an additional mandatory argument **'-s'** in which you need to list any of the following three bacterial species:
+If you choose mlplasmids for the prediction, there is an additional mandatory argument **'-s'** in which you need to list any of the following bacterial species:
 
 - 'Enterococcus faecium'
 - 'Klebsiella pneumoniae'
+- 'Acinetobacter baumannii'
 - 'Escherichia coli'
 
 You can use plasflow as a classifier if you have a different bacterial species. 
@@ -160,7 +161,7 @@ Mandatory arguments:
 
 - **-i**: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format
 - **-c**: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'
-- **-s**: Only applicable if mlplasmids is chosen. Bacterial species from the graph file. If you have specified mlplasmids as classifier you need to provide one of the following three bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae' or 'Escherichia coli'
+- **-s**: Only applicable if mlplasmids is chosen. Bacterial species from the graph file. If you have specified mlplasmids as classifier you need to provide one of the following bacterial species: 'Enterococcus faecium','Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'
 
 Optional arguments:
 
