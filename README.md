@@ -13,7 +13,7 @@ plasmid contigs into several discrete plasmid components.
 # Installation
 
 ``` bash
-git clone https://gitlab.com/sirarredondo/gplas.git
+git clone https://gitlab.com/mmb-umcu/gplas.git
 cd gplas
 ./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
@@ -67,7 +67,7 @@ version 0.8.0
 Following this, it will install the tools that we use to predict
 plasmid-derived contigs.
 
-4.  [mlplasmids](https://gitlab.com/sirarredondo/mlplasmids) version
+4.  [mlplasmids](https://gitlab.com/mmb-umcu/mlplasmids) version
     1.0.0
 
 5.  [plasflow](https://anaconda.org/bioconda/plasflow) version 1.1
@@ -262,4 +262,4 @@ have generated long-reads.
 
 You can report any issues or bugs that you find while installing/running
 gplas using the [issue
-tracker](https://gitlab.com/sirarredondo/gplas/issues)
+tracker](https://gitlab.com/mmb-umcu/gplas/issues)
