@@ -12,7 +12,6 @@ suppressMessages(library(Biostrings))
 suppressMessages(library(seqinr))
 
 # Inputs
-
 path_nodes <- snakemake@input[["nodes"]]
 path_links <- snakemake@input[["clean_links"]]
 path_prediction <- snakemake@input[["clean_prediction"]]
@@ -25,6 +24,8 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 iterations <- snakemake@params[["iterations"]]
 modularity_threshold <- snakemake@params[["modularity_threshold"]]
+
+
 
 links <- read.table(file = path_links, header = TRUE)
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
@@ -125,8 +126,6 @@ for(solution in 1:nrow(solutions))
 if(is.null(circular_sequences) == FALSE)
 {
   
-}
-
 no_duplicated <- circular_sequences[!duplicated(circular_sequences),]
 for(combination in 1:nrow(no_duplicated))
 {
@@ -141,6 +140,7 @@ for(combination in 1:nrow(no_duplicated))
     total_pairs <- rbind(total_pairs, df_test)
   }
   
+}
 }
 
 total_pairs$Starting_node <- gsub(pattern = '\\+', replacement = '', x = total_pairs$Starting_node)
@@ -219,6 +219,7 @@ single_edge_counting <- weight_counting %>%
 weight_graph <- data.frame(From_to = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,1]),
                            To_from = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,2]),
                            weight = single_edge_counting$Weight)
+
 total_scaled_weight <- NULL
 
 full_graph_info <- NULL
@@ -302,6 +303,10 @@ information_components <- data.frame(Original_component = original_components,
 
 full_info_components <- merge(node_and_component, information_components, by = 'Original_component')
 
+
+if(length(components_graph) >= 1)
+{
+  
 for(component in 1:length(components_graph))
 {
   subgraph <- components_graph[[component]]
@@ -321,8 +326,10 @@ complete_partition_info$Modularity <- round(complete_partition_info$Modularity,2
 modularity_threshold <- as.numeric(modularity_threshold)
 
 complete_partition_info$Decision <- ifelse(complete_partition_info$Modularity >= modularity_threshold, 'Split', 'No_split')
+}
 
 singletons_component <- which((components(no_loops_graph)$csize == 1) == TRUE)
+
 
 if(length(singletons_component) > 0)
 {
@@ -492,7 +499,6 @@ for(component in unique(df_nodes$Component))
   suppressWarnings(write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename))
 
 }
-
 
 colnames(full_info_assigned)[8] <- 'Bin'
 colnames(results_subgraph)[2] <- 'Bin'
