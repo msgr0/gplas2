@@ -79,10 +79,23 @@ If you choose mlplasmids for the prediction, there is an additional mandatory ar
 - 'Acinetobacter baumannii'
 - 'Escherichia coli'
 
+```{bash, eval = FALSE}
+./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
+```
+
 You can use plasflow as a classifier if you have a different bacterial species. 
 
-```{bash, eval = TRUE}
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
+```{bash, eval = FALSE}
+./gplas.sh -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
+```
+
+
+### New model for A. baumannii
+
+Thanks to the brilliant work from Alessia Carrara and Julian Paganini, we developed a new model for mlplasmids and integrated it into gplas. To use the model, please run: 
+
+```{bash, eval = FALSE}
+./gplas.sh -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
 ```
 
 
