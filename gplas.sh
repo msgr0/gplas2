@@ -13,7 +13,7 @@ while getopts ":i:n:s:c:t:x:r:f:e:q:h" opt; do
  case $opt in
    h)
    cat figures/logo.txt
-   echo -e "Welcome to the user guide of gplas (version 0.6.1):\n"
+   echo -e "Welcome to the user guide of gplas (version 0.7.0):\n"
    echo -e "Basic usage example: ./gplas.sh -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'\n"
    echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format\n"
    echo -e "Classifier:\n \t -c \t Mandatory: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'\n"
@@ -297,7 +297,7 @@ then
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
   echo -e "\n"
 
-  echo -e "gplas version 0.6.1 - Preprint of gplas: https://www.biorxiv.org/content/10.1101/835900v1"
+  echo -e "gplas version 0.7.0 - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483"
 else
   echo -e "Looks like something went wrong!"
 fi
