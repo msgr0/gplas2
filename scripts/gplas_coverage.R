@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript
 # Getting the arguments out of SnakeMake
 
-# Libraries required to generate the gplas output 
+# Libraries required to generate the gplas output
 
 suppressMessages(library(tidyverse))
 suppressMessages(library(spatstat))
@@ -16,7 +16,7 @@ path_prediction <- snakemake@input[["prediction"]]
 raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
 raw_contig_names <- names(raw_nodes)
 
-# Checking if the assembly was generated using Velvet or SPAdes
+# Checking if the assembly was generated using Unicycler or SPAdes
 
 kc_check <- grep(pattern = 'KC', x = raw_contig_names)
 
@@ -33,14 +33,14 @@ if(length(kc_check) == length(raw_contig_names))
 raw_number <- str_split_fixed(string = raw_contig_names, pattern = '_', n = 2)[,1]
 number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
-# Checking if the assembly was generated using Unicycler 
+# Checking if the assembly was generated using Unicycler
 
 if(length(kc_check) != length(raw_contig_names))
 {
   raw_length <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 4)[,3]
   length <- gsub(pattern = '_dp', replacement = '', x = raw_length)
   coverage <- str_split_fixed(string = raw_contig_names, pattern = ':', n = 5)[,5]
-  
+
 }
 
 contig_info <- data.frame(number = number,
@@ -120,10 +120,10 @@ for(node in unique_nodes)
 {
   repeat_links <- subset(links, links$V3 == node)
   repeat_links <- repeat_links[! duplicated(repeat_links),]
-  
+
   node_info <- data.frame(number = node,
                           indegree = length(repeat_links$V1))
-  
+
   indegree_info <- rbind(indegree_info, node_info)
 }
 
@@ -147,6 +147,11 @@ if(classifier == 'mlplasmids')
   clean_pred <- read.table(file = path_prediction, header = TRUE)
 }
 
+if(classifier == 'predict')
+{
+  clean_pred <- read.table(file = path_prediction, header = TRUE)
+}
+
 if(classifier == 'plasflow')
 {
   plasflow_prediction <- read.table(file = path_prediction, header = TRUE)
@@ -155,43 +160,43 @@ if(classifier == 'plasflow')
   for(contig in 1:nrow(plasflow_prediction))
   {
     particular_contig <- plasflow_prediction[contig,]
-    
+
     val <- max(as.numeric(particular_contig[,c(6:33)]))
     column <- which(particular_contig[,c(1:33)] == val)
     particular_contig$label <- colnames(particular_contig)[column]
     particular_contig$prob <- as.numeric(as.character(particular_contig[,column]))
     particular_contig$Prediction <- str_split_fixed(string = particular_contig$label, pattern = '\\.', n = 2)[,1]
-    
+
     if(particular_contig$Prediction == 'chromosome')
     {
       particular_contig$Prediction <- 'Chromosome'
       particular_contig$Prob_Chromosome <- particular_contig$prob
       particular_contig$Prob_Plasmid <- 1-particular_contig$Prob_Chromosome
-      
+
       clean_contig <- data.frame(Prob_Chromosome = particular_contig$Prob_Chromosome,
                                  Prob_Plasmid = particular_contig$Prob_Plasmid,
                                  Prediction = particular_contig$Prediction,
                                  Contig_name = particular_contig$contig_name,
                                  Contig_length = particular_contig$contig_length)
-      
+
       clean_pred <- rbind(clean_pred, clean_contig)
     }
-    
+
     if(particular_contig$Prediction == 'plasmid')
     {
       particular_contig$Prediction <- 'Plasmid'
       particular_contig$Prob_Plasmid <- particular_contig$prob
       particular_contig$Prob_Chromosome <- 1-particular_contig$Prob_Plasmid
-      
+
       clean_contig <- data.frame(Prob_Chromosome = particular_contig$Prob_Chromosome,
                                  Prob_Plasmid = particular_contig$Prob_Plasmid,
                                  Prediction = particular_contig$Prediction,
                                  Contig_name = particular_contig$contig_name,
                                  Contig_length = particular_contig$contig_length)
-      
+
       clean_pred <- rbind(clean_pred, clean_contig)
     }
-    
+
   }
 }
 
@@ -202,8 +207,8 @@ clean_pred$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
 #clean_pred$coverage <- str_split_fixed(string = clean_pred$Contig_name, pattern = ':', n = 5)[,5]
 
-#clean_pred$coverage <- as.numeric(as.character(clean_pred$coverage)) # Converting the column length into a numeric column 
-#clean_pred$length <- as.numeric(as.character(clean_pred$Contig_length)) # Converting the column coverage into a coverage column 
+#clean_pred$coverage <- as.numeric(as.character(clean_pred$coverage)) # Converting the column length into a numeric column
+#clean_pred$length <- as.numeric(as.character(clean_pred$Contig_length)) # Converting the column coverage into a coverage column
 
 clean_pred$length <- NULL
 clean_pred$coverage <- NULL
@@ -217,13 +222,13 @@ write.table(x = final_prediction, file = snakemake@output[["clean_prediction"]],
 
 ###########################################################################################################################################
 
-# Selecting the plasmid seeds in our graph 
+# Selecting the plasmid seeds in our graph
 
 pl_nodes <- subset(final_prediction, final_prediction$Prediction == 'Plasmid' | final_prediction$Prediction == 'plasmid' & final_prediction$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
-pl_nodes <- pl_nodes[! pl_nodes$number %in% repeats$number,] # From these contigs we remove contigs that could correspond to transposases 
-pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the contigs based on length 
+pl_nodes <- pl_nodes[! pl_nodes$number %in% repeats$number,] # From these contigs we remove contigs that could correspond to transposases
+pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the contigs based on length
 
-initialize_nodes <- unique(pl_nodes$number) # These contigs are going to be used as seeds to start finding the solutions 
+initialize_nodes <- unique(pl_nodes$number) # These contigs are going to be used as seeds to start finding the solutions
 
 write.table(x = initialize_nodes, file = snakemake@output[["initialize_nodes"]], row.names = FALSE)
 
@@ -235,11 +240,11 @@ chr_contigs <- subset(clean_pred, clean_pred$Prob_Chromosome > 0.7 & clean_pred$
 
 cov_estimation <- chr_contigs[! chr_contigs$number %in% repeats$number, ]
 
-# Different measures could be consider, we can use the median absolute deviation (mad) which can be more robust in case our population does not follow a normal distribution 
+# Different measures could be consider, we can use the median absolute deviation (mad) which can be more robust in case our population does not follow a normal distribution
 
-# This is the coverage spread that we find in our data 
+# This is the coverage spread that we find in our data
 
-cov <- mad(cov_estimation$coverage) # We assign the mad to the maximum variation k-mer variation that we allow in our data 
+cov <- mad(cov_estimation$coverage) # We assign the mad to the maximum variation k-mer variation that we allow in our data
 
 sd_estimation <- sd(cov_estimation$coverage)
 
@@ -247,8 +252,3 @@ max_variation <- cov*1.0
 max_variation_small <- cov*5.0
 
 write.table(x = sd_estimation, file = snakemake@output[["coverage"]], row.names = FALSE)
-
-
-
-
-
