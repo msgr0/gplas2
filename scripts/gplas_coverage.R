@@ -225,6 +225,7 @@ write.table(x = final_prediction, file = snakemake@output[["clean_prediction"]],
 # Selecting the plasmid seeds in our graph
 
 pl_nodes <- subset(final_prediction, final_prediction$Prediction == 'Plasmid' & final_prediction$Prob_Plasmid >= as.numeric(as.character(threshold)) | final_prediction$Prediction == 'plasmid' & final_prediction$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
+pl_nodes <- subset(pl_nodes, pl_nodes$Contig_length > 1e3) # Filtering the plasmid seeds by length 
 pl_nodes <- pl_nodes[! pl_nodes$number %in% repeats$number,] # From these contigs we remove contigs that could correspond to transposases
 pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the contigs based on length
 
