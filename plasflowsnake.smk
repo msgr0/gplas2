@@ -1,5 +1,3 @@
-configfile: "templates/final.yaml"
-
 rule awk_links:
     input:
         lambda wildcards: config["samples"][wildcards.sample]
