@@ -216,29 +216,22 @@ fi
 
 echo "##################################################################"
 
-( echo "cat <<EOF >templates/final.yaml";
-  cat templates/template.yml;
+cp templates/final.yaml templates/"$name"_assembly.yaml
+cp templates/template.yml templates/"$name"_template.yaml
+
+( echo "cat <<EOF >templates/"$name"_assembly.yaml";
+  cat templates/"$name"_template.yaml;
   echo "EOF";
-) > templates/temp.yaml
-. templates/temp.yaml
+) > templates/"$name"_temp.yaml
+. templates/"$name"_temp.yaml
 
 sleep 10s
 
 if command -v conda > /dev/null; then
  echo  -e 'Conda is present\n'
 else
-  echo -e "Conda is needed to run gplas.\n Installing conda"
-  initial_path=$PWD
-  cd /tmp
-  curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-  bash Miniconda3-latest-Linux-x86_64.sh
-  source ~/.bashrcd
-  conda config --add channels defaults
-  conda config --add channels bioconda
-  conda config --add channels conda-forge
-  cd $initial_path
+  echo -e "Conda is needed to run gplas.\n Please install conda before running gplas"
 fi
-
 
 echo -e "Creating (only the first-time) a conda environment to install and run snakemake"
 
@@ -251,9 +244,8 @@ conda activate gplas
 if [ "$classifier" == "extract" ];
 then
     echo -e "We need to extract the contigs first from the assembly graph, use later those contigs for your binary prediction" "\n"
-    sleep 5s
-    snakemake --unlock --use-conda -s otherclassifiers.smk gplas_input/"$name"_raw_nodes.fasta
-    snakemake --use-conda -s otherclassifiers.smk gplas_input/"$name"_raw_nodes.fasta
+    snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk gplas_input/"$name"_raw_nodes.fasta
+    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk gplas_input/"$name"_raw_nodes.fasta
     echo -e "Next step is to predict the extracted contigs with your desired binary classifier (e.g Kraken database)" "\n"
     exit
 fi
@@ -261,8 +253,8 @@ fi
 if [ "$classifier" == "predict" ];
 then
     echo -e "Resuming gplas using the prediction given by the user" "\n"
-    snakemake --unlock --use-conda -s otherclassifiers.smk results/"$name"_results.tab
-    snakemake --use-conda -s otherclassifiers.smk results/"$name"_results.tab
+    snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
+    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
 fi
 
 
@@ -270,20 +262,20 @@ if [ "$classifier" == "mlplasmids" ];
 then
   if [ "$reference" == "No reference provided" ];
   then
-      snakemake --unlock --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
-      snakemake --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab
+      snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab 
+      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
-      snakemake --use-conda -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
+      snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
   fi
 else
   if [ "$reference" == "No reference provided" ];
   then
-      snakemake --unlock --use-conda -s plasflowsnake.smk results/"$name"_results.tab
-      snakemake --use-conda -s plasflowsnake.smk results/"$name"_results.tab
+      snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
+      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
   else
-      snakemake --unlock --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
-      snakemake --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
+      snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
+      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk evaluation/"$name"_metrics.tab
   fi
 fi
 
