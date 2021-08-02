@@ -225,7 +225,7 @@ cp templates/template.yml templates/"$name"_template.yaml
 ) > templates/"$name"_temp.yaml
 . templates/"$name"_temp.yaml
 
-sleep 10s
+sleep 1s
 
 if command -v conda > /dev/null; then
  echo  -e 'Conda is present\n'
@@ -307,5 +307,16 @@ then
 
   echo -e "gplas version 0.8.0 - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483"
 else
-  echo -e "Looks like something went wrong!"
+  echo -e "Looks like no plasmids could be detected in your assembly graph\n"
+  echo -e "Please check the file:   coverage/*_clean_prediction.tab    If all contigs were predicted as chromosome, gplas probably failed at the step to create random walks starting from plasmid seeds\n"
+  echo -e "If that's the case, probably your isolate does not carry any plasmid(s)\n"
+  echo -e "\n"
+  echo -e "If you don't see any files present at:   gplas_input/  or  coverage/   most likely the installation of gplas failed at some point\n"
+sleep 10s
+  echo -e "If you have used plasflow as a classifier please cite:
+  Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321"
+  echo -e "\n"
+  echo -e "If you have used mlplasmids as a classifier please cite:
+  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224"
+  echo -e "Thank you for using gplas! gplas version 0.8.0 - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483\n"
 fi
