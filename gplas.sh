@@ -9,7 +9,7 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:k:n:s:c:t:x:r:f:e:q:h" opt; do
+while getopts ":i:k:n:s:c:t:x:r:f:e:q:h:b:" opt; do
  case $opt in
    h)
    cat figures/logo.txt
@@ -71,6 +71,9 @@ while getopts ":i:k:n:s:c:t:x:r:f:e:q:h" opt; do
      ;;
    r)
      reference=$OPTARG
+     ;;
+   b)
+     bold_sd_coverage=$OPTARG
      ;;
    \?)
      ./gplas.sh -h
@@ -202,6 +205,15 @@ else
     echo -e "Using the following gplas filtering threshold score:" $modularity_threshold "\n"
 fi
 
+if [ -z "$bold_sd_coverage" ];
+then
+    echo -e "You did not specified the coverage SD for constructing plasmid walks in bold mode, using 10 as default"
+    bold_sd_coverage=10
+else
+    echo -e "Coverage SD for bold mode:" $bold_sd_coverage "\n"
+fi
+
+
 if [ -z "$reference" ];
 then
     reference="No reference provided"
@@ -248,17 +260,22 @@ then
     snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk gplas_input/"$name"_raw_nodes.fasta
     echo -e "Next step is to predict the extracted contigs with your desired binary classifier (e.g Kraken database)" "\n"
     exit
-fi
 
-if [ "$classifier" == "predict" ];
+elif [ "$classifier" == "predict" ];
 then
     echo -e "Resuming gplas using the prediction given by the user" "\n"
-    snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
-    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
-fi
-
-
-if [ "$classifier" == "mlplasmids" ];
+     snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
+     snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
+  if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ]
+  then
+    echo "Some plasmid contigs were left unbinned, running gplas in bold mode"    
+     snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
+     snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
+  else #move the results
+    echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
+    mv results/normal_mode/"$name"* results/
+  fi
+elif [ "$classifier" == "mlplasmids" ];
 then
   if [ "$reference" == "No reference provided" ];
   then
