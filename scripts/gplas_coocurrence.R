@@ -493,7 +493,7 @@ for(component in unique(df_nodes$Component))
 {
   nodes_component <- subset(df_nodes, df_nodes$Component == component)
   component_complete_name <- paste(snakemake@params[["sample"]], 'bin', sep = '_')
-  filename <- paste('results/', component_complete_name, sep = '')
+  filename <- paste('results/normal_mode/', component_complete_name, sep = '')
   filename <- paste(filename,component, sep = '_')
   filename <- paste(filename,'.fasta',sep = '')
   suppressWarnings(write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename))
