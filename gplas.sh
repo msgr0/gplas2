@@ -9,14 +9,18 @@
 ## A bash script to run the gplas pipeline
 ## This script has been converted and transformed from the script present in the gitlab repo 'bactofidia' by aschuerch
 
-while getopts ":i:k:n:s:c:t:x:r:f:e:q:h:b:" opt; do
+while getopts ":i:n:s:c:t:x:f:e:q:hb:k" opt; do
  case $opt in
    h)
    cat figures/logo.txt
    echo -e "Welcome to the user guide of gplas (version 0.8.0):\n"
    echo -e "Basic usage example: ./gplas.sh -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'\n"
    echo -e "Input:\n \t -i \t Mandatory: Path to the graph file in *.gfa format used to extract nodes and links. Gfa file format\n"
-   echo -e "Classifier:\n \t -c \t Mandatory: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'.\n"
+   echo -e "Classifier:\n \t -c \t Mandatory: Classifier used to predict the contigs extracted from the input graph. String value: 'plasflow' or 'mlplasmids'. Alternatively, other binary classifiers can be utilized with the 'extract' and 'predict' options, as detailed below. \n
+\t    \t For using a different binary classifier coupled with gplas three steps must be followed:
+\t    \t 1) Classifier option must be set to 'extract'. This will generate a fasta file containing the extracted nodes sequences, which will be saved to gplas_input/\${name}_raw_nodes.fasta.
+\t    \t 2) Extracted nodes will be used as input for the binary classification tool selected by the user. After binary classifcation, predictions will need to be formated appropriately and saved to independent_prediction/\${name}_plasmid_prediction.tab.
+\t    \t 3) Classifier option must be set to 'predict'.\n"
    echo -e "Bacterial species: \n \t -s \t Mandatory (if mlplasmids is chosen): Bacterial species from the graph file. If you have specified mlplasmids as classifier
                  you need to provide one of the following three bacterial species:\n
                 'Enterococcus faecium','Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'\n"
@@ -25,15 +29,15 @@ while getopts ":i:k:n:s:c:t:x:r:f:e:q:h:b:" opt; do
    echo -e "Settings:\n \t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1.
                  Default mlplasmids threshold: 0.5
                  Default plasflow threshold: 0.7\n"
+   echo -e "Bold variance:\n \t -b \t Optional: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes. Numeric value: X times coverage variance of the chromsome.
+\t    \t Default: 5\n" 
    echo -e "\t -x \t Optional: Number of times gplas finds plasmid walks per each plasmid starting node. Integer value ranging from 1 to infinite.
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
                  Default: 0.1\n"
    echo -e "\t -q \t Optional: Modularity threshold to split components present in the plasmidome network. Integer value ranging from 0 to 1
                  Default: 0.2\n"
-   echo -e "Benchmarking purposes: \n \t -r \t Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
-                 benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
-                 for your chromosome and plasmids. Fasta file format"
+   echo -e "\t -k \t Optional: Keeps intermediary files (i.e. plasmid-walks).\n"
    exit
    ;;
    i)
@@ -46,7 +50,7 @@ while getopts ":i:k:n:s:c:t:x:r:f:e:q:h:b:" opt; do
      name=$OPTARG
      ;;
    k)
-     external=$OPTARG
+    keep='true'   
      ;;
    s)
      species=$OPTARG
@@ -68,9 +72,6 @@ while getopts ":i:k:n:s:c:t:x:r:f:e:q:h:b:" opt; do
      ;;
    q)
      modularity_threshold=$OPTARG
-     ;;
-   r)
-     reference=$OPTARG
      ;;
    b)
      bold_sd_coverage=$OPTARG
@@ -207,8 +208,8 @@ fi
 
 if [ -z "$bold_sd_coverage" ];
 then
-    echo -e "You did not specified the coverage SD for constructing plasmid walks in bold mode, using 10 as default"
-    bold_sd_coverage=10
+    echo -e "You did not specified the coverage SD for constructing plasmid walks in bold mode, using 5 as default"
+    bold_sd_coverage=5
 else
     echo -e "Coverage SD for bold mode:" $bold_sd_coverage "\n"
 fi
@@ -275,26 +276,42 @@ then
     echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
     mv results/normal_mode/"$name"* results/
   fi
+
 elif [ "$classifier" == "mlplasmids" ];
 then
-  if [ "$reference" == "No reference provided" ];
-  then
-      snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s mlplasmidssnake.smk results/"$name"_results.tab 
-      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk results/"$name"_results.tab
-  else
-      snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
-      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk evaluation/"$name"_metrics.tab
-  fi
+    snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s mlplasmidssnake.smk results/normal_mode/"$name"_results.tab 
+    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk results/normal_mode/"$name"_results.tab
+    if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ];
+    then
+        echo "Some plasmid contigs were left unbinned, running gplas in bold mode"
+        snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk results/"$name"_results.tab
+        snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s mlplasmidssnake.smk results/"$name"_results.tab
+    else #move the results
+        echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
+        mv results/normal_mode/"$name"* results/
+    fi
 else
-  if [ "$reference" == "No reference provided" ];
-  then
-      snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
-      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
-  else
-      snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s plasflowsnake.smk evaluation/"$name"_metrics.tab
-      snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk evaluation/"$name"_metrics.tab
-  fi
+    snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s plasflowsnake.smk results/normal_mode/"$name"_results.tab
+    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/normal_mode/"$name"_results.tab
+    if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ];
+    then
+        echo "Some plasmid contigs were left unbinned, running gplas in bold mode"
+        snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
+        snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s plasflowsnake.smk results/"$name"_results.tab
+    else #move the results
+        echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
+        mv results/normal_mode/"$name"* results/
+    fi
 fi
+
+#if the keep flag is not specified, remove all intermediate files
+if [ -z "$keep" ] && [ "$classifier"!="extract" ];
+then
+    echo -e "Intermediate files will be deleted. If you want to keep this files, use the -k flag"
+    bash scripts/remove_intermediate_files.sh -n "$name"
+fi
+
+
 
 file_to_check=results/"$name"_results.tab
 
