@@ -145,7 +145,7 @@ rule extract_unbinned_solutions:
     message:
         "Extracting unbinned nodes from the initial run"
     shell:
-        """for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks}; done"""
+        """for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; done"""
 
 rule combine_solutions:
     input:
