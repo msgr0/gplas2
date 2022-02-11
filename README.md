@@ -80,9 +80,9 @@ plasmid-derived contigs.
 
 Gplas only requires a single argument **‘-i’** corresponding to an
 assembly graph in gfa format. Such an assembly graph can be obtained
-with [SPAdes genome assembler](https://github.com/ablab/spades). You
-need to specify which classifier gplas is going to use, mlplasmids or
-plasflow, with the argument **‘-c’**
+with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). You
+need to specify which classifier gplas is going to use with the argument **‘-c’**
+Out of the box, gplas uses 'mlplasmids' or 'plasflow' as classifiers, but other tools can also be used with the 'extract' and 'predict' arguments.
 
 If you choose mlplasmids for the prediction, there is an additional
 mandatory argument **‘-s’** in which you need to list any of the
@@ -104,6 +104,31 @@ species.
 ./gplas.sh -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
 ```
 
+### Running gplas coupled to a different binary classifier 
+
+For using other binary classifiers, three steps must be followed:
+1) The classifier argument must be set to 'extract'. This will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**.
+
+``` bash
+./gplas.sh -i test/faecium_graph.gfa -c extract -s 'Enterococcus faecium' -n 'my_isolate'
+```
+2) Extracted nodes will be used as input for the binary classifier selected by the user. After binary classifcation, predictions will need to be formated appropriately (see below) and saved to **independent_prediction/my_isolate_plasmid_prediction.tab**.
+
+The output from binary classification tools has to be formatted to a tab separated file containing the following columns and headers:
+
+| Prob\_Chromosome | Prob\_Plasmid |  Prediction  |            Contig\_name                  | Contig\_length|
+|-----------------:|:-------------:|-------------:|-----------------------------------------:|--------------:|
+|       0.40       |      0.60     |    Plasmid   |  S1\_LN:i:4240\_dp:f:1.936810327946946   |      4240     |
+|       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
+|       0.12       |      0.88     |  Chromosome  |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
+
+Currently, [plasmidEC](https://github.com/lisavader/plasmidEC) provides the option to automatically generate results in a format compatible with gplas.
+
+3) To complete the plasmid predictions, we will run gplas again setting the classifier argument to 'predict'.
+
+``` bash
+./gplas.sh -i test/faecium_graph.gfa -c predict -s 'Enterococcus faecium' -n 'my_isolate'
+```
 ### New model for A. baumannii
 
 Thanks to the brilliant work from Alessia Carrara and Julian Paganini,
