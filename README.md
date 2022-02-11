@@ -80,9 +80,9 @@ plasmid-derived contigs.
 
 Gplas only requires a single argument **‘-i’** corresponding to an
 assembly graph in gfa format. Such an assembly graph can be obtained
-with [SPAdes genome assembler](https://github.com/ablab/spades). You
-need to specify which classifier gplas is going to use, mlplasmids or
-plasflow, with the argument **‘-c’**
+with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). You
+need to specify which classifier gplas is going to use with the argument **‘-c’**
+Out of the box, gplas uses 'mlplasmids' or 'plasflow' as classifiers, but other tools can also be used with the 'extract' and 'predict' arguments.
 
 If you choose mlplasmids for the prediction, there is an additional
 mandatory argument **‘-s’** in which you need to list any of the
@@ -104,6 +104,34 @@ species.
 ./gplas.sh -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
 ```
 
+### Running gplas coupled to a different binary classifier 
+
+For using other binary classifiers, three steps must be followed:
+1) The classifier argument must be set to 'extract'.
+
+This will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**.
+
+``` bash
+./gplas.sh -i test/faecium_graph.gfa -c extract -n 'my_isolate'
+```
+2) Extracted nodes will be used as input for the binary classifier selected by the user. 
+After binary classifcation, predictions will need to be formated appropriately (see below) and saved to **independent_prediction/my_isolate_plasmid_prediction.tab**.
+
+The output from the selected binary classification tools has to be formatted to a tab separated file containing the following columns and headers:
+
+| Prob\_Chromosome | Prob\_Plasmid |  Prediction  | Contig\_name                             | Contig\_length|
+|-----------------:|--------------:|:-------------|:-----------------------------------------|--------------:|
+|       0.40       |      0.60     |    Plasmid   |  S1\_LN:i:4240\_dp:f:1.936810327946946   |      4240     |
+|       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
+|       0.12       |      0.88     |  Chromosome  |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
+
+Currently, [plasmidEC](https://github.com/lisavader/plasmidEC) provides the option to automatically generate results for *E. coli* in a format compatible with gplas.
+
+3) To complete the plasmid predictions, we will run gplas again setting the classifier argument to 'predict'.
+
+``` bash
+./gplas.sh -i test/faecium_graph.gfa -c predict -s 'Enterococcus faecium' -n 'my_isolate'
+```
 ### New model for A. baumannii
 
 Thanks to the brilliant work from Alessia Carrara and Julian Paganini,
@@ -193,7 +221,13 @@ grep '>' results/my_isolate*.fasta
     ## >S57_LN:i:2626_dp:f:0.9929149754371588
     ## >S60_LN:i:1589_dp:f:1.0577429501871556
 
-### walks/\*solutions.csv
+
+
+## Intermdiary results files
+
+If the **-k** flag is selected, gplas will also **keep** all intermediary files needed to construct the plasmid predictions. For example:
+
+### walks/normal_mode/\*solutions.csv
 
 gplas generates plasmid-like walks per each plasmid starting node. These
 paths are used later to generate the edges from the plasmidome network
@@ -208,7 +242,7 @@ the same plasmid sequence. In these cases, gplas can traverse the
 sequence in different ways generating different plasmid-like paths.
 
 ``` bash
-head -n 10 walks/my_isolate_solutions.csv
+head -n 10 walks/normal_mode/my_isolate_solutions.csv
 ```
 
     ## 18+,76-,102+,33+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,116+,61-,88-,89+,69-,96-,119+,64-,116+,61-,88-,90+,69-,100+,119+,64-,116+,63+,115-,64+,119-,100-,69+
@@ -239,7 +273,7 @@ Mandatory arguments:
 -   **-i**: Path to the graph file in \*.gfa format used to extract
     nodes and links. Gfa file format
 -   **-c**: Classifier used to predict the contigs extracted from the
-    input graph. String value: ‘plasflow’ or ‘mlplasmids’
+    input graph. String value: ‘plasflow’, ‘mlplasmids’, 'extract' or 'predict'.
 -   **-s**: Only applicable if mlplasmids is chosen. Bacterial species
     from the graph file. If you have specified mlplasmids as classifier
     you need to provide one of the following bacterial species:
@@ -258,17 +292,10 @@ Optional arguments:
     edges. Integer value ranging from 0 to 1. Default: 0.1
 -   **-q**: Modularity threshold to split components present in the
     plasmidome network. Integer value ranging from 0 to 1. Default: 0.2
+-   **-b**: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted unitigs. 
+    Numeric value: X times coverage variance of the chromsome. Default: 5.
+-   **-k**: Keep intermediary files.
 
-For benchmarking purposes you can pass a complete genome to gplas and
-will generate a precision and completeness. Using this you can assess
-the performance of gplas on a small set of genomes in which perhaps you
-have generated long-reads.
-
--   **-r**: Path to the complete reference genome corresponding to the
-    graph given. For optimal results using this benchmarking flag,
-    please name the reference genomes using the Unicycler scheme:
-    e.g. ‘1 length=4123456’ ‘2 length=10000’ ‘3 length=2000’ for your
-    chromosome and plasmids. Fasta file format Fasta file format
 
 # Help page
 
@@ -302,6 +329,9 @@ have generated long-reads.
     ##       -n      Optional: Output name used in the files generated by gplas. Default: 'unnamed'
     ## 
     ## Settings:
+    ##      -b 	 Optional: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes. Numeric value: X times coverage variance of 
+    ##                     the chromsome. Default: 5.
+    ##
     ##       -t      Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1.
     ##                  Default mlplasmids threshold: 0.5
     ##                  Default plasflow threshold: 0.7
@@ -315,10 +345,8 @@ have generated long-reads.
     ##   -q      Optional: Modularity threshold to split components present in the plasmidome network. Integer value ranging from 0 to 1
     ##                  Default: 0.2
     ## 
-    ## Benchmarking purposes: 
-    ##       -r      Optional: Path to the complete reference genome corresponding to the graph given. For optimal results using this
-    ##                  benchmarking flag, please name the reference genomes using the Unicycler scheme: e.g. '1 length=4123456' '2 length=10000' '3 length=2000'
-    ##                  for your chromosome and plasmids. Fasta file format
+    ## 	 -k 	 Optional: Keeps intermediary files (i.e. plasmid-walks).
+
 
 # Issues/Bugs
 
