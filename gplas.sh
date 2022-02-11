@@ -29,8 +29,7 @@ while getopts ":i:n:s:c:t:x:f:e:q:hb:k" opt; do
    echo -e "Settings:\n \t -t \t Optional: Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1.
                  Default mlplasmids threshold: 0.5
                  Default plasflow threshold: 0.7\n"
-   echo -e "Bold variance:\n \t -b \t Optional: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes. Numeric value: X times coverage variance of the chromsome.
-\t    \t Default: 5\n" 
+   echo -e "\t -b \t Optional: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes. Numeric value: X times coverage variance of the chromsome. Default: 5\n" 
    echo -e "\t -x \t Optional: Number of times gplas finds plasmid walks per each plasmid starting node. Integer value ranging from 1 to infinite.
                  Default: 20\n"
    echo -e "\t -f \t Optional: Gplas filtering threshold score to reject possible outcoming edges. Integer value ranging from 0 to 1.
