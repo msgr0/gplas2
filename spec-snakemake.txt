@@ -130,4 +130,11 @@ https://conda.anaconda.org/bioconda/noarch/snakemake-minimal-5.5.4-py_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/boto3-1.9.215-py_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/google-cloud-core-1.0.3-py_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/google-cloud-storage-1.18.0-py_0.tar.bz2
+https://conda.anaconda.org/conda-forge/linux-64/r-base-3.5.1-hc461eb7_1012.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/bioconductor-biostrings-2.50.2-r351h14c3975_0.tar.bz2
+https://conda.anaconda.org/bioconda/noarch/bioconductor-biocgenerics-0.28.0-r351_1.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/bioconductor-iranges-2.16.0-r351h14c3975_0.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/bioconductor-s4vectors-0.20.1-r351h14c3975_0.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/bioconductor-xvector-0.22.0-r351h14c3975_0.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/bioconductor-zlibbioc-1.28.0-r351h14c3975_0.tar.bz2
 https://conda.anaconda.org/bioconda/noarch/snakemake-5.5.4-1.tar.bz2
