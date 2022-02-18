@@ -264,18 +264,24 @@ then
 elif [ "$classifier" == "predict" ];
 then
     echo -e "Resuming gplas using the prediction given by the user" "\n"
-     snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
-     snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
-  if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ]
-  then
-    echo "Some plasmid contigs were left unbinned, running gplas in bold mode"    
-     snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
-     snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
-  else #move the results
-    echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
-    mv results/normal_mode/"$name"* results/
-  fi
-
+    echo -e "Checking if prediction file is correctly formatted" "\n"
+    check_file_output=$(Rscript scripts/check_independent_prediction_format.R "$name")
+    if [[ -z "$check_file_output" ]]; then
+        echo 'Please modify format on input files and re-run gplas' && exit 1 
+    else
+        echo $check_file_output  
+        snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
+        snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/normal_mode/"$name"_results.tab
+        if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ]
+        then
+        echo "Some plasmid contigs were left unbinned, running gplas in bold mode"    
+        snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
+        snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s otherclassifiers.smk results/"$name"_results.tab
+        else #move the results
+          echo "No contigs were left unbinned, is not necessary to run gplas in bold mode"
+          mv results/normal_mode/"$name"* results/
+        fi
+    fi
 elif [ "$classifier" == "mlplasmids" ];
 then
     snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s mlplasmidssnake.smk results/normal_mode/"$name"_results.tab 
@@ -306,11 +312,9 @@ fi
 #if the keep flag is not specified, remove all intermediate files
 if [ -z "$keep" ] && [ "$classifier"!="extract" ];
 then
-    echo -e "Intermediate files will be deleted. If you want to keep this files, use the -k flag"
+    echo -e "Intermediate files will be deleted. If you want to keep these files, use the -k flag"
     bash scripts/remove_intermediate_files.sh -n "$name"
 fi
-
-
 
 file_to_check=results/"$name"_results.tab
 
