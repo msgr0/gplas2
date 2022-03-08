@@ -9,16 +9,16 @@ tool that extends the possibility of accurately binning predicted
 plasmid contigs into several discrete plasmid components.
 
 # Table of Contents
-* [Installation][#installation]
-* [Quick usage][#quick-usage]
-    * [Running gplas with an assembly graph][#Running-gplas-with-an-assembly-graph]
-    * [Running gplas coupled to a different binary classifier][Running-gplas-coupled-to-a-different-binary-classifier]
-    * [New model for A. baumannii][New-model-for-A-baumannii]
-    * [Main output files][#main-output-files]
-* [Complete usage][#complete-usage]
-    * [Intermediary results files][#intermediary-results-files]
-* [Help page][#help-page]
-* [Issues and Bugs][#issues-and-bugs]
+* [Installation](#installation)
+* [Quick usage](#quick-usage)
+    * [Running gplas with an assembly graph](#Running-gplas-with-an-assembly-graph)
+    * [Running gplas coupled to a different binary classifier](#running-gplas-coupled-to-a-different-binary-classifier)
+    * [New model for A. baumannii](#new-model-for-A-baumannii)
+    * [Main output files](#main-output-files)
+* [Complete usage](#complete-usage)
+    * [Intermediary results files](#intermediary-results-files)
+* [Help page](#help-page)
+* [Issues and Bugs](#issues-and-bugs)
 
 # Installation
 
