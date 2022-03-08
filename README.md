@@ -1,7 +1,7 @@
 gplas: binning plasmid-predicted contigs
 ================
 
-<p align="center"><img src="figures/logo.png" alt="gplas" width="600"></p>
+<div align="center"><img src="figures/logo.png" alt="gplas" width="600"/></div>
 
 gplas is a tool to bin plasmid-predicted contigs based on sequence
 composition, coverage and assembly graph information. Gplas is a new
