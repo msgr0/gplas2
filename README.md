@@ -11,9 +11,9 @@ plasmid contigs into several discrete plasmid components.
 # Table of Contents
 * [Installation](#installation)
 * [Quick usage](#quick-usage)
-    * [Running gplas with an assembly graph](#Running-gplas-with-an-assembly-graph)
+    * [Running gplas with an assembly graph](#running-gplas-with-an-assembly-graph)
     * [Running gplas coupled to a different binary classifier](#running-gplas-coupled-to-a-different-binary-classifier)
-    * [New model for A. baumannii](#new-model-for-A-baumannii)
+    * [New model for A. baumannii](#new-model-for-a-baumannii)
     * [Main output files](#main-output-files)
 * [Complete usage](#complete-usage)
     * [Intermediary results files](#intermediary-results-files)
@@ -262,7 +262,7 @@ Optional arguments:
     Numeric value: X times coverage variance of the chromsome. Default: 5.
 -   **-k**: Keep intermediary files.
 
-### Intermdiary results files
+### Intermediary results files
 
 If the **-k** flag is selected, gplas will also **keep** all intermediary files needed to construct the plasmid predictions. For example:
 
