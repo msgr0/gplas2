@@ -8,12 +8,14 @@ rule awk_links:
         "gplas_input/{sample}_raw_links.txt"
     conda:
         "envs/r_packages.yaml"
-    message:
-        "Extracting the links from the graph {input}"
     log:
         "logs/{sample}_log_links.txt"
+    message:
+        "Extracting the links from the graph {input}"
     shell:
-        """awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}"""
+        """
+        awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}
+        """
 
 rule awk_nodes:
     input:
@@ -22,15 +24,14 @@ rule awk_nodes:
         "gplas_input/{sample}_raw_nodes.fasta"
     conda:
         "envs/r_packages.yaml"
-    message:
-        "Extracting the nodes from the graph {input}"
     log:
         "logs/{sample}_log_nodes.txt"
     message:
         "Extracting the nodes from the graph {input}"
     shell:
-        """awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
-
+        """
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}
+        """
 
 rule gplas_coverage:
     input:
@@ -54,7 +55,6 @@ rule gplas_coverage:
     script:
         "scripts/gplas_coverage.R"
 
-
 rule gplas_paths:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
@@ -77,7 +77,6 @@ rule gplas_paths:
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
-
     script:
         "scripts/gplas_paths.R"
 
@@ -145,7 +144,11 @@ rule extract_unbinned_solutions:
     message:
         "Extracting unbinned nodes from the initial run"
     shell:
-        """for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; done"""
+        """
+        for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do \
+        grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; \
+        done
+        """
 
 rule combine_solutions:
     input:
@@ -156,7 +159,9 @@ rule combine_solutions:
     message:
          "Combinning walks from normal and bold modes"
     shell:
-        """cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}""" 
+        """
+        cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}
+        """ 
 
 rule gplas_coocurr_final:
     input:

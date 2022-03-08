@@ -1,6 +1,6 @@
 wildcard_constraints:
   sample="[^/]+"
-  
+
 rule awk_links:
     input:
         lambda wildcards: config["samples"][wildcards.sample]
@@ -8,12 +8,14 @@ rule awk_links:
         "gplas_input/{sample}_raw_links.txt"
     conda:
         "envs/r_packages.yaml"
-    message:
-        "Extracting the links from the graph {input}"
     log:
         "logs/{sample}_log_links.txt"
+    message:
+        "Extracting the links from the graph {input}"
     shell:
-        """awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}"""
+        """
+        awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}
+        """
 
 rule awk_nodes:
     input:
@@ -22,34 +24,42 @@ rule awk_nodes:
         "gplas_input/{sample}_raw_nodes.fasta"
     conda:
         "envs/r_packages.yaml"
-    message:
-        "Extracting the nodes from the graph {input}"
     log:
         "logs/{sample}_log_nodes.txt"
+    message:
+        "Extracting the nodes from the graph {input}"
     shell:
-        """awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
+        """
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}
+        """
 
-rule plasflow:
+rule mlplasmids:
     input:
         "gplas_input/{sample}_raw_nodes.fasta"
     output:
-        "plasflow_prediction/{sample}_plasmid_prediction.tab"
+        "mlplasmids_prediction/{sample}_plasmid_prediction.tab"
     params:
         species = config["species"],
-        prob = config["threshold_prediction"],
         threshold = config["threshold_prediction"]
     conda:
-        "envs/plasflow.yaml"
+        "envs/r_packages.yaml"
+    log:
+        normalmessage="logs/{sample}_normal_log_mlplasmids.txt",
+        errormessage="logs/{sample}_error_log_mlplasmids.txt"
     message:
-        "Running plasflow to obtain the plasmid prediction using the nodes extracted from the graph. If this is the first time running plasflow, installation can take a few minutes"
+        "Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph."
     shell:
-        """current_path=$(pwd) && cd ~ && PlasFlow.py --input "$current_path"/{input} --threshold {params.threshold} --output "$current_path"/{output}"""
+        """
+        Rscript scripts/run_mlplasmids.R \
+        {input} {output} {params.threshold} {params.species} \
+        1>> {log.normalmessage} 2>> {log.errormessage}
+        """
 
 rule gplas_coverage:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         links="gplas_input/{sample}_raw_links.txt",
-        prediction="plasflow_prediction/{sample}_plasmid_prediction.tab"
+        prediction="mlplasmids_prediction/{sample}_plasmid_prediction.tab"
     output:
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
@@ -71,7 +81,7 @@ rule gplas_paths:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
+        prediction="mlplasmids_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -86,9 +96,10 @@ rule gplas_paths:
         filt_gplas = config["filt_gplas"]
     conda:
         "envs/r_packages.yaml"
+    threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
-    threads: 1
+
     script:
         "scripts/gplas_paths.R"
 
@@ -96,12 +107,12 @@ rule gplas_paths_bold:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
+        prediction="mlplasmids_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
         clean_prediction="coverage/{sample}_clean_prediction.tab",
-        initialize_nodes="coverage/{sample}_initialize_nodes.tab"
+        initialize_nodes="coverage/{sample}_initialize_nodes.tab" 
     output:
         solutions="walks/bold_mode/{sample}_solutions_bold.csv",
         connections="walks/bold_mode/{sample}_connections_bold.tab"
@@ -122,7 +133,7 @@ rule gplas_coocurr:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
+        prediction="mlplasmids_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -135,8 +146,8 @@ rule gplas_coocurr:
         results="results/normal_mode/{sample}_results.tab"
     params:
         threshold = config["threshold_prediction"],
-        classifier = config["classifier"],
         iterations = config["number_iterations"],
+        classifier = config["classifier"],
         edge_gplas = config["edge_gplas"],
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
@@ -153,10 +164,16 @@ rule extract_unbinned_solutions:
         bold_walks="walks/bold_mode/{sample}_solutions_bold.csv"
     output:
         unbinned_walks="walks/unbinned_nodes/{sample}_solutions_unbinned.csv"
+    conda:
+        "envs/r_packages.yaml"
     message:
         "Extracting unbinned nodes from the initial run"
     shell:
-        """for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; done"""
+        """
+        for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do \
+        grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; \
+        done
+        """
 
 rule combine_solutions:
     input:
@@ -165,15 +182,17 @@ rule combine_solutions:
     output:
         combined_walks="walks/{sample}_solutions.csv"
     message:
-         "Combinning walks from normal and bold modes"
+        "Combinning walks from normal and bold modes"
     shell:
-        """cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}"""
-	    
+        """
+        cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}
+        """
+
 rule gplas_coocurr_final:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="plasflow_prediction/{sample}_plasmid_prediction.tab",
+        prediction="mlplasmids_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -197,3 +216,4 @@ rule gplas_coocurr_final:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
         "scripts/gplas_coocurrence_final.R"
+
