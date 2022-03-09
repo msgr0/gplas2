@@ -139,13 +139,14 @@ elif [ "$classifier" == "mlplasmids" ]; then
   # set snakefile for analysis
   snakeFile="snakefiles/mlplasmidssnake.smk"
   # assert that species should be from list of valid species
-  list_species=('Enterococcus faecium' 'Enterococcus faecalis' 'Klebsiella pneumoniae' 'Acinetobacter baumannii' 'Escherichia coli')
+  delcare -a list_species=('Enterococcus faecium' 'Enterococcus faecalis'
+    'Klebsiella pneumoniae' 'Acinetobacter baumannii' 'Escherichia coli')
   if [ -z species ]; then
     usage
     echo -e "\n Error: You have specified mlplasmids as classifier but you have not indicated one of the following three bacterial species:
     \t'Enterococcus faecium','Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'\n"
     exit 1
-  elif [ " "${list_species[@]}" " == *" "$species" "* ]; then
+  elif [ "${list_species[@]}" =~ "$species" ]; then
     # do nothing
     :
   else
