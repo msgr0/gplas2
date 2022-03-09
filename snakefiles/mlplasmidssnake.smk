@@ -99,7 +99,6 @@ rule gplas_paths:
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
-
     script:
         "../scripts/gplas_paths.R"
 

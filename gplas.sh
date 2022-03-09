@@ -129,7 +129,7 @@ if [ -z "$input" ]; then
   exit 1
 fi
 
-# better classifier test conditions
+## Classifier test conditions
 if [ -z "$classifier" ]; then
   # No classifier was chosen; throw error and exit
   usage
@@ -187,7 +187,7 @@ if [ -z "$threshold_prediction" ]; then
   else
     # default threshold for other classifiers
     threshold_prediction=0.5
-  fi #else nothing?
+  fi
 fi
 
 if [ -z "$filt_gplas" ]; then
@@ -247,7 +247,7 @@ samples:
   "${name}": "${input}"
 reference:
   "${reference}": "${reference}"
-species: "${species}"
+species: "'${species}'"
 threshold_prediction: "${threshold_prediction}"
 number_iterations: "${number_iterations}"
 classifier: "${classifier}"
