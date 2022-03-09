@@ -226,6 +226,21 @@ cat figures/logo.txt
 echo -e "\n"
 echo "##################################################################"
 
+## Print chosen parameters
+cat <<START
+Your results will be named ${name}
+Input graph: ${input}
+Bacterial species: ${species}
+Classifier: ${classifier}
+Threshold for predicting plasmid-derived contigs: ${threshold_prediction}
+Number of plasmid walks created per node: ${number_iterations}
+Threshold of gplas scores: ${filt_gplas}
+Minimum frequency to consider an edge: ${edge_gplas}
+Modularity threshold used to partition the network: ${modularity_threshold}
+Coverage SD for bold mode: ${bold_sd_coverage}
+Reference genome to evaluate the results of gplas: ${reference}
+START
+
 ## Set up snakemake config templates
 cat <<EOF >templates/"${name}"_assembly.yaml
 samples:
@@ -316,17 +331,6 @@ if [ -f "results/${name}_results.tab" ]; then
   cat figures/logo.txt
   cat <<YES_PREDICTION
 Congratulations! Prediction succesfully done.
-Your results are named ${name}
-Input graph: ${input}
-Bacterial species: ${species}
-Classifier: ${classifier}
-Threshold for predicting plasmid-derived contigs: ${threshold_prediction}
-Number of plasmid walks created per node: ${number_iterations}
-Threshold of gplas scores: ${filt_gplas}
-Minimum frequency to consider an edge: ${edge_gplas}
-Modularity threshold used to partition the network: ${modularity_threshold}
-Coverage SD for bold mode: ${bold_sd_coverage}
-Reference genome to evaluate the results of gplas: ${reference}
 Your results are in results/ and walks/
 
 We hope it helps your research, thanks for using gplas!

@@ -73,7 +73,7 @@ rule gplas_coverage:
     message:
         "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
-        "scripts/gplas_coverage.R"
+        "../scripts/gplas_coverage.R"
 
 rule gplas_paths:
     input:
@@ -98,7 +98,7 @@ rule gplas_paths:
     message:
         "Searching for plasmid-like walks using a greedy approach"
     script:
-        "scripts/gplas_paths.R"
+        "../scripts/gplas_paths.R"
 
 rule gplas_paths_bold:
     input:
@@ -124,7 +124,7 @@ rule gplas_paths_bold:
     message:
         "Searching for plasmid-like walks using a greedy approach"
     script:
-        "scripts/gplas_paths_bold.R"
+        "../scripts/gplas_paths_bold.R"
 
 rule gplas_coocurr:
     input:
@@ -153,7 +153,7 @@ rule gplas_coocurr:
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "scripts/gplas_coocurrence.R"
+        "../scripts/gplas_coocurrence.R"
 
 rule extract_unbinned_solutions:
     input:
@@ -210,4 +210,4 @@ rule gplas_coocurr_final:
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "scripts/gplas_coocurrence_final.R"
+        "../scripts/gplas_coocurrence_final.R"
