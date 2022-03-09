@@ -7,7 +7,7 @@ rule awk_links:
     output:
         "gplas_input/{sample}_raw_links.txt"
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     log:
         "logs/{sample}_log_links.txt"
     message:
@@ -23,7 +23,7 @@ rule awk_nodes:
     output:
         "gplas_input/{sample}_raw_nodes.fasta"
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     log:
         "logs/{sample}_log_nodes.txt"
     message:
@@ -42,7 +42,7 @@ rule mlplasmids:
         species = config["species"],
         threshold = config["threshold_prediction"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     log:
         normalmessage="logs/{sample}_normal_log_mlplasmids.txt",
         errormessage="logs/{sample}_error_log_mlplasmids.txt"
@@ -71,11 +71,11 @@ rule gplas_coverage:
         classifier = config["classifier"],
         threshold = config["threshold_prediction"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     message:
         "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
-        "../scripts/gplas_coverage.R"
+        "scripts/gplas_coverage.R"
 
 rule gplas_paths:
     input:
@@ -95,13 +95,13 @@ rule gplas_paths:
         classifier = config["classifier"],
         filt_gplas = config["filt_gplas"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
 
     script:
-        "../scripts/gplas_paths.R"
+        "scripts/gplas_paths.R"
 
 rule gplas_paths_bold:
     input:
@@ -122,12 +122,12 @@ rule gplas_paths_bold:
         filt_gplas = config["filt_gplas"],
         bold_sd_coverage = config["bold_sd_coverage"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
     script:
-        "../scripts/gplas_paths_bold.R"
+        "scripts/gplas_paths_bold.R"
 
 rule gplas_coocurr:
     input:
@@ -152,11 +152,11 @@ rule gplas_coocurr:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "../scripts/gplas_coocurrence.R"
+        "scripts/gplas_coocurrence.R"
 
 rule extract_unbinned_solutions:
     input:
@@ -165,7 +165,7 @@ rule extract_unbinned_solutions:
     output:
         unbinned_walks="walks/unbinned_nodes/{sample}_solutions_unbinned.csv"
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     message:
         "Extracting unbinned nodes from the initial run"
     shell:
@@ -211,9 +211,9 @@ rule gplas_coocurr_final:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "../envs/r_packages.yaml"
+        "envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "../scripts/gplas_coocurrence_final.R"
+        "scripts/gplas_coocurrence_final.R"
 

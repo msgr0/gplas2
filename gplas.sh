@@ -146,7 +146,7 @@ elif [ "$classifier" == "mlplasmids" ]; then
     echo -e "\n Error: You have specified mlplasmids as classifier but you have not indicated one of the following three bacterial species:
     \t'Enterococcus faecium','Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'\n"
     exit 1
-  elif [ "${list_species[@]}" =~ "$species" ]; then
+  elif [[ "${list_species[@]}" =~ $species ]]; then
     # do nothing
     :
   else
@@ -284,8 +284,8 @@ eval "$(conda shell.bash hook)"
 if [ "$classifier" == "extract" ]; then
   # If classifier is extract, then unlock folder, perform extraction mode and quit gplas
   echo -e "We need to extract the contigs first from the assembly graph, use later those contigs for your binary prediction."
-  snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s $snakeFile gplas_input/"$name"_raw_nodes.fasta
-  snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s $snakeFile gplas_input/"$name"_raw_nodes.fasta
+  snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -d $PWD -s $snakeFile gplas_input/"$name"_raw_nodes.fasta
+  snakemake --use-conda --configfile templates/"$name"_assembly.yaml -d $PWD -s $snakeFile gplas_input/"$name"_raw_nodes.fasta
   echo -e "Next step is to predict the extracted contigs with your desired binary classifier."
   exit 0
 
@@ -305,14 +305,14 @@ else
   fi
 
   # Unlock folder and perform analysis
-  snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -s $snakeFile results/normal_mode/"$name"_results.tab 
-  snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s $snakeFile results/normal_mode/"$name"_results.tab
+  snakemake --unlock --configfile templates/"$name"_assembly.yaml --use-conda -d $PWD -s $snakeFile results/normal_mode/"$name"_results.tab 
+  snakemake --use-conda --configfile templates/"$name"_assembly.yaml -d $PWD -s $snakeFile results/normal_mode/"$name"_results.tab
 
   if [ -f results/normal_mode/"$name"_bin_Unbinned.fasta ]; then
     # Unlock & Rerun in bold mode if there are unbinned plasmids
     echo -e "Some plasmid contigs were left unbinned, running gplas in bold mode"
-    snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -s $snakeFile results/"$name"_results.tab
-    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -s $snakeFile results/"$name"_results.tab
+    snakemake --unlock --use-conda --configfile templates/"$name"_assembly.yaml -d $PWD -s $snakeFile results/"$name"_results.tab
+    snakemake --use-conda --configfile templates/"$name"_assembly.yaml -d $PWD -s $snakeFile results/"$name"_results.tab
   else
     #move the results
     echo -e "No contigs were left unbinned, is not necessary to run gplas in bold mode"
