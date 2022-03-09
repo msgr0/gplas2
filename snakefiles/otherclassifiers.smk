@@ -7,7 +7,7 @@ rule awk_links:
     output:
         "gplas_input/{sample}_raw_links.txt"
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     log:
         "logs/{sample}_log_links.txt"
     message:
@@ -23,7 +23,7 @@ rule awk_nodes:
     output:
         "gplas_input/{sample}_raw_nodes.fasta"
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     log:
         "logs/{sample}_log_nodes.txt"
     message:
@@ -49,7 +49,7 @@ rule gplas_coverage:
         classifier = config["classifier"],
         threshold = config["threshold_prediction"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
@@ -73,7 +73,7 @@ rule gplas_paths:
         classifier = config["classifier"],
         filt_gplas = config["filt_gplas"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
@@ -99,7 +99,7 @@ rule gplas_paths_bold:
         filt_gplas = config["filt_gplas"],
         bold_sd_coverage = config["bold_sd_coverage"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
@@ -129,7 +129,7 @@ rule gplas_coocurr:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
@@ -157,7 +157,7 @@ rule combine_solutions:
     output:
         combined_walks="walks/{sample}_solutions.csv"
     message:
-         "Combinning walks from normal and bold modes"
+        "Combinning walks from normal and bold modes"
     shell:
         """
         cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}
@@ -186,7 +186,7 @@ rule gplas_coocurr_final:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:

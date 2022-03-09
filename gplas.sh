@@ -227,7 +227,7 @@ echo -e "\n"
 echo "##################################################################"
 
 ## Set up snakemake config templates
-cat <<EOF >templates/"${name}"_template.yaml
+cat <<EOF >templates/"${name}"_assembly.yaml
 samples:
   "${name}": "${input}"
 reference:
