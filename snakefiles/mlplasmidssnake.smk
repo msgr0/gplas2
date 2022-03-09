@@ -50,9 +50,9 @@ rule mlplasmids:
         "Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph."
     shell:
         """
-        Rscript ../scripts/run_mlplasmids.R \
-        ../{input} ../{output} {params.threshold} {params.species} \
-        1>> ../{log.normalmessage} 2>> ../{log.errormessage}
+        Rscript scripts/run_mlplasmids.R \
+        {input} {output} {params.threshold} {params.species} \
+        1>> {log.normalmessage} 2>> {log.errormessage}
         """
 
 rule gplas_coverage:
