@@ -7,13 +7,15 @@ rule awk_links:
     output:
         "gplas_input/{sample}_raw_links.txt"
     conda:
-        "envs/r_packages.yaml"
-    message:
-        "Extracting the links from the graph {input}"
+        "../envs/r_packages.yaml"
     log:
         "logs/{sample}_log_links.txt"
+    message:
+        "Extracting the links from the graph {input}"
     shell:
-        """awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}"""
+        """
+        awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}
+        """
 
 rule awk_nodes:
     input:
@@ -21,16 +23,15 @@ rule awk_nodes:
     output:
         "gplas_input/{sample}_raw_nodes.fasta"
     conda:
-        "envs/r_packages.yaml"
-    message:
-        "Extracting the nodes from the graph {input}"
+        "../envs/r_packages.yaml"
     log:
         "logs/{sample}_log_nodes.txt"
     message:
         "Extracting the nodes from the graph {input}"
     shell:
-        """awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}"""
-
+        """
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}
+        """
 
 rule gplas_coverage:
     input:
@@ -48,12 +49,11 @@ rule gplas_coverage:
         classifier = config["classifier"],
         threshold = config["threshold_prediction"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Extracting the sd k-mer coverage from the chromosome-predicted contigs"
     script:
-        "scripts/gplas_coverage.R"
-
+        "../scripts/gplas_coverage.R"
 
 rule gplas_paths:
     input:
@@ -73,13 +73,12 @@ rule gplas_paths:
         classifier = config["classifier"],
         filt_gplas = config["filt_gplas"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
-
     script:
-        "scripts/gplas_paths.R"
+        "../scripts/gplas_paths.R"
 
 rule gplas_paths_bold:
     input:
@@ -100,12 +99,12 @@ rule gplas_paths_bold:
         filt_gplas = config["filt_gplas"],
         bold_sd_coverage = config["bold_sd_coverage"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     threads: 1
     message:
         "Searching for plasmid-like walks using a greedy approach"
     script:
-        "scripts/gplas_paths_bold.R"
+        "../scripts/gplas_paths_bold.R"
 
 rule gplas_coocurr:
     input:
@@ -130,11 +129,11 @@ rule gplas_coocurr:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "scripts/gplas_coocurrence.R"
+        "../scripts/gplas_coocurrence.R"
 
 rule extract_unbinned_solutions:
     input:
@@ -145,7 +144,11 @@ rule extract_unbinned_solutions:
     message:
         "Extracting unbinned nodes from the initial run"
     shell:
-        """for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; done"""
+        """
+        for node in $(grep Unbinned {input.results} | cut -f 1 -d ' '); do \
+        grep -w "^${{node}}" {input.bold_walks} >> {output.unbinned_walks} || continue; \
+        done
+        """
 
 rule combine_solutions:
     input:
@@ -154,9 +157,11 @@ rule combine_solutions:
     output:
         combined_walks="walks/{sample}_solutions.csv"
     message:
-         "Combinning walks from normal and bold modes"
+        "Combinning walks from normal and bold modes"
     shell:
-        """cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}""" 
+        """
+        cat {input.unbinned_walks} {input.normal_walks} > {output.combined_walks}
+        """ 
 
 rule gplas_coocurr_final:
     input:
@@ -181,8 +186,8 @@ rule gplas_coocurr_final:
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"]
     conda:
-        "envs/r_packages.yaml"
+        "../envs/r_packages.yaml"
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
-        "scripts/gplas_coocurrence_final.R"
+        "../scripts/gplas_coocurrence_final.R"
