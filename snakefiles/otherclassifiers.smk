@@ -22,6 +22,8 @@ rule awk_nodes:
         lambda wildcards: config["samples"][wildcards.sample]
     output:
         "gplas_input/{sample}_raw_nodes.fasta"
+    params:
+        min_node_length=config["min_node_length"]
     conda:
         "../envs/r_packages.yaml"
     log:
@@ -30,7 +32,9 @@ rule awk_nodes:
         "Extracting the nodes from the graph {input}"
     shell:
         """
-        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {sample}_raw_nodes_unfiltered.fasta 2>> {log}
+        awk -v min=${l} 'BEGIN {RS = ">" ; ORS = ""} length($2) >= min {print ">"$0}' {output.nodes_unfiltered} > {output}
+        rm {sample}_raw_nodes_unfiltered.fasta
         """
 
 rule gplas_coverage:

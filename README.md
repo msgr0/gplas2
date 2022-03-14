@@ -356,6 +356,8 @@ initial and end node of the path.
         Integer value ranging from 0 to 1. Default: 0.1
     -q  [Optional] Modularity threshold to split components present in the plasmidome network.
         Integer value ranging from 0 to 1. Default: 0.2
+    -l  [Optional] Filter threshold for minimum length of sequences to be considered.
+        Integer value ranging from 0 to infinite. Default: 1
 
     Other:
     -h  Print this help message.
