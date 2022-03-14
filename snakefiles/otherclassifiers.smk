@@ -34,7 +34,7 @@ rule awk_nodes:
         """
         awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {wildcards.sample}_raw_nodes_unfiltered.fasta 2>> {log}
         awk -v min=${l} 'BEGIN {RS = ">" ; ORS = ""} length($2) >= min {print ">"$0}' {output.nodes_unfiltered} > {output}
-        rm {sample}_raw_nodes_unfiltered.fasta
+        rm {wildcards.sample}_raw_nodes_unfiltered.fasta
         """
 
 rule gplas_coverage:
