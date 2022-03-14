@@ -32,9 +32,9 @@ rule awk_nodes:
         "Extracting the nodes from the graph {input}"
     shell:
         """
-        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {wildcards.sample}_raw_nodes_unfiltered.fasta 2>> {log}
-        awk -v min=${min_node_length} 'BEGIN {RS = ">" ; ORS = ""} length($2) >= min {print ">"$0}' {output.nodes_unfiltered} > {output}
-        rm {wildcards.sample}_raw_nodes_unfiltered.fasta
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {sample}_raw_nodes_unfiltered.fasta 2>> {log}
+        awk -v min={min_node_length} 'BEGIN {RS = ">" ; ORS = ""} length($2) >= min {print ">"$0}' {output.nodes_unfiltered} > {output}
+        rm {sample}_raw_nodes_unfiltered.fasta
         """
 
 rule gplas_coverage:
