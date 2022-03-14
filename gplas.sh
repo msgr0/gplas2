@@ -217,7 +217,6 @@ fi
 
 if [ -z "$min_node_length" ]; then
   min_node_length=1000
-elif 
 fi
 
 if [ -z "$reference" ]; then
@@ -248,6 +247,7 @@ Threshold of gplas scores: ${filt_gplas}
 Minimum frequency to consider an edge: ${edge_gplas}
 Modularity threshold used to partition the network: ${modularity_threshold}
 Coverage SD for bold mode: ${bold_sd_coverage}
+Minimum sequence length: ${min_node_length}
 Reference genome to evaluate the results of gplas: ${reference}
 START
 
