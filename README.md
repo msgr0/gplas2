@@ -259,7 +259,8 @@ Optional arguments:
 -   **-q**: Modularity threshold to split components present in the
     plasmidome network. Integer value ranging from 0 to 1. Default: 0.2
 -   **-b**: Coverage variance allowed for bold walks to recover unbinned plasmid-predicted unitigs. 
-    Numeric value: X times coverage variance of the chromsome. Default: 5.
+    Numeric value: X times coverage variance of the chromsome. Default: 5
+-   **-l**: Threshold for filtering sequences based on minimum length. Default: 1000
 -   **-k**: Keep intermediary files.
 
 ### Intermediary results files
@@ -356,6 +357,8 @@ initial and end node of the path.
         Integer value ranging from 0 to 1. Default: 0.1
     -q  [Optional] Modularity threshold to split components present in the plasmidome network.
         Integer value ranging from 0 to 1. Default: 0.2
+    -l  [Optional] Filter threshold for minimum length of sequences to be considered.
+        Integer value ranging from 0 to infinite. Default: 1000
 
     Other:
     -h  Print this help message.

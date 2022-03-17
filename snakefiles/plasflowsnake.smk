@@ -22,6 +22,8 @@ rule awk_nodes:
         lambda wildcards: config["samples"][wildcards.sample]
     output:
         "gplas_input/{sample}_raw_nodes.fasta"
+    params:
+        min_node_length=config["min_node_length"]
     conda:
         "../envs/r_packages.yaml"
     log:
@@ -31,6 +33,16 @@ rule awk_nodes:
     shell:
         """
         awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' {input}  1>> {output} 2>> {log}
+        # extract nodes
+        awk '{{if($1 == "S") print ">"$1$2"_"$4"_"$5"\\n"$3}}' \
+        {input} 1>> {wildcards.sample}_raw_nodes_unfiltered.fasta 2>> {log}
+        
+        # filter nodes based on sequence length
+        awk -v min={params.min_node_length} 'BEGIN {{RS = ">" ; ORS = ""}} length($2) >= min {{print ">"$0}}' \
+        {wildcards.sample}_raw_nodes_unfiltered.fasta > {output}
+        
+        # remove unfiltered nodes file
+        rm {wildcards.sample}_raw_nodes_unfiltered.fasta
         """
 
 rule plasflow:

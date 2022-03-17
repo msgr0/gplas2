@@ -45,16 +45,18 @@ Output:
   -k  [Optional] Keeps intermediary files (i.e. plasmid-walks).
 
 Parameters:
-  -t  [Optional] Threshold to predict plasmid-derived sequences. Integer value ranging from 0 to 1. 
+  -t  [Optional] Threshold to predict plasmid-derived sequences. Float value ranging from 0 to 1. 
       Only valid for classifier options 'plasflow' (default: 0.5) and 'mlplasmids' (default: 0.7).
   -b  [Optional] Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes.
-      Numeric value: X times coverage variance of the chromsome. Default: 5
+      Integer value: X times coverage variance of the chromsome. Default: 5
   -x  [Optional] Number of times gplas finds plasmid walks per each plasmid starting node.
       Integer value ranging from 1 to infinite. Default: 20
   -f  [Optional] Gplas filtering threshold score to reject possible outcoming edges.
-      Integer value ranging from 0 to 1. Default: 0.1
+      Float value ranging from 0 to 1. Default: 0.1
   -q  [Optional] Modularity threshold to split components present in the plasmidome network.
-      Integer value ranging from 0 to 1. Default: 0.2
+      Float value ranging from 0 to 1. Default: 0.2
+  -l  [Optional] Filter threshold for minimum length of sequences to be considered.
+      Integer value ranging from 0 to infinite. Default: 1000
 
 Other:
   -h  Print this help message.
@@ -64,7 +66,8 @@ HELP_USAGE
 }
 
 ## Argument parsing
-while getopts ":i:n:s:c:t:x:f:e:q:b:khv" opt; do
+while getopts ":i:n:s:c:t:x:f:e:q:b:l:khv" opt; do
+
   case $opt in
     h)
       cat figures/logo.txt
@@ -105,6 +108,10 @@ while getopts ":i:n:s:c:t:x:f:e:q:b:khv" opt; do
     b)
       bold_sd_coverage=$OPTARG
       ;;
+    l)
+      min_node_length=$OPTARG
+      ;;
+
     v)
       echo -e "gplas version ${version}"
       exit 0
@@ -210,6 +217,10 @@ if [ -z "$bold_sd_coverage" ]; then
   bold_sd_coverage=5
 fi
 
+if [ -z "$min_node_length" ]; then
+  min_node_length=1000
+fi
+
 if [ -z "$reference" ]; then
   reference="No reference provided"
 else
@@ -238,10 +249,12 @@ Threshold of gplas scores: ${filt_gplas}
 Minimum frequency to consider an edge: ${edge_gplas}
 Modularity threshold used to partition the network: ${modularity_threshold}
 Coverage SD for bold mode: ${bold_sd_coverage}
+Minimum sequence length: ${min_node_length}
 Reference genome to evaluate the results of gplas: ${reference}
 START
 
 ## Set up snakemake config templates
+mkdir -p templates
 cat <<EOF >templates/"${name}"_assembly.yaml
 samples:
   "${name}": "${input}"
@@ -256,6 +269,7 @@ edge_gplas: "${edge_gplas}"
 name: "${name}"
 modularity_threshold: "${modularity_threshold}"
 bold_sd_coverage: "${bold_sd_coverage}"
+min_node_length: "${min_node_length}"
 EOF
 
 sleep 1s
