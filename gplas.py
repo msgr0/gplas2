@@ -15,18 +15,28 @@ A python wrapped to run the gplas pipeline.
 import os
 import sys
 import argparse
+import time
+import subprocess
+
+#******************************#
+#*                            *#
+#* Command line parsing       *#
+#*                            *#
+#******************************#
 
 
-parser = argparse.ArgumentParser(description='gplas (A tool for binning plasmid-predicted contigs into individual predictions.')
+#create a function to pass float ranges
+parser = argparse.ArgumentParser(description='gplas (A tool for binning plasmid-predicted contigs into individual predictions.',add_help=False)
 parser.add_argument('-i','--input',type=str, required=True)
-parser.add_argument('-c','--classifier',type=str, required=True)
-parser.add_argument('-s','--species',type=str)
-parser.add_argument('-n','--name',type=int, default='unnamed')
+parser.add_argument('-c','--classifier',type=str, required=True, choices=['mlplasmids','plasflow','extract','predict'])
+parser.add_argument('-s','--species',type=str, required='mlplasmids' in sys.argv, default='Unknown')
+parser.add_argument('-n','--name',type=str, default='unnamed')
 parser.add_argument('-k','--keep', action='store_true')
-parser.add_argument('-t','--threshold_probability',type=float, default=0.5)
+parser.add_argument('-t','--threshold_prediction',type=float, default=0.5)
 parser.add_argument('-b','--bold_walks',type=int, default=5)
-parser.add_argument('-x','--walks',type=int, default=20)
-parser.add_argument('-f','--filtering_threshold',type=float, default=0.1)
+parser.add_argument('-x','--number_iterations',type=int, default=20)
+parser.add_argument('-f','--filt_gplas',type=float, default=0.1)
+parser.add_argument('-e','--edge_threshold', type=float, default=0.1)
 parser.add_argument('-q','--modularity_threshold',type=float, default=0.2)
 parser.add_argument('-l','--length_filter',type=int, default=1000)
 parser.add_argument('-h','--help',action='store_true')
@@ -36,12 +46,10 @@ args = parser.parse_args()
 
 
 
+
 version="1.0.0"
 
-
-
-#help function
-
+#Get help function
 def help_message():
     message="""
 Welcome to the user guide of gplas (version 1.0.0).
@@ -92,7 +100,226 @@ Other:
   -v  Print gplas version.
           """
     return print(message)
+
+## Print version
           
 def print_version():
     print("gplas version", version)
+
+
+#******************************#
+#*                            *#
+#*     Explore arguments      *#
+#*                            *#
+#******************************#
+
+
+if args.help==True:
+    help_message()
+    sys.exit(0)
     
+if args.version==True:
+    print_version()
+    sys.exit(0)
+ 
+if args.classifier=='mlplasmids':
+   snakeFile='snakefiles/mlplasmidssnake.smk'
+   list_species=['Escherichia coli', 'Klebsiella pneumoniae', 'Acinetobacter baumannii','Enterococcus faecium','Enterococcus faecalis']
+   if args.species not in list_species:
+       print("Error: You have specified mlplasmids as classifier but you have not indicated a valid species. Please select one of the following:'Enterococcus faecium', 'Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'.")
+       sys.exit(1)
+   if args.threshold_prediction is None:
+       args.threshold_prediction=0.5
+
+if args.classifier=='plasflow':
+    snakeFile="snakefiles/plasflowsnake.smk"
+    if args.threshold_prediction is None:
+        args.threshold_prediction=0.7
+    
+if args.classifier=='extract':
+  snakeFile="snakefiles/otherclassifiers.smk"
+  
+if args.classifier=='predict':
+  # set snakefile for analysis
+  snakeFile="snakefiles/otherclassifiers.smk"
+  
+
+#******************************#
+#*                            *#
+#*        Start gplas         *#
+#*                            *#
+#******************************#
+
+logo_file=open('figures/logo.txt', 'r')
+read_logo=logo_file.read()
+print ('\n')
+print(read_logo)
+print("##################################################################")
+
+#Print chosen parameters
+print("Your results will be named", args.name)
+print("Input grpah: ", args.input)
+print("Bacterial species: ", args.species)
+print("Classifier: ", args.classifier)
+print("Threshold for predicting plasmid-derived contigs: ", args.threshold_prediction)
+print("Number of plasmid walks created per node: ", args.number_iterations)
+print("Threshold of gplas scores: ", args.filt_gplas)
+print("Minimum frequency to consider an edge: ", args.edge_threshold)
+print("Modularity threshold used to partition the network: ", args.modularity_threshold)
+print("Coverage SD for bold mode: ", args.bold_walks)
+print("Minimum sequence length: ", args.length_filter)
+print("##################################################################")    
+
+#Set up snakemake config files
+if not os.path.exists('templates'):
+    os.mkdir('templates')
+
+template_file='templates/'+args.name+'_assembly.yaml'
+
+
+with open(template_file, 'w+') as template:
+    template.write('samples:'+'\n')
+    template.write('  "'+args.name+'": "'+args.input+'"'+'\n')
+    template.write('species: '+'"'+"'"+args.species+"'"+'"'+'\n')
+    template.write('threshold_prediction: '+'"'+str(args.threshold_prediction)+'"'+'\n')
+    template.write('number_iterations: '+'"'+str(args.number_iterations)+'"'+'\n')
+    template.write('classifier: '+'"'+args.classifier+'"'+'\n')
+    template.write('filt_gplas: '+'"'+str(args.filt_gplas)+'"'+'\n')
+    template.write('edge_gplas: '+'"'+str(args.edge_threshold)+'"'+'\n')
+    template.write('name: '+'"'+args.name+'"'+'\n')
+    template.write('modularity_threshold: '+'"'+str(args.modularity_threshold)+'"'+'\n')
+    template.write('bold_sd_coverage: '+'"'+str(args.bold_walks)+'"'+'\n')
+    template.write('min_node_length: '+'"'+str(args.length_filter)+'"'+'\n')
+
+
+time.sleep(1)
+
+#Test for conda installation
+conda_install_check='conda list'
+conda_check=subprocess.Popen(conda_install_check, shell=True, stdout=subprocess.DEVNULL, executable='/bin/bash')
+conda_check.wait()
+
+if conda_check.returncode == 0:
+    print('Conda is present.\n')
+else:
+    print('Error: Conda is needed to run gplas.\n Please install conda before running gplas.\n')
+    sys.exit(1)
+
+#1. Get the conda path
+get_conda_path="conda info | grep -i 'base environment' | awk '{print $4}'"
+conda_path_parser=subprocess.run(get_conda_path, shell=True, text=True, capture_output=True, executable='/bin/bash')
+conda_path=conda_path_parser.stdout.strip()
+
+#2. Create gplas environment if not present
+gplas_env_check="source "+str(conda_path)+"/etc/profile.d/conda.sh && conda activate gplas"
+gplas_activate=subprocess.run(gplas_env_check, shell=True, text=True, executable='/bin/bash')
+
+if gplas_activate.returncode == 0:
+    print('gplas environment is present')
+    print('\n')
+else:
+    print('Creating a conda environment to install and run snakemake')
+    snakemake_installation_command='source '+str(conda_path)+'/etc/profile.d/conda.sh && conda create --name gplas --file envs/spec-snakemake.txt'
+    snakemake_installation=subprocess.run(snakemake_installation_command, shell=True, executable='/bin/bash')
+   
+#3. Run analysis
+if args.classifier=='extract':
+    # If classifier is extract, then unlock folder, perform extraction mode and quit gplas
+    print("We need to extract the contigs first from the assembly graph, use later those contigs for your binary prediction.\n")
+    command_snakemake_unlock=str(gplas_env_check)+' && snakemake --unlock --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' gplas_input/'+args.name+'_raw_nodes.fasta'
+    command_snakemake_run=str(gplas_env_check)+' && snakemake --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' gplas_input/'+args.name+'_raw_nodes.fasta'
+    subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
+    subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+
+else:
+    if args.classifier=='predict':
+        # If classifier is external ('predict'), then verify that the provided input prediction file is valid
+        print("Resuming gplas using the prediction given by the user.\n")
+        print("Checking if prediction file is correctly formatted.|n")
+        check_file_output_command=str(gplas_env_check)+' && Rscript scripts/check_independent_prediction_format.R '+args.name
+        check_file_run=subprocess.run(check_file_output_command, shell=True, text=True, executable='/bin/bash',capture_output=True)
+        if check_file_run.returncode == 0:
+            print(check_file_run.stdout)
+            
+        else:
+            print(check_file_run.stderr)
+            print("Please modify format on input files and re-run gplas")
+            sys.exit(1)
+            
+    command_snakemake_unlock=str(gplas_env_check)+' && snakemake --unlock --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/normal_mode/'+args.name+'_results.tab'
+    command_snakemake_run=str(gplas_env_check)+' && snakemake --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/normal_mode/'+args.name+'_results.tab'
+    subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
+    subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+    
+    #4 Check if there are Unbinned contigs
+    unbinned_path='results/normal_mode/'+args.name+'_bin_Unbinned.fasta'
+    if os.path.exists(unbinned_path):
+        #If there are contigs left unbinned, unlock and run gplas in bold-mode
+        print('\n')
+        print('Some contigs were left Unbinned, running gplas in bold mode')
+        print('\n')
+        command_snakemake_unlock=str(gplas_env_check)+' && snakemake --unlock --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/'+args.name+'_results.tab'
+        command_snakemake_run=str(gplas_env_check)+' && snakemake --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/'+args.name+'_results.tab'
+        subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
+        subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+    else:
+        #move final results
+        os.rename("results/normal_mode/"+args.name+"*","results/")
+            
+
+if args.keep==False and args.classifier!='extract':
+  print("Intermediate files will be deleted. If you want to keep these files, use the -k flag")
+  remove_command='bash scripts/remove_intermediate_files.sh -n '+args.name
+  subprocess.run(remove_command, shell=True, text=True, executable='/bin/bash')
+   
+def success_message():
+    print ('\n')
+    print(read_logo)
+    print ('\n')
+    print("""
+
+Congratulations! Prediction succesfully done.
+
+Your results are in results/
+
+We hope it helps your research, thanks for using gplas!
+If you have used plasflow as a classifier please cite:
+  Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
+If you have used mlplasmids as a classifier please cite:
+  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
+
+Thank you for using gplas version 1.0.0! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+""")
+    
+    sys.exit(0)
+    
+
+
+def error_message():    
+    print('\n')
+    print("""
+Looks like no plasmids could be detected in your assembly graph
+
+Please check the file:   coverage/*_clean_prediction.tab. 
+If all contigs were predicted as chromosome, gplas probably failed at the step to create random walks starting from plasmid seeds. If that's the case, probably your isolate does not carry any plasmid(s)
+If you don't see any files present at:   gplas_input/  or  coverage/  most likely the installation of gplas failed at some point
+
+If you have used plasflow as a classifier please cite:
+  Pawel S Krawczyk et al. PlasFlow: predicting plasmid sequences in metagenomic data using genome signatures, Nucleic Acids Research, doi: 10.1093/nar/gkx1321
+If you have used mlplasmids as a classifier please cite:
+  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
+
+Thank you for using gplas version 1.0.0! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+          
+        """)
+    sys.exit(0)
+    
+#5 Check that output has been correctly created
+final_results_path='results/'+args.name+'_results.tab'
+if os.path.exists(final_results_path):
+    success_message()
+    sys.exit(0)
+    
+else:
+    error_message()
+    sys.exit(1)
