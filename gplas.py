@@ -32,7 +32,7 @@ parser.add_argument('-c','--classifier',type=str, required=True, choices=['mlpla
 parser.add_argument('-s','--species',type=str, required='mlplasmids' in sys.argv, default='Unknown')
 parser.add_argument('-n','--name',type=str, default='unnamed')
 parser.add_argument('-k','--keep', action='store_true')
-parser.add_argument('-t','--threshold_prediction',type=float, default=0.5)
+parser.add_argument('-t','--threshold_prediction',type=float)
 parser.add_argument('-b','--bold_walks',type=int, default=5)
 parser.add_argument('-x','--number_iterations',type=int, default=20)
 parser.add_argument('-f','--filt_gplas',type=float, default=0.1)
@@ -142,6 +142,8 @@ if args.classifier=='extract':
 if args.classifier=='predict':
   # set snakefile for analysis
   snakeFile="snakefiles/otherclassifiers.smk"
+  if args.threshold_prediction is None:
+        args.threshold_prediction=0.5
   
 
 #******************************#
