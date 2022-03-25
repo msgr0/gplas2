@@ -33,5 +33,4 @@ rm results/normal_mode/"$name"*png
 fi
 
 rm templates/"$name"_assembly*
-rm templates/"$name"_temp*
 
