@@ -47,15 +47,15 @@ rule awk_nodes:
 rule gplas_coverage:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
-	    links="gplas_input/{sample}_raw_links.txt",
+        links="gplas_input/{sample}_raw_links.txt",
         prediction="independent_prediction/{sample}_plasmid_prediction.tab"
     output:
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
-    	graph_repeats="coverage/{sample}_repeats_graph.tab",
-    	clean_links="coverage/{sample}_clean_links.tab",
-    	clean_prediction="coverage/{sample}_clean_prediction.tab",
-    	initialize_nodes="coverage/{sample}_initialize_nodes.tab"
+        graph_repeats="coverage/{sample}_repeats_graph.tab",
+        clean_links="coverage/{sample}_clean_links.tab",
+        clean_prediction="coverage/{sample}_clean_prediction.tab",
+        initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     params:
         classifier = config["classifier"],
         threshold = config["threshold_prediction"]
@@ -69,7 +69,7 @@ rule gplas_coverage:
 rule gplas_paths:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
-	    clean_links="coverage/{sample}_clean_links.tab",
+        clean_links="coverage/{sample}_clean_links.tab",
         prediction="independent_prediction/{sample}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
@@ -164,7 +164,7 @@ rule extract_unbinned_solutions:
 rule combine_solutions:
     input:
         unbinned_walks="walks/unbinned_nodes/{sample}_solutions_unbinned.csv",
-       	normal_walks="walks/normal_mode/{sample}_solutions.csv"
+	normal_walks="walks/normal_mode/{sample}_solutions.csv"
     output:
         combined_walks="walks/{sample}_solutions.csv"
     message:

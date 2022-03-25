@@ -74,10 +74,10 @@ rule gplas_coverage:
     output:
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
-    	graph_repeats="coverage/{sample}_repeats_graph.tab",
-    	clean_links="coverage/{sample}_clean_links.tab",
-    	clean_prediction="coverage/{sample}_clean_prediction.tab",
-    	initialize_nodes="coverage/{sample}_initialize_nodes.tab"
+        graph_repeats="coverage/{sample}_repeats_graph.tab",
+        clean_links="coverage/{sample}_clean_links.tab",
+        clean_prediction="coverage/{sample}_clean_prediction.tab",
+        initialize_nodes="coverage/{sample}_initialize_nodes.tab"
     params:
         classifier = config["classifier"],
         threshold = config["threshold_prediction"]
