@@ -1,0 +1,4 @@
+mamba
+snakemake==5.5.4
+rbase
+shutils
