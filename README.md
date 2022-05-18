@@ -9,78 +9,67 @@ tool that extends the possibility of accurately binning predicted
 plasmid contigs into several discrete plasmid components.
 
 # Table of Contents
-* [Installation](#installation)
-* [Quick usage](#quick-usage)
-    * [Running gplas with an assembly graph](#running-gplas-with-an-assembly-graph)
-    * [Running gplas coupled to a different binary classifier](#running-gplas-coupled-to-a-different-binary-classifier)
-    * [New model for A. baumannii](#new-model-for-a-baumannii)
-    * [Main output files](#main-output-files)
-* [Complete usage](#complete-usage)
-    * [Intermediary results files](#intermediary-results-files)
-* [Help page](#help-page)
-* [Issues and Bugs](#issues-and-bugs)
+- [gplas: binning plasmid-predicted contigs](#gplas-binning-plasmid-predicted-contigs)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+  - [Installation using conda (to be implemented)](#installation-using-conda-to-be-implemented)
+  - [Installation using pip and conda](#installation-using-pip-and-conda)
+  - [Installation using source code](#installation-using-source-code)
+- [Quick usage](#quick-usage)
+    - [Running gplas with an assembly graph](#running-gplas-with-an-assembly-graph)
+    - [Running gplas coupled to a different binary classifier](#running-gplas-coupled-to-a-different-binary-classifier)
+    - [New model for A. baumannii](#new-model-for-a-baumannii)
+    - [Main output files](#main-output-files)
+        - [results/\*results.tab](#resultsresultstab)
+        - [results/\*components.tab](#resultscomponentstab)
+        - [results/\*plasmidome\_network.png](#resultsplasmidome_networkpng)
+        - [results/\*components.fasta](#resultscomponentsfasta)
+- [Complete usage](#complete-usage)
+    - [Intermediary results files](#intermediary-results-files)
+        - [walks/normal_mode/\*solutions.csv](#walksnormal_modesolutionscsv)
+- [Help page](#help-page)
+- [Issues and Bugs](#issues-and-bugs)
 
 # Installation
 
+## Installation using conda (to be implemented)
+
+## Installation using pip and conda
+
+While the conda recipe is under construction, the prefered way of installing gplas is using pip and a conda environment.
+
+First, create a new conda environment and activate it:
 ``` bash
-git clone https://gitlab.com/sirarredondo/gplas.git
+conda create --name gplas --file envs/gplas.yaml
+conda activate gplas
+```
+
+Next, clone the repository and enter the directory
+``` bash
+git clone https://gitlab.com/mmb-umcu/gplas.git
 cd gplas
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
+```
+
+Next, we install gplas using pip
+
+``` bash
+pip install -e .
+```
+
+When this has finished, test the installation using 
+
+``` bash
+python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
+```
+## Installation using source code
+``` bash
+git clone https://gitlab.com/mmb-umcu/gplas.git
+cd gplas/gplas
+python gplas.py -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
 
 First-time installation can take some time depending on your internet
 speed (\~20 minutes).
-
-The good news is that you do not have to install any dependencies. The
-snakemake pipeline and different conda environments integrate all the
-dependencies required to run gplas.
-
-After the first-time installation, you will get the prediction of gplas
-in a few minutes and using a single thread!
-
-Gplas first checks if the following tools are present on your system:
-
-1.  [Conda](https://bioconda.github.io/)
-
-2.  [Snakemake](https://snakemake.readthedocs.io/en/stable/) version
-    5.5.4
-
-After this, gplas will start the snakemake pipeline and will install
-different conda environments with the following R packages:
-
-      
-[igraph](https://cran.r-project.org/web/packages/igraph/index.html)
-version 1.2.4.1
-
-      
-[ggraph](https://cran.r-project.org/web/packages/ggraph/index.html)
-version 1.0.2
-
-      
-[Biostrings](https://www.bioconductor.org/packages/release/bioc/html/Biostrings.html)
-version 2.50.2
-
-      
-[seqinr](https://cran.r-project.org/web/packages/seqinr/index.html)
-version 3.4-5
-
-       [tidyverse](https://www.tidyverse.org/) version 1.2.1
-
-      
-[spatstat](https://cran.r-project.org/web/packages/spatstat/index.html)
-version 1.59-0
-
-      
-[ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html)
-version 0.8.0
-
-Following this, it will install the tools that we use to predict
-plasmid-derived contigs.
-
-1.  [mlplasmids](https://gitlab.com/sirarredondo/mlplasmids) version
-    1.0.0
-
-2.  [plasflow](https://anaconda.org/bioconda/plasflow) version 1.1
 
 # Quick usage
 
