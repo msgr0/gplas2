@@ -12,6 +12,7 @@ A python wrapped to run the gplas pipeline.
 ## https://gitlab.com/aschuerch/bactofidia
 """
 
+from cProfile import run
 import shutil
 import glob
 import os
@@ -120,7 +121,7 @@ def success_message():
     print ('\n')
     print(read_logo)
     print ('\n')
-    print("""
+    print(f"""
 
 Congratulations! Prediction succesfully done.
 
@@ -130,7 +131,7 @@ We hope it helps your research, thanks for using gplas!
 If you have used smlplasmids as a classifier please cite:
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
 
-Thank you for using gplas version 1.0.0! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+Thank you for using gplas version {version}! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
 """)
     
     sys.exit(0)
@@ -160,6 +161,15 @@ Thank you for using gplas version 1.0.0! - https://academic.oup.com/bioinformati
 #*                            *#
 #******************************#
 
+# Runs a (snakemake) command and checks if it returned without error
+def runSnake(command):
+    run = subprocess.run(command, shell=True, text=True, executable='/bin/bash')
+    if run.returncode == 1:
+        print("It looks like Snakemake encountered an error. Please refer to the Snakemake output to see what went wrong")
+        sys.exit(1)
+    else:
+        return 0
+
 if args.help==True:
     help_message()
     sys.exit(0)
@@ -174,8 +184,7 @@ if args.classifier=='mlplasmids':
    if args.species not in list_species:
        print("Error: You have specified mlplasmids as classifier but you have not indicated a valid species. Please select one of the following:'Enterococcus faecium', 'Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or 'Escherichia coli'.")
        sys.exit(1)
-   if args.threshold_prediction is None:
-       args.threshold_prediction=0.5
+  
 
 
 elif args.classifier=='plasflow':
@@ -187,8 +196,11 @@ elif args.classifier=='plasflow':
     
 elif args.classifier=='extract' or args.classifier=='predict':
     snakeFile=f"{snkdir}/otherclassifiers.smk"
-    if args.threshold_prediction is None:
-        args.threshold_prediction=0.5
+    
+    
+    
+if args.threshold_prediction is None:
+    args.threshold_prediction=0.5
 
 #******************************#
 #*                            *#
@@ -242,18 +254,17 @@ with open(template_file, 'w+') as template:
 time.sleep(1)
    
 #3. Run analysis
-#os.chdir(os.path.dirname(__file__)) # Change directory to where the package is located
 
 if args.classifier=='extract':
     ##3.1  If classifier is extract, then unlock folder, perform extraction mode and quit gplas
     print("We need to extract the contigs first from the assembly graph, use later those contigs for your binary prediction.\n")
-    command_snakemake_unlock='snakemake --unlock --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' gplas_input/'+args.name+'_raw_nodes.fasta'
-    command_snakemake_run='snakemake --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' gplas_input/'+args.name+'_raw_nodes.fasta'
-    subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
-    subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+    command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} gplas_input/{args.name}_raw_nodes.fasta'
+    command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} gplas_input/{args.name}_raw_nodes.fasta'
+    runSnake(command_snakemake_unlock)
+    runSnake(command_snakemake_run)
+    
 
-else:
-    if args.classifier=='predict':
+elif args.classifier=='predict':
         ##3.2 If classifier is external ('predict'), then verify that the provided input prediction file is the correct format
         print("Resuming gplas using the prediction given by the user.\n")
         print("Checking if prediction file is correctly formatted.\n")
@@ -267,14 +278,16 @@ else:
             print("Please modify format on input files and re-run gplas")
             sys.exit(1)
     
+else:
+    
     ##3.3 Run snakemake workflows        
-    command_snakemake_unlock='snakemake --unlock --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/normal_mode/'+args.name+'_results.tab'
-    command_snakemake_run='snakemake --use-conda --configfile '+ template_file + ' -d $PWD -s '+snakeFile+' results/normal_mode/'+args.name+'_results.tab'
-    subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
-    subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+    command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
+    command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
+    runSnake(command_snakemake_unlock)
+    runSnake(command_snakemake_run)
     
     ##3.4 Check if there are Unbinned contigs
-    unbinned_path='results/normal_mode/'+args.name+'_bin_Unbinned.fasta'
+    unbinned_path=f'results/normal_mode/{args.name}_bin_Unbinned.fasta'
     if os.path.exists(unbinned_path):
         ##3.5 If there are contigs left unbinned, unlock and run gplas in bold-mode
         print('\n')
@@ -282,15 +295,13 @@ else:
         print('\n')
         command_snakemake_unlock=f' snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
         command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
-        subprocess.run(command_snakemake_unlock, shell=True, text=True, executable='/bin/bash')
-        subprocess.run(command_snakemake_run, shell=True, text=True, executable='/bin/bash')
+        runSnake(command_snakemake_unlock)
+        runSnake(command_snakemake_run)
     else:
         ##3.6 If there was not unbinned contigs, just move results files to the final location.
         for file in glob.glob(f"results/normal_mode/{args.name}*"):
-            print(file)
             shutil.copy(file, "results/")
-        #os.rename("results/normal_mode/"+args.name+"*","results/")
-            
+           
 ##3.7 If the -k flag was not selected, delete intermediary files
 if args.keep==False and args.classifier!='extract':
   print("Intermediate files will be deleted. If you want to keep these files, use the -k flag")
