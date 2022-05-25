@@ -36,31 +36,28 @@ plasmid contigs into several discrete plasmid components.
 
 ## Installation using pip and conda
 
-While the conda recipe is under construction, the prefered way of installing gplas is using pip and a conda environment.
+While the conda recipe is under construction, the prefered way of installing gplas is using pip and a conda environment. Please follow the instructions below:
 
-First, create a new conda environment and activate it:
+Clone the repository and enter the directory
+``` bash
+git clone https://gitlab.com/mmb-umcu/gplas.git
+cd gplas
+```
+Create a new conda environment and activate it:
 ``` bash
 conda create --name gplas --file envs/gplas.yaml
 conda activate gplas
 ```
 
-Next, clone the repository and enter the directory
-``` bash
-git clone https://gitlab.com/mmb-umcu/gplas.git
-cd gplas
-```
-
-Next, we install gplas using pip
-
+Install gplas using pip
 ``` bash
 pip install -e .
 ```
-
 When this has finished, test the installation using 
-
 ``` bash
 python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
+
 ## Installation using source code
 ``` bash
 git clone https://gitlab.com/mmb-umcu/gplas.git
@@ -91,14 +88,14 @@ following bacterial species:
 -   ‘Escherichia coli’
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
+python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
 ```
 
 You can use plasflow as a classifier if you have a different bacterial
 species.
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
+python -m gplas.gplas -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
 ```
 
 ### Running gplas coupled to a different binary classifier 
@@ -109,7 +106,7 @@ For using other binary classifiers, three steps must be followed:
 This will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**.
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -c extract -n 'my_isolate'
+python -m gplas.gplas -i test/faecium_graph.gfa -c extract -n 'my_isolate'
 ```
 2) Extracted nodes will be used as input for the binary classifier selected by the user. 
 After binary classifcation, predictions will need to be formated appropriately (see below) and saved to **independent_prediction/my_isolate_plasmid_prediction.tab**. Keep in mind that the name set with `-n 'my_isolate` must be kept as a prefix for this last file.
@@ -127,7 +124,7 @@ Currently, [plasmidEC](https://github.com/lisavader/plasmidEC) provides the opti
 3) To complete the plasmid predictions, we will run gplas again setting the classifier argument to 'predict'.
 
 ``` bash
-./gplas.sh -i test/faecium_graph.gfa -c predict -n 'my_isolate'
+python -m gplas.gplas -i test/faecium_graph.gfa -c predict -n 'my_isolate'
 ```
 ### New model for A. baumannii
 
@@ -136,7 +133,7 @@ we developed a new model for mlplasmids and integrated it into gplas. To
 use the model, please run:
 
 ``` bash
-./gplas.sh -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
+python -m gplas.gplas -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
 ```
 
 ### Main output files
@@ -297,7 +294,7 @@ initial and end node of the path.
 # Help page
 
 ``` bash
-./gplas.sh -h
+python -m gplas.gplas -h
 ```
     _______ .______    __           ___           _______.
     /  _____||   _  \  |  |         /   \         /       |
@@ -309,10 +306,10 @@ initial and end node of the path.
     Welcome to the user guide of gplas (version 1.0.0).
 
     BASIC USAGE
-    ./gplas.sh [-i <file>] [-c <string>] [-s <string>] [...]
+    python -m gplas.gplas [-i <file>] [-c <string>] [-s <string>] [...]
 
     Example:
-    ./gplas.sh -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'
+    python -m gplas.gplas -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'
 
     USER OPTIONS
     Input:
