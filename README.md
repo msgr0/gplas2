@@ -45,7 +45,7 @@ cd gplas
 ```
 Create a new conda environment and activate it:
 ``` bash
-conda create --name gplas --file envs/gplas.yaml
+conda env create --name gplas --file envs/gplas.yaml
 conda activate gplas
 ```
 
