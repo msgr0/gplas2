@@ -186,6 +186,7 @@ total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_node
 
 weight_counting <- NULL
 
+if (length(total_pairs) > 0) {
 for(row in 1:nrow(total_pairs))
 {
   initial_node <- as.numeric(total_pairs[row,1])
@@ -208,7 +209,10 @@ for(row in 1:nrow(total_pairs))
   
   weight_counting <- rbind(weight_counting, df_count)
 }
-  
+} else {
+print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Please assemby your genome with different paramenters or with a different tool and re-run gplas.")
+quit(status=1)
+}
   
 single_edge_counting <- weight_counting %>%
   group_by(Pair) %>%
