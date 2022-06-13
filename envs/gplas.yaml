@@ -1,4 +1,4 @@
-name: gplasdev
+name: gplas
 channels:
   - bioconda
   - conda-forge
