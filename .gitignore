@@ -1,0 +1,13 @@
+.snakemake/
+gplas/.snakemake/
+results/
+gplas/results/
+templates/
+gplas/templates/
+gplas_input/
+gplas/gplas_input/
+logs/
+gplas/logs/
+mlplasmids_prediction/
+gplas/mlplasmids_prediction/
+

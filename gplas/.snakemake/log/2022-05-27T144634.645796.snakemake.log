@@ -1,3 +1,0 @@
-AttributeError in line 24 of /home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk:
-module 'collections' has no attribute 'Iterable'
-  File "/home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk", line 24, in <module>
