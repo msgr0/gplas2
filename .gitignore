@@ -10,4 +10,9 @@ logs/
 gplas/logs/
 mlplasmids_prediction/
 gplas/mlplasmids_prediction/
-
+walks/
+gplas/walks/
+coverage/
+gplas/coverage/
+gplas.egg-info/
+gplas/__pycache__/
