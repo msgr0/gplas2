@@ -4,9 +4,10 @@ suppressMessages(library(Biostrings))
 
 arguments = commandArgs(trailingOnly=TRUE)
 isolate_name <- arguments[1]
+prediction_dir <- arguments[2]
 
 #get a path for the prediction file
-prediction_file_path<-paste('independent_prediction/',isolate_name,'_plasmid_prediction.tab',sep='')
+prediction_file_path<-paste(prediction_dir,'/',isolate_name,'_plasmid_prediction.tab',sep='')
 #get a path for fasta file.
 raw_nodes_path<-paste('gplas_input/',isolate_name,'_raw_nodes.fasta',sep='')
 

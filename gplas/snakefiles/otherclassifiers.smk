@@ -1,3 +1,4 @@
+PREDICT_DIR=config["predict_dir"]
 wildcard_constraints:
   sample="[^/]+"
 
@@ -44,7 +45,7 @@ rule gplas_coverage:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         links="gplas_input/{sample}_raw_links.txt",
-        prediction="independent_prediction/{sample}_plasmid_prediction.tab"
+        prediction=f"{PREDICT_DIR}/{{sample}}_plasmid_prediction.tab"
     output:
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
@@ -64,7 +65,7 @@ rule gplas_paths:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="independent_prediction/{sample}_plasmid_prediction.tab",
+        prediction=f"{PREDICT_DIR}/{{sample}}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -87,7 +88,7 @@ rule gplas_paths_bold:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="independent_prediction/{sample}_plasmid_prediction.tab",
+        prediction=f"{PREDICT_DIR}/{{sample}}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -111,7 +112,7 @@ rule gplas_coocurr:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
 	    clean_links="coverage/{sample}_clean_links.tab",
-        prediction="independent_prediction/{sample}_plasmid_prediction.tab",
+        prediction=f"{PREDICT_DIR}/{{sample}}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
@@ -166,7 +167,7 @@ rule gplas_coocurr_final:
     input:
         nodes="gplas_input/{sample}_raw_nodes.fasta",
         clean_links="coverage/{sample}_clean_links.tab",
-        prediction="independent_prediction/{sample}_plasmid_prediction.tab",
+        prediction=f"{PREDICT_DIR}/{{sample}}_plasmid_prediction.tab",
         coverage="coverage/{sample}_estimation.txt",
         graph_contigs="coverage/{sample}_graph_contigs.tab",
         graph_repeats="coverage/{sample}_repeats_graph.tab",
