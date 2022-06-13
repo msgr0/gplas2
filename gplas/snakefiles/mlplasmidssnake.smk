@@ -1,9 +1,9 @@
 from pathlib import Path
-from gplas import snakefiles
-from gplas import scripts
-scriptdir = os.path.abspath(os.path.dirname(scripts.__file__))
-snkdir = snakefiles.__file__
-print(snkdir)
+#from gplas import snakefiles
+#from gplas import scripts
+#scriptdir = os.path.abspath(os.path.dirname(scripts.__file__))
+#snkdir = snakefiles.__file__
+#print(snkdir)
 thisdir = os.path.abspath(os.path.dirname(__file__))
 print(thisdir)
 wildcard_constraints:
@@ -22,7 +22,7 @@ rule awk_links:
         "Extracting the links from the graph {input}"
     shell:
         """
-        awk -F "\\t" '{{if($1 == "L") print $N}}' {input}  1>> {output} 2>> {log}
+        awk -F "\\t" '{{if($1 == "L") print $0}}' {input}  1>> {output} 2>> {log}
         """
 
 rule awk_nodes:
@@ -60,7 +60,7 @@ rule mlplasmids:
     params:
         species = config["species"],
         threshold = config["threshold_prediction"],
-        scriptdir=scriptdir
+        #scriptdir=scriptdir
     #conda:
     #    "../envs/r_packages.yaml"
     log:
@@ -70,8 +70,7 @@ rule mlplasmids:
         "Running mlplasmids to obtain the plasmid prediction using the nodes extracted from the graph."
     shell:
         """
-        pwd
-        Rscript {params.scriptdir}/run_mlplasmids.R \
+        Rscript gplas/scripts/run_mlplasmids.R \
         {input} {output} {params.threshold} {params.species} \
         1>> {log.normalmessage} 2>> {log.errormessage}
         """

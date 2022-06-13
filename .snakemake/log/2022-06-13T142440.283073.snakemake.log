@@ -1,0 +1,34 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	gplas_coocurr
+	1	gplas_coverage
+	1	gplas_paths
+	3
+
+[Mon Jun 13 14:24:40 2022]
+Job 2: Extracting the sd k-mer coverage from the chromosome-predicted contigs
+
+[Mon Jun 13 14:24:47 2022]
+Finished job 2.
+1 of 3 steps (33%) done
+
+[Mon Jun 13 14:24:47 2022]
+Job 4: Searching for plasmid-like walks using a greedy approach
+
+[Mon Jun 13 14:24:47 2022]
+Error in rule gplas_paths:
+    jobid: 4
+    output: walks/normal_mode/installation_solutions.csv, walks/normal_mode/installation_connections.tab
+
+RuleException:
+WorkflowError in line 123 of /home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk:
+URLError: <urlopen error [Errno 2] No such file or directory: '/home/rodrigo/gplas/gplas/snakefiles/gplas/scripts/gplas_paths.R'>
+  File "/home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk", line 123, in __rule_gplas_paths
+  File "/home/rodrigo/miniconda3/envs/gplasdev/lib/python3.7/concurrent/futures/thread.py", line 57, in run
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/rodrigo/gplas/.snakemake/log/2022-06-13T142440.283073.snakemake.log

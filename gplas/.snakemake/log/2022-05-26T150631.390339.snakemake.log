@@ -1,0 +1,3 @@
+ModuleNotFoundError in line 2 of /home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk:
+No module named 'gplas'
+  File "/home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk", line 2, in <module>

@@ -25,6 +25,8 @@ from pathlib import Path
 
 # Directories
 pkgdir = os.path.dirname(__file__)
+# Source code installation won't have a package, set to cwd
+pkgdir='.' if pkgdir == '' else pkgdir
 snkdir = f"{pkgdir}/snakefiles"
 scriptdir = f"{pkgdir}/scripts"
 #******************************#

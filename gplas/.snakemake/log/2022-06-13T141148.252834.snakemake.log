@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 28 of /home/rodrigo/gplas/gplas/snakefiles/mlplasmidssnake.smk:
+Missing input files for rule awk_nodes:
+test/faecium_graph.gfa
