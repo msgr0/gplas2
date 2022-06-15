@@ -56,11 +56,11 @@ if (colnames(prediction_file)[5]!='Contig_length') {
 ###################################################################################################################
 
 #3. Check the data type of every column
-if (class(prediction_file[,c(1)])!='numeric'){
+if (class(prediction_file[,c(1)])!='numeric' && class(prediction_file[,c(1)])!='integer'){
   stop("Error in prediction file format. First column should contain numeric values between 0 and 1.")
 }
 
-if (class(prediction_file[,c(2)])!='numeric'){
+if (class(prediction_file[,c(2)])!='numeric' && class(prediction_file[,c(2)])!='integer'){
   stop("Error in prediction file format. Second column should contain numeric values between 0 and 1.")
 }
 

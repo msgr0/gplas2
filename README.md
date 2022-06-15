@@ -14,7 +14,6 @@ plasmid contigs into several discrete plasmid components.
 - [Installation](#installation)
   - [Installation using conda (to be implemented)](#installation-using-conda-to-be-implemented)
   - [Installation using pip and conda](#installation-using-pip-and-conda)
-  - [Installation using source code](#installation-using-source-code)
 - [Quick usage](#quick-usage)
     - [Running gplas with an assembly graph](#running-gplas-with-an-assembly-graph)
     - [Running gplas coupled to a different binary classifier](#running-gplas-coupled-to-a-different-binary-classifier)
@@ -67,7 +66,7 @@ Gplas only requires a single argument **‘-i’** corresponding to an
 assembly graph in gfa format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). You
 need to specify which classifier gplas is going to use with the argument **‘-c’**
-Out of the box, gplas uses 'mlplasmids' or 'plasflow' as classifiers, but other tools can also be used with the 'extract' and 'predict' arguments.
+Out of the box, gplas uses 'mlplasmids' as a classifier, but other tools can also be used with the 'extract' and 'predict' arguments.
 
 If you choose mlplasmids for the prediction, there is an additional
 mandatory argument **‘-s’** in which you need to list any of the
@@ -81,26 +80,22 @@ following bacterial species:
 ``` bash
 python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
 ```
-
-You can use plasflow as a classifier if you have a different bacterial
-species.
-
-``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c plasflow -s 'Other species' -n 'my_isolate'
-```
+If you want to predict plasmids for a different species, you can use a different binary classifier. 
 
 ### Running gplas coupled to a different binary classifier 
 
 For using other binary classifiers, three steps must be followed:
 1) The classifier argument must be set to 'extract'.
 
-This will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**.
-
 ``` bash
 python -m gplas.gplas -i test/faecium_graph.gfa -c extract -n 'my_isolate'
 ```
-2) Extracted nodes will be used as input for the binary classifier selected by the user. 
-After binary classifcation, predictions will need to be formated appropriately (see below) and saved to **independent_prediction/my_isolate_plasmid_prediction.tab**. Keep in mind that the name set with `-n 'my_isolate` must be kept as a prefix for this last file.
+Running this command will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**. This file must be kept intact in order for next steps to work.
+
+2) The previous file will be used as input for the binary classifier selected by the user. 
+After binary classifcation, predictions will need to be formated appropriately (see below) and saved with the name: **my_isolate_plasmid_prediction.tab**. The prefix of the file name must match with the input given to `-n 'my_isolate'`.
+
+Currently, [plasmidEC](https://github.com/lisavader/plasmidEC) provides the option to automatically generate results for *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica and S. aureus* in a format compatible with gplas.
 
 The output from the selected binary classification tools has to be formatted to a tab separated file containing the following columns and headers:
 
@@ -110,12 +105,11 @@ The output from the selected binary classification tools has to be formatted to 
 |       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
 |       0.12       |      0.88     |  Chromosome  |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
 
-Currently, [plasmidEC](https://github.com/lisavader/plasmidEC) provides the option to automatically generate results for *E. coli* in a format compatible with gplas.
 
 3) To complete the plasmid predictions, we will run gplas again setting the classifier argument to 'predict'.
 
 ``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c predict -n 'my_isolate'
+python -m gplas.gplas -i test/faecium_graph.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_location}/my_isolate_plasmid_prediction.tab
 ```
 ### New model for A. baumannii
 
