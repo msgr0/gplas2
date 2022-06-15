@@ -271,4 +271,3 @@ dependencies:
     - wrapt==1.14.0
     - yte==1.2.2
     - zipp==3.8.0
-prefix: /hpc/dla_mm/jkerkvliet/miniconda3/envs/gplasdev
