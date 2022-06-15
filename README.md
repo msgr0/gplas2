@@ -42,7 +42,8 @@ Clone the repository and enter the directory
 git clone https://gitlab.com/mmb-umcu/gplas.git
 cd gplas
 ```
-Create a new conda environment and activate it:
+
+Create a new conda environment and activate it
 ``` bash
 conda env create --name gplas --file envs/gplas.yaml
 conda activate gplas
@@ -56,8 +57,6 @@ When this has finished, test the installation using
 ``` bash
 python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
-First-time installation can take some time depending on your internet
-speed (\~20 minutes).
 
 # Quick usage
 
