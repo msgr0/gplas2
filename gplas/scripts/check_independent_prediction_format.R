@@ -26,7 +26,7 @@ prediction_file<-read.csv(prediction_file_path, sep='\t', header=TRUE)
 
 #1. Check the number of columns
 if (ncol(prediction_file)!=5) {
-  stop('Error in prediction file format. The firle should contain 5 columns, and they should be tab separated.')
+  stop('Error in prediction file format. The file should contain 5 columns, and they should be tab separated.')
 }
 
 #######################################################################################################################################
@@ -76,6 +76,10 @@ if (class(prediction_file[,c(5)])!='integer'){
   stop("Error in prediction file format. Fifth column should contain integer values with lenght of contigs")
 }
 
+#4. check if plasmids exist in the prediction
+if (! "Plasmid" %in% unique(prediction_file[,3])){
+  stop("No plasmids are predicted, so gplas can't do anything")
+}
 #####################################################################################################################
 
 #4. Check if the names of the contigs in the predictions match the ones on the FASTA file

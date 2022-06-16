@@ -171,9 +171,7 @@ for(node in unique(total_pairs$Starting_node))
   complete_node_info <- rbind(complete_node_info, particular_node)
 }
 
-
 total_pairs <- complete_node_info
-
 initial_nodes <- gsub(pattern = '\\+', replacement = '', x = starting_nodes)
 initial_nodes <- gsub(pattern = '\\-', replacement = '', x = initial_nodes)
 
@@ -183,17 +181,14 @@ total_pairs$Connecting_node <- as.character(total_pairs$Connecting_node)
 total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% initial_nodes)
 total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_nodes)
 
-
 weight_counting <- NULL
-
-if (length(total_pairs) > 0) {
+if (length(total_pairs) > 0 && nrow(total_pairs) != 0) {
 for(row in 1:nrow(total_pairs))
 {
   initial_node <- as.numeric(total_pairs[row,1])
   connecting_node <- as.numeric(total_pairs[row,2])
   
   raw_count <- as.numeric(total_pairs[row,3])
-  
   if(initial_node < connecting_node)
   {
     pair <- paste(initial_node,connecting_node, sep = '-')

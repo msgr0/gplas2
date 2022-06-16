@@ -2,7 +2,6 @@
 # Getting the arguments out of SnakeMake
 
 # Libraries required to generate the gplas output 
-
 suppressMessages(library(igraph))
 suppressMessages(library(ggraph))
 suppressMessages(library(tidyverse))
@@ -37,6 +36,10 @@ repeats$number <- gsub(pattern = '\\+',replacement = '',x = repeats$number) # Re
 repeats$number <- gsub(pattern = '\\-',replacement = '',x = repeats$number) # Removing directionality (to match the numbers present in mlplasmids prediction)
 
 initialize_nodes <- read.table(file = path_init_nodes, header = TRUE)
+if( dim(initialize_nodes)[1] == 0){
+stop("There are no suitable plasmids to create the walks. gplas can't do anything")
+}
+
 initialize_nodes <- initialize_nodes[,1]
 
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
@@ -65,7 +68,6 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
     links <- initial_links
     
     record_connections <- NULL
-    
     record_connections <- data.frame(factor = 1.0,
                                      number_iterations = number_iterations,
                                      iteration = iterations,
@@ -121,7 +123,6 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
         {
           print(path, quote = FALSE) 
         }
-        
         output <- paste(path, collapse = ',')
         write.table(x = output, file = output_path, append = TRUE, row.names = FALSE, quote = FALSE, col.names = FALSE)
         path <- initial_seed # There are no connections possible from this contig
@@ -348,7 +349,6 @@ for(seed in initialize_nodes)
   set.seed(123)
   positive_seed <- paste(seed, '+', sep = '')
   negative_seed <- paste(seed, '-', sep = '')
-  
   plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
   plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
 }  
