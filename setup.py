@@ -5,7 +5,7 @@ with open('envs/requirements.txt') as file_open:
 
 setup(
     name="gplas",
-    version="1.1.0-dev",
+    version="1.1.2",
     scripts=["gplas/snakefiles/mlplasmidssnake.smk"],
     packages=find_packages(),
     install_requires=requirements,
