@@ -21,7 +21,9 @@ import argparse
 import time
 import subprocess
 from pathlib import Path
-
+from .version import version as VERSION
+# version
+#VERSION="1.0.0"
 
 # Directories
 pkgdir = os.path.dirname(__file__)
@@ -33,30 +35,40 @@ scriptdir = f"{pkgdir}/scripts"
 #*                            *#
 #******************************#
 
+class PriorityPrinting(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if option_string == "-h" or option_string == "--help":
+            parser.print_help()
+        elif option_string == "-v" or option_string == "--version":
+            print(f"gplas version {VERSION}")    
+        parser.exit()
 
 #create a function to pass float ranges
-parser = argparse.ArgumentParser(description='gplas (A tool for binning plasmid-predicted contigs into individual predictions.',add_help=False)
-parser.add_argument('-i','--input',type=str, required=True)
-parser.add_argument('-c','--classifier',type=str, required=True, choices=['mlplasmids','extract','predict'])
-parser.add_argument('-s','--species',type=str, required='mlplasmids' in sys.argv, default='Unknown')
-parser.add_argument('-n','--name',type=str, default='unnamed')
-parser.add_argument('-k','--keep', action='store_true')
-parser.add_argument('-t','--threshold_prediction',type=float)
-parser.add_argument('-b','--bold_walks',type=int, default=5)
-parser.add_argument('-x','--number_iterations',type=int, default=20)
-parser.add_argument('-f','--filt_gplas',type=float, default=0.1)
-parser.add_argument('-e','--edge_threshold', type=float, default=0.1)
-parser.add_argument('-q','--modularity_threshold',type=float, default=0.2)
-parser.add_argument('-l','--length_filter',type=int, default=1000)
-parser.add_argument('-h','--help',action='store_true')
-parser.add_argument('-v','--version',action='store_true')
-parser.add_argument('-P','--prediction',default='independent_prediction/')
+parser = argparse.ArgumentParser(description='gplas (A tool for binning plasmid-predicted contigs into individual predictions.',formatter_class=argparse.ArgumentDefaultsHelpFormatter,add_help=False)
+parser.register('action','printing',PriorityPrinting)
+parser.add_argument('-i','--input',type=str, required=True, help="Path to the graph file in GFA (.gfa) format, used to extract nodes and links")
+parser.add_argument('-c','--classifier',type=str, required=True, choices=['mlplasmids','extract','predict'], help="Classifier used to predict the contigs extracted from the input graph.")
+parser.add_argument('-s','--species',type=str, required='mlplasmids' in sys.argv, default='Unknown', help="Bacterial species from the graph file.\
+      If you have specified mlplasmids as classifier you need to provide one of the following three bacterial species:\
+      'Enterococcus faecium', 'Enterococcus faecalis', 'Klebsiella pneumoniae', 'Acinetobacter baumannii' or\
+      'Escherichia coli'.")
+parser.add_argument('-n','--name',type=str, default='unnamed', help="Output name used in the gplas files")
+parser.add_argument('-k','--keep', action='store_true', help="Keep intermediary files")
+parser.add_argument('-t','--threshold_prediction',type=float,help="Prediction threshold for plasmid-derived sequences")
+parser.add_argument('-b','--bold_walks',type=int, default=5, help="Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes")
+parser.add_argument('-x','--number_iterations',type=int, default=20,help="Number of walk iterations per starting node")
+parser.add_argument('-f','--filt_gplas',type=float, default=0.1, help="filtering threshold to reject outgoing edges")
+parser.add_argument('-e','--edge_threshold', type=float, default=0.1,help="Edge threshold")
+parser.add_argument('-q','--modularity_threshold',type=float, default=0.2, help="Modularity threshold to split components in the plasmidome network")
+parser.add_argument('-l','--length_filter',type=int, default=1000, help="Filtering threshold for sequence length")
+parser.add_argument('-h','--help',action='printing',nargs=0,help="Prints this message")
+parser.add_argument('-v','--version',action='printing',nargs=0,help="Prints gplas version")
+parser.add_argument('-P','--prediction',default='independent_prediction/',help="Location of independent prediction input")
 args = parser.parse_args()
 
 
 
 
-version="1.0.0"
 
 #Get help function
 def help_message():
@@ -112,9 +124,6 @@ Other:
 
 ## Print version
           
-def print_version():
-    print("gplas version", version)
-
 #Success Message
 
 def success_message():
@@ -322,3 +331,7 @@ if os.path.exists(final_results_path):
 else:
     error_message()
     sys.exit(1)
+
+
+def start():
+    print("Starting gplas")
