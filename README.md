@@ -55,7 +55,13 @@ pip install -e .
 ```
 When this has finished, test the installation using 
 ``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
+gplas --help
+```
+This should should show the help page of gplas.
+
+To test the tool, use
+``` bash
+gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'installation'
 ```
 
 # Quick usage
@@ -78,7 +84,7 @@ following bacterial species:
 -   ‘Escherichia coli’
 
 ``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
+gplas -i test/faecium_graph.gfa -c mlplasmids -s 'Enterococcus faecium' -n 'my_isolate'
 ```
 If you want to predict plasmids for a different species, you can use a different binary classifier. 
 
@@ -88,7 +94,7 @@ For using other binary classifiers, three steps must be followed:
 1) The classifier argument must be set to 'extract'.
 
 ``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c extract -n 'my_isolate'
+gplas -i test/faecium_graph.gfa -c extract -n 'my_isolate'
 ```
 Running this command will generate a fasta file containing the extracted nodes sequences, which will be saved to **gplas_input/my_isolate_raw_nodes.fasta**. This file must be kept intact in order for next steps to work.
 
@@ -109,7 +115,7 @@ The output from the selected binary classification tools has to be formatted to 
 3) To complete the plasmid predictions, we will run gplas again setting the classifier argument to 'predict'.
 
 ``` bash
-python -m gplas.gplas -i test/faecium_graph.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_location}/my_isolate_plasmid_prediction.tab
+gplas -i test/faecium_graph.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_location}/my_isolate_plasmid_prediction.tab
 ```
 ### New model for A. baumannii
 
@@ -118,7 +124,7 @@ we developed a new model for mlplasmids and integrated it into gplas. To
 use the model, please run:
 
 ``` bash
-python -m gplas.gplas -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
+gplas -i test/abaumannii_graph.gfa -c mlplasmids -s 'Acinetobacter baumannii' -n 'ab_test' -t 0.7
 ```
 
 ### Main output files
@@ -279,7 +285,7 @@ initial and end node of the path.
 # Help page
 
 ``` bash
-python -m gplas.gplas -h
+gplas -h
 ```
     _______ .______    __           ___           _______.
     /  _____||   _  \  |  |         /   \         /       |
@@ -291,10 +297,10 @@ python -m gplas.gplas -h
     Welcome to the user guide of gplas (version 1.0.0).
 
     BASIC USAGE
-    python -m gplas.gplas [-i <file>] [-c <string>] [-s <string>] [...]
+    gplas [-i <file>] [-c <string>] [-s <string>] [...]
 
     Example:
-    python -m gplas.gplas -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'
+    gplas -i mygraph.gfa -c mlplasmids -s 'Enterococcus faecium'
 
     USER OPTIONS
     Input:
