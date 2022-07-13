@@ -140,7 +140,7 @@ We hope it helps your research, thanks for using gplas!
 If you have used smlplasmids as a classifier please cite:
   Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
 
-Thank you for using gplas version {version}! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+Thank you for using gplas version {VERSION}! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
 """)
     
     sys.exit(0)
