@@ -15,8 +15,8 @@ plasmid contigs into several discrete plasmid components.
   - [Installation using conda (to be implemented)](#installation-using-conda-to-be-implemented)
   - [Installation using pip and conda](#installation-using-pip-and-conda)
 - [Quick usage](#quick-usage)
-    - [1. Extracting nodes from the assembly graph.](#extracting-nodes)
-    - [2. Binary classification of nodes using an external tool](#binary-classification)
+    - [1. Extracting nodes from the assembly graph](#extracting-nodes-from-the-assembly-graph)
+    - [2. Binary classification of nodes using an external tool](#binary-classification-of-nodes-using-an-external-tool)
         - [2.1 Using plasmidEC](#using-plasmidec)
         - [2.2 Using a different tool](#using-a-different-tool)
             - [Formatting the binary classification file](#formatting-the-binary-classification-file)
@@ -27,7 +27,6 @@ plasmid contigs into several discrete plasmid components.
         - [results/\*results.tab](#resultsresultstab)
 - [Complete usage](#complete-usage)
     - [Intermediary results files](#intermediary-results-files)
-        - [walks/normal_mode/\*solutions.csv](#walksnormal_modesolutionscsv)
 - [Issues and Bugs](#issues-and-bugs)
 
 # Installation
@@ -67,25 +66,24 @@ To make plasmid predictions, gplas will require two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A **.tab** file with a binary classification (plasmid/chromsome) of the nodes in the assembly graph.  
-See below for instructions on how to generate this file.
+2) A **.tab** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph.  
+See below for instructions on how to generate a file with this information.
 
-Follow the next 3 simple steps to get plasmid predictions:
+Follow these 3 simple steps to use gplas:
 
-### 1. Extracting nodes from the assembly graph. 
+### 1. Extracting nodes from the assembly graph <a name="extracting-nodes-from-the-assembly-graph"></a>
 
 First, use gplas to extract the nodes from the assembly graph. For this, the **-c** flag should be set to **extract**.
 
 ``` bash
 gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 ```
-Gplas will generate a FASTA file containing the nodes sequences. This FASTA file will be located in **gplas_input/my_isolate_raw_nodes.fasta**.  
+Gplas will generate a FASTA file containing the nodes sequences. This FASTA file will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta.  
 
-### 2. Binary classification of nodes using an external tool
+### 2. Binary classification of nodes using an external tool <a name="binary-classification-of-nodes-using-an-external-tool"></a>
+Use this FASTA file as the input for an **external binary classification software**.
 
-Use this FASTA file (generated in the previous step) as the input for an external binary classification software.
-
-#### 2.1 Using plasmidEC
+#### 2.1 Using plasmidEC <a name="using-plasmidec"></a>
 
 We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. PlasmidEC automatically outputs the classification file in a format that is fully compatible with gplas. 
 
@@ -93,13 +91,13 @@ Currently, plasmidEC can be used for binary classification of 8 species: *E. col
 
 If you've used plasmidEC, please move to Step 3.
 
-#### 2.2 Using a different tool
+#### 2.2 Using a different tool <a name="using-a-different-tool"></a>
 
-There are other binary classification tools available, and they are all compatible with gplas. We've recently listed and reviewed many of those [here](https://www.mdpi.com/2076-2607/9/8/1613). However, if you use any of these tools, you will have to format their output to be compatible with gplas. See below. 
+There are many binary classification tools available, and they are all compatible with gplas. We've recently listed and reviewed several of these tools [here](https://www.mdpi.com/2076-2607/9/8/1613). If you use any of these tools, you will have to format their output to be compatible with gplas. See below. 
 
-##### Formatting the binary classification file
+##### <ins>Formatting the binary classification file</ins>
 
-**Important:** This step is only required if you didn't use plasmidEC as a binary classifier.
+*Important: This step is only required if you didn't use plasmidEC as a binary classifier.*
 
 The output from the selected binary classification tools has to be formatted as a tab separated file containing the following columns and headers (case sensitive):
 
