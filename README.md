@@ -73,18 +73,22 @@ with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycl
 
 To predict individual plasmids, gplas requires that nodes in assembly graph are classified as either plasmid or chromosome. This step has to be completed by using an external classification tool.
 
-We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. PlasmidEC outperforms most available tools, and it produces an output that is fully compatible with gplas. 
+We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. 
 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
+PlasmidEC outperforms most available tools, and it offers two extra-advantages:
+1) It uses an assembly graph in **.gfa** format as input.
+2) It outputs a **.tab** classification file that is automatically compatible with gplas. 
+
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*
 
-
-
+Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
+classify the nodes and move to step 2.
 
 ##### <ins>Using a different tool</ins> <a name="using-a-different-tool"></a>
 
-Other binary classification tools exist, and we've recently listed and reviewed several of these  [here](https://www.mdpi.com/2076-2607/9/8/1613). Although they are all compatible with gplas, extra steps are required to complete the plasmid predictions. See below the instructions.
+Other binary classification tools exist, and we've recently listed and reviewed several of these  [here](https://www.mdpi.com/2076-2607/9/8/1613). Although they are all compatible with gplas, extra steps are required to complete the plasmid predictions. 
 
 1) Use gplas to convert the nodes from the assembly graph to FASTA format. For this, the **-c** flag should be set to **extract**.
 
@@ -94,14 +98,9 @@ gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 
 The output FASTA file, containing the nodes sequences, will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
 
-Second, use this FASTA file as an input for the binary classification tool of your choice. 
+2) Use this FASTA file as an input for the binary classification tool of your choice. 
 
-Finally, format the output 
-
-
-##### <ins>Formatting the binary classification file</ins>
-
-*Important: This step is only required if you didn't use plasmidEC as a binary classifier.*
+3) Format the output as indicated below:
 
 The output from the selected binary classification tools has to be formatted as a tab separated file containing the following columns and headers (case sensitive):
 
@@ -114,11 +113,10 @@ The output from the selected binary classification tools has to be formatted as 
 Once formatted, save this file with the name: **my_isolate_plasmid_prediction.tab**. 
 The prefix of the file-name (in this example: **my_isolate**) must match with the argument passed to **-n** in Step 1. 
 
-Once you've formatted the output file as above, move to Step 3.
+Once you've formatted the output file as above, move to Step 2.
 
-### 3. Predict plasmids
-Gplas will now predict individual plasmids in your sample. For this, you will run gplas again and set **-c** flag to **predict**. Also, with the **-P** flag, you will indicate the path to the directory holding the binary
-classification file (obtained in Step 2). 
+### Step 2 - Predict plasmids
+Gplas will now predict individual plasmids in your sample. For this, you will run gplas again and set **-c** flag to **predict**. Also, with the **-P** flag, you will indicate the path to the directory holding the binary classification file (obtained in Step 1). 
 
 ``` bash
 gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_directory}
