@@ -112,7 +112,7 @@ The prefix of the file-name (in this example: **my_isolate**) must match with th
 Once you've formatted the output file as above, move to Step 2.
 
 ### Step 2 - Predict plasmids <a name="predict-plasmids"></a>
-Gplas will now predict individual plasmids in your sample. For this, you will run gplas again and set **-c** flag to **predict**. Also, with the **-P** flag, you will indicate the path to the directory holding the binary classification file (obtained in Step 1). 
+Gplas will now predict individual plasmids in your sample. For this, you will run gplas setting **-c** flag to **predict**. Also, with the **-P** flag, you will indicate the path to the directory holding the binary classification file (obtained in Step 1). 
 
 ``` bash
 gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_directory}
