@@ -16,14 +16,10 @@ plasmid contigs into several discrete plasmid components.
   - [Installation using pip and conda](#installation-using-pip-and-conda)
 - [Usage](#usage)
     - [Step 1 - Binary classification of nodes](#binary-classification-of-nodes-using-an-external-tool)
-        - [2.1 Using plasmidEC](#using-plasmidec)
-        - [2.2 Using a different tool](#using-a-different-tool)
-            - [Formatting the binary classification file](#formatting-the-binary-classification-file)
-    - [3. Predict plasmids](#predict-plasmids)
+        - [Using plasmidEC](#using-plasmidec)
+        - [Using a different tool](#using-a-different-tool)
+    - [ Step 2 - Predict plasmids](#predict-plasmids)
 - [Output files](#main-output-files)
-        - [results/\*c.fasta](#resultscomponentsfasta)
-        - [results/\*plasmidome\_network.png](#resultsplasmidome_networkpng)
-        - [results/\*results.tab](#resultsresultstab)
 - [Complete usage](#complete-usage)
     - [Intermediary results files](#intermediary-results-files)
 - [Issues and Bugs](#issues-and-bugs)
@@ -84,7 +80,7 @@ PlasmidEC outperforms most available tools, and it offers two extra-advantages:
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*
 
 Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
-classify the nodes and move to step 2.
+classify your nodes and move to step 2.
 
 ##### <ins>Using a different tool</ins> <a name="using-a-different-tool"></a>
 
@@ -115,7 +111,7 @@ The prefix of the file-name (in this example: **my_isolate**) must match with th
 
 Once you've formatted the output file as above, move to Step 2.
 
-### Step 2 - Predict plasmids
+### Step 2 - Predict plasmids <a name="predict-plasmids"></a>
 Gplas will now predict individual plasmids in your sample. For this, you will run gplas again and set **-c** flag to **predict**. Also, with the **-P** flag, you will indicate the path to the directory holding the binary classification file (obtained in Step 1). 
 
 ``` bash
