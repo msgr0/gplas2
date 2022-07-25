@@ -245,25 +245,27 @@ from a single node (plasmid unitig). These walk can be directly given to
 Bandage to visualize and manually inspect a walk.
 
 In this case, we find different possible plasmid walks starting from the
-node 18+. These paths may contain inversions and rearrangements since
+node 67-. These paths may contain inversions and rearrangements since
 repeats units such as transposases which can be present several times in
 the same plasmid sequence. In these cases, gplas can traverse the
 sequence in different ways generating different plasmid-like paths.
 
 ``` bash
-head -n 10 walks/normal_mode/my_isolate_solutions.csv
+tail -n 10 walks/normal_mode/my_isolate_solutions.csv
 ```
 
-    ## 18+,76-,102+,33+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,116+,61-,88-,89+,69-,96-,119+,64-,116+,61-,88-,90+,69-,100+,119+,64-,116+,63+,115-,64+,119-,100-,69+
-    ## 18+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
-    ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
-    ## 18+,76-,52+,94+,57-,77+,87-,65+,54-,94+
-    ## 18+,76-,102+,33+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,102+,92+,47+,115-,64+,31-,79+,60-,70-,50+,64-,113+
-    ## 18+,76-,52+,94+,57-,77+,18+
-    ## 18+,76-,102+,92+,47+,115-,64+,31-,79+,46-,79+,60-,70-,50+,64-,114+
+``` bash
+67-,70-,50-,143-
+67-,70-,50-,143-
+67-,70-,50-,143-
+67-,70-,47+,117-,84-,59+,70-,50-,143-
+67-,70-,50-,143-
+67-,70-,50-,143-
+67-,70-,47+,117-,84-,59+,70-,50-,143-
+67-,70-,47+,117-,84-,59+,70-,50-,143-
+67-,70-,50-,143-
+67-,70-,50-,143-
+```
 
 For example, we can inspect in Bandage the path:
 18+,76-,52+,94+,57-,77+,18+
