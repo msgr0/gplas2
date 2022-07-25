@@ -198,20 +198,6 @@ time.sleep(1)
    
 #3. Run analysis
 
-#if args.classifier=='predict':
-#        ##3.2 If classifier is external ('predict'), then verify that the provided input prediction file is the correct format
-#        print("Resuming gplas using the prediction given by the user.\n")
-#        print("Checking if prediction file is correctly formatted.\n")
-#        print(f"Checking for {args.prediction}")
-#        check_file_output_command=f'Rscript {scriptdir}/check_independent_prediction_format.R {args.name} {args.prediction}'
-#        check_file_run=subprocess.run(check_file_output_command, shell=True, text=True, executable='/bin/bash',capture_output=True)
-#        if check_file_run.returncode == 0:
-#            print(check_file_run.stdout)
-            
-#        else:
-#            print(check_file_run.stderr)
-#            print("Please modify format on input files and re-run gplas")
-#            sys.exit(1)
 
 if args.classifier=='extract':
     ##3.1  If classifier is extract, then unlock folder, perform extraction mode and quit gplas
