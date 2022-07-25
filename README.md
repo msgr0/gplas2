@@ -68,9 +68,9 @@ with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycl
 
 ### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
-To predict individual plasmids, some preprocessing is needed. Gplas requires that nodes in assembly graph are classified as either plasmid or chromosome. This step has to be completed by using an external classification tool.
+-To predict individual plasmids, some preprocessing is needed. Gplas requires that nodes in assembly graph are classified as either plasmid or chromosome, and these classifications should be summarised in a **tab-separated** file with an specific format.
 
-We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. 
+-This classification step has to be completed by using an **external classification tool**. We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. However, all binary classification tools are compatible with gplas.
 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
