@@ -7,13 +7,13 @@ isolate_name <- arguments[1]
 prediction_dir <- arguments[2]
 
 #get a path for the prediction file
-prediction_file_path<-paste(prediction_dir,'/',isolate_name,'_plasmid_prediction.tab',sep='')
+prediction_file_path<-prediction_dir
 #get a path for fasta file.
 raw_nodes_path<-paste('gplas_input/',isolate_name,'_raw_nodes.fasta',sep='')
 
 #Check if prediction file exists
 if (file.exists(prediction_file_path)==FALSE) {
-    stop ('Prediction file does not exist or name is incorrect. Predictions files should be named as follows: $name_plasmid_prediction.tab. File should be located in the independent_prediction/ directory ' )
+    stop ('Prediction file does not exist or name is incorrect. Please, check your input for the -P argument.')
 }
 
 #Check if fasta file exists
