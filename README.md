@@ -78,7 +78,7 @@ PlasmidEC outperforms most available binary classification tools, and it offers 
 1) It uses assembly graphs in **.gfa** format as input (most tools can't). 
 2) It outputs a **classification file** that is automatically compatible with gplas (Other tools will require extra processing of the output). 
 
-Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*
+Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*. Although, it is possible to train models for new species.
 
 Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
 classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
