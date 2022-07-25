@@ -117,10 +117,10 @@ Once you've formatted the output file as above, move to [Predict plasmids](https
 ### Predict plasmids <a name="predict-plasmids"></a>
 After pre-processing, we are now ready to predict individual plasmids. 
 
-Run gplas and set the **-c** flag to **predict**. Also, provide the paths to your assembly graph using the **-i** flag, and to your binary classification file with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
+Run gplas and set the **-c** flag to **predict**. Provide the paths to your assembly graph, using the **-i** flag, and to your binary classification file, with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
 
 ``` bash
-gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
+gplas -c predict -i test/test_ecoli.gfa -P gplas/independent_prediction/test_ecoli_plasmid_prediction.tab -n 'my_isolate'
 ```
 *Note: If you didn't use plasmidEC for preprocessing, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
 
