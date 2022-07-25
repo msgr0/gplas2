@@ -93,30 +93,34 @@ Other binary classification tools exist, and we've recently listed and reviewed 
 gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 ```
 
-The output FASTA file, containing the nodes sequences, will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
+The output FASTA file will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
 
 2) Use this FASTA file as an input for the binary classification tool of your choice. 
 
-3) After classification is finished, format the output as indicated below:
+3) Format the output file: 
 
-The output from the binary classification tool has to be formatted as a tab separated file containing the following columns and headers (case sensitive):
+The output from the binary classification tool has to be formatted as a tab separated file containing specific columns and headers (case sensitive). See a preloaded example below:
+
+``` bash
+head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
+```
 
 | Prob\_Chromosome | Prob\_Plasmid |  Prediction  | Contig\_name                             | Contig\_length|
 |-----------------:|--------------:|:-------------|:-----------------------------------------|--------------:|
-|       0.40       |      0.60     |    Plasmid   |  S1\_LN:i:4240\_dp:f:1.936810327946946   |      4240     |
-|       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
-|       0.12       |      0.88     |    Plasmid   |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
+|       1       |      0     |  Chromosome  |  S1\_LN:i:346767\_dp:f:0.9966562474408179   |      346767     |
+|       1       |      0     |  Chromosome  | S10\_LN:i:175297\_dp:f:0.9360667247742771  |     175297    |
+|       0.33       |      0.67     |    Plasmid   |  S100\_LN:i:1076\_dp:f:2.530236029051145   |      1076     |
 
 
 Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids)..
 
 ### Predict plasmids <a name="predict-plasmids"></a>
-After obtaining the .tab file with the binary classification of the nodes, we are now ready to predict individual plasmids. For this, run gplas setting the **-c** flag to **predict**. Also, use the **-P** flag to indicate the path to the the binary classification file (obtained in Step 1). 
+After preprocessing, we are now ready to predict individual plasmids. For this, run gplas setting the **-c** flag to **predict**. Also, use the **-P** flag to indicate the path to the the binary classification file (obtained in the preprocessing step). 
 
 ``` bash
 gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${path_to_classifcation_file}
 ```
-*Note: If you didn't use plasmidEC, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
+*Note: If you didn't use plasmidEC for preprocessing, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
 
 # Output files
 
