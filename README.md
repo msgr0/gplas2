@@ -268,10 +268,7 @@ tail -n 10 walks/normal_mode/my_isolate_solutions.csv
 ```
 
 For example, we can inspect in Bandage the path:
-18+,76-,52+,94+,57-,77+,18+
-
-This path forms a circular sequence since there is overlap between the
-initial and end node of the path.
+67-,70-,47+,117-,84-,59+,70-,50-,143-
 
 ![](figures/bandage_path.jpg)<!-- -->
 
