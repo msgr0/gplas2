@@ -15,10 +15,10 @@ plasmid contigs into several discrete plasmid components.
   - [Installation using conda (to be implemented)](#installation-using-conda-to-be-implemented)
   - [Installation using pip and conda](#installation-using-pip-and-conda)
 - [Usage](#usage)
-    - [Step 1 - Binary classification of nodes](#binary-classification-of-nodes-using-an-external-tool)
+    - [Preprocessing - Binary classification of nodes](#binary-classification-of-nodes-using-an-external-tool)
         - [Using plasmidEC](#using-plasmidec)
         - [Using a different tool](#using-a-different-tool)
-    - [ Step 2 - Predict plasmids](#predict-plasmids)
+    - [Predict plasmids](#predict-plasmids)
 - [Output files](#main-output-files)
 - [Complete usage](#complete-usage)
     - [Intermediary results files](#intermediary-results-files)
@@ -65,7 +65,7 @@ with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycl
 
 # Usage
 
-### Step 1 - Binary classification of nodes <a name="binary-classification-of-nodes-using-an-external-tool"></a>
+### Preprocessing - Binary classification of nodes <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
 To predict individual plasmids, gplas requires that nodes in assembly graph are classified as either plasmid or chromosome. This step has to be completed by using an external classification tool.
 
@@ -104,7 +104,7 @@ The output from the selected binary classification tools has to be formatted as 
 |-----------------:|--------------:|:-------------|:-----------------------------------------|--------------:|
 |       0.40       |      0.60     |    Plasmid   |  S1\_LN:i:4240\_dp:f:1.936810327946946   |      4240     |
 |       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
-|       0.12       |      0.88     |  Chromosome  |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
+|       0.12       |      0.88     |    Plasmid   |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
 
 Once formatted, save this file with the name: **my_isolate_plasmid_prediction.tab**. 
 The prefix of the file-name (in this example: **my_isolate**) must match with the argument passed to **-n** in Step 1. 
@@ -115,7 +115,7 @@ Once you've formatted the output file as above, move to Step 2.
 Gplas will now predict individual plasmids in your sample. For this, you will run gplas setting the **-c** flag to **predict**. Also, using the **-P** flag, you will indicate the path to the directory holding the binary classification file (obtained in Step 1). 
 
 ``` bash
-gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${binary_classifcation_directory}
+gplas -i test/test_ecoli.gfa -c predict -n 'test_ecoli' -P ${binary_classifcation_directory}
 ```
 
 # Output files
