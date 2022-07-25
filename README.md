@@ -64,7 +64,7 @@ Gplas needs two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A **.tab** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See below for an example on how to generate this file. 
+2) A tab-separated file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See [below](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#binary-classification-of-nodes-using-an-external-tool) for instructions on how to obtain this file. 
 
 ### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
@@ -75,13 +75,13 @@ We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
 PlasmidEC outperforms most available binary classification tools, and it offers two extra-advantages:
-1) It uses the assembly graph as input. (in **.gfa** format) 
-2) It outputs a **.tab** classification file that is automatically compatible with gplas. 
+1) It uses assembly graphs in **.gfa** format as input (most tools can't). 
+2) It outputs a **classification file** that is automatically compatible with gplas (Other tools will require extra processing of the output). 
 
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*
 
 Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
-classify the nodes in your .gfa file. After this, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
+classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
 
 ##### <ins>Using a different binary classifier</ins> <a name="using-a-different-tool"></a>
 
@@ -115,10 +115,12 @@ head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids)..
 
 ### Predict plasmids <a name="predict-plasmids"></a>
-After preprocessing, we are now ready to predict individual plasmids. For this, run gplas setting the **-c** flag to **predict**. Also, use the **-P** flag to indicate the path to the the binary classification file (obtained in the preprocessing step). 
+After preprocessing, we are now ready to predict individual plasmids. 
+
+Run gplas and set the **-c** flag to **predict**. Also, provide the paths to your assembly graph using the **-i** flag, and to your binary classification file with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
 
 ``` bash
-gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${path_to_classifcation_file}
+gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 ```
 *Note: If you didn't use plasmidEC for preprocessing, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
 
@@ -187,16 +189,15 @@ prediction, contig name, k-mer coverage, length, bin assigned.
 # Complete usage
 
 ``` bash
-gplas -h
+gplas --help
 ```
 ``` bash
-usage: gplas -i INPUT -c {mlplasmids,extract,predict} [-s SPECIES] [-n NAME]
-             [-k] [-t THRESHOLD_PREDICTION] [-b BOLD_WALKS]
-             [-x NUMBER_ITERATIONS] [-f FILT_GPLAS] [-e EDGE_THRESHOLD]
-             [-q MODULARITY_THRESHOLD] [-l LENGTH_FILTER] [-h] [-v]
-             [-P PREDICTION]
+usage: gplas -i INPUT -c {extract,predict} [-n NAME] [-P PREDICTION] [-k]
+             [-t THRESHOLD_PREDICTION] [-b BOLD_WALKS] [-x NUMBER_ITERATIONS]
+             [-f FILT_GPLAS] [-e EDGE_THRESHOLD] [-q MODULARITY_THRESHOLD]
+             [-l LENGTH_FILTER] [-h] [-v]
 
-gplas (A tool for binning plasmid-predicted contigs into individual
+gplas: A tool for binning plasmid-predicted contigs into individual
 predictions.
 
 optional arguments:
@@ -204,9 +205,11 @@ optional arguments:
                         Path to the graph file in GFA (.gfa) format, used to
                         extract nodes and links (default: None)
   -c {extract,predict}, --classifier {extract,predict}
-                        Classifier used to predict the contigs extracted from
-                        the input graph. (default: None)
+                        Select to extract nodes from the assembly graph or to
+                        predict individual plasmids. (default: None)
   -n NAME, --name NAME  Output name used in the gplas files (default: unnamed)
+  -P PREDICTION, --prediction PREDICTION
+                        Path to the binary classification file (default: None)
   -k, --keep            Keep intermediary files (default: False)
   -t THRESHOLD_PREDICTION, --threshold_prediction THRESHOLD_PREDICTION
                         Prediction threshold for plasmid-derived sequences
@@ -230,9 +233,7 @@ optional arguments:
                         1000)
   -h, --help            Prints this message (default: None)
   -v, --version         Prints gplas version (default: None)
-  -P PREDICTION, --prediction PREDICTION
-                        Location of independent prediction input (default:
-                        independent_prediction/)
+
 ```
 
 ### Intermediary results files
