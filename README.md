@@ -107,15 +107,15 @@ head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 
 | Prob\_Chromosome | Prob\_Plasmid |  Prediction  | Contig\_name                             | Contig\_length|
 |-----------------:|--------------:|:-------------|:-----------------------------------------|--------------:|
-|       1       |      0     |  Chromosome  |  S1\_LN:i:346767\_dp:f:0.9966562474408179   |      346767     |
-|       1       |      0     |  Chromosome  | S10\_LN:i:175297\_dp:f:0.9360667247742771  |     175297    |
-|       0.33       |      0.67     |    Plasmid   |  S100\_LN:i:1076\_dp:f:2.530236029051145   |      1076     |
+|       1       |      0     |  Chromosome  |  S1\_LN:i:374865\_dp:f:1.0749885035087077   |      374865     |
+|       1       |      0     |  Chromosome  | S10\_LN:i:198295\_dp:f:0.8919341045340952  |     198295    |
+|       0       |      1     |    Plasmid   |  S20\_LN:i:91233\_dp:f:0.5815421095375989   |      91233     |
 
 
-Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids)..
+Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
 
 ### Predict plasmids <a name="predict-plasmids"></a>
-After preprocessing, we are now ready to predict individual plasmids. 
+After pre-processing, we are now ready to predict individual plasmids. 
 
 Run gplas and set the **-c** flag to **predict**. Also, provide the paths to your assembly graph using the **-i** flag, and to your binary classification file with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
 
@@ -133,6 +133,7 @@ ls results/my_isolate*
 ```
 
     ## results/my_isolate_bin_1.fasta
+    ## results/my_isolate_bin_2.fasta
     ## results/my_isolate_bins.tab
     ## results/my_isolate_plasmidome_network.png
     ## results/my_isolate_results.tab
@@ -145,16 +146,15 @@ Fasta files with the nodes belonging to each predicted component.
 grep '>' results/my_isolate*.fasta
 ```
 
-    ## >S18_LN:i:54155_dp:f:1.0514645940835776
-    ## >S31_LN:i:21202_dp:f:1.194722937126809
-    ## >S33_LN:i:18202_dp:f:1.1628830074648842
-    ## >S46_LN:i:8487_dp:f:1.2210058174026983
-    ## >S47_LN:i:8177_dp:f:0.9996798934685464
-    ## >S50_LN:i:4993_dp:f:1.1698997426343487
-    ## >S52_LN:i:4014_dp:f:0.9783821389091624
-    ## >S54_LN:i:3077_dp:f:1.1553028848000615
-    ## >S57_LN:i:2626_dp:f:0.9929149754371588
-    ## >S60_LN:i:1589_dp:f:1.0577429501871556
+``` bash
+>S32_LN:i:42460_dp:f:0.6016122804021161
+>S47_LN:i:17888_dp:f:0.5893320957724726
+>S50_LN:i:11225_dp:f:0.6758514700227541
+>S56_LN:i:6837_dp:f:0.5759570101860518
+>S59_LN:i:5519_dp:f:0.5544497698217399
+>S67_LN:i:2826_dp:f:0.6746421335091037
+>S20_LN:i:91233_dp:f:0.5815421095375989
+```
 
 ##### results/\*plasmidome\_network.png
 
