@@ -198,20 +198,20 @@ time.sleep(1)
    
 #3. Run analysis
 
-if args.classifier=='predict':
-        ##3.2 If classifier is external ('predict'), then verify that the provided input prediction file is the correct format
-        print("Resuming gplas using the prediction given by the user.\n")
-        print("Checking if prediction file is correctly formatted.\n")
-        print(f"Checking for {args.prediction}")
-        check_file_output_command=f'Rscript {scriptdir}/check_independent_prediction_format.R {args.name} {args.prediction}'
-        check_file_run=subprocess.run(check_file_output_command, shell=True, text=True, executable='/bin/bash',capture_output=True)
-        if check_file_run.returncode == 0:
-            print(check_file_run.stdout)
+#if args.classifier=='predict':
+#        ##3.2 If classifier is external ('predict'), then verify that the provided input prediction file is the correct format
+#        print("Resuming gplas using the prediction given by the user.\n")
+#        print("Checking if prediction file is correctly formatted.\n")
+#        print(f"Checking for {args.prediction}")
+#        check_file_output_command=f'Rscript {scriptdir}/check_independent_prediction_format.R {args.name} {args.prediction}'
+#        check_file_run=subprocess.run(check_file_output_command, shell=True, text=True, executable='/bin/bash',capture_output=True)
+#        if check_file_run.returncode == 0:
+#            print(check_file_run.stdout)
             
-        else:
-            print(check_file_run.stderr)
-            print("Please modify format on input files and re-run gplas")
-            sys.exit(1)
+#        else:
+#            print(check_file_run.stderr)
+#            print("Please modify format on input files and re-run gplas")
+#            sys.exit(1)
 
 if args.classifier=='extract':
     ##3.1  If classifier is extract, then unlock folder, perform extraction mode and quit gplas
@@ -223,27 +223,44 @@ if args.classifier=='extract':
     
 
 else:
-    ##3.3 Run snakemake workflows        
-    command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
-    command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
+    ##3.3 Run snakemake workflows until obtainin the _raw_nodes.fasta file.
+    command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} gplas_input/{args.name}_raw_nodes.fasta'
+    command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} gplas_input/{args.name}_raw_nodes.fasta'
     runSnake(command_snakemake_unlock)
     runSnake(command_snakemake_run)
 
-    ##3.4 Check if there are Unbinned contigs
-    unbinned_path=f'results/normal_mode/{args.name}_bin_Unbinned.fasta'
-    if os.path.exists(unbinned_path):
-        ##3.5 If there are contigs left unbinned, unlock and run gplas in bold-mode
-        print('\n')
-        print('Some contigs were left Unbinned, running gplas in bold mode')
-        print('\n')
-        command_snakemake_unlock=f' snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
-        command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
+    #3.4 Check if the independent prediction file is correctly formatted.
+    print("Checking if prediction file is correctly formatted.\n")
+    check_file_output_command=f'Rscript {scriptdir}/check_independent_prediction_format.R {args.name} {args.prediction}'
+    check_file_run=subprocess.run(check_file_output_command, shell=True, text=True, executable='/bin/bash',capture_output=True)
+    
+    if check_file_run.returncode == 0: #if file is correctly formated, continue the snakemake pipeline
+        print(check_file_run.stdout)
+        command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
+        command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
         runSnake(command_snakemake_unlock)
         runSnake(command_snakemake_run)
+
+        #3.5 Check for Unbinned contigs
+        unbinned_path=f'results/normal_mode/{args.name}_bin_Unbinned.fasta'
+        if os.path.exists(unbinned_path): #run bold mode if contigs were left unbinned.
+            ##3.5 If there are contigs left unbinned, unlock and run gplas in bold-mode
+            print('\n')
+            print('Some contigs were left Unbinned, running gplas in bold mode')
+            print('\n')
+            command_snakemake_unlock=f' snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
+            command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
+            runSnake(command_snakemake_unlock)
+            runSnake(command_snakemake_run)
+        else:
+            ##3.6 If there was not unbinned contigs, just move results files to the final location.
+            for file in glob.glob(f"results/normal_mode/{args.name}*"):
+                shutil.copy(file, "results/")
+
     else:
-        ##3.6 If there was not unbinned contigs, just move results files to the final location.
-        for file in glob.glob(f"results/normal_mode/{args.name}*"):
-            shutil.copy(file, "results/")
+        print(check_file_run.stderr)
+        print("Please modify format on input files and re-run gplas")
+        sys.exit(1)    
            
 ##3.7 If the -k flag was not selected, delete intermediary files
 if args.keep==False and args.classifier!='extract':
