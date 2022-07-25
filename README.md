@@ -64,7 +64,7 @@ Gplas needs two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A **.tab** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See below for an example on how to generate this file. 
+2) A tab-separated file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See [below](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#binary-classification-of-nodes-using-an-external-tool) for instructions on how to obtain this file. 
 
 ### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
@@ -75,13 +75,13 @@ We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
 PlasmidEC outperforms most available binary classification tools, and it offers two extra-advantages:
-1) It uses the assembly graph as input. (in **.gfa** format) 
-2) It outputs a **.tab** classification file that is automatically compatible with gplas. 
+1) It uses assembly graphs in **.gfa** format as input (most tools can't). 
+2) It outputs a **classification file** that is automatically compatible with gplas (Other tools will require extra processing of the output). 
 
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*
 
 Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
-classify the nodes in your .gfa file. After this, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
+classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
 
 ##### <ins>Using a different binary classifier</ins> <a name="using-a-different-tool"></a>
 
@@ -93,30 +93,36 @@ Other binary classification tools exist, and we've recently listed and reviewed 
 gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 ```
 
-The output FASTA file, containing the nodes sequences, will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
+The output FASTA file will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
 
 2) Use this FASTA file as an input for the binary classification tool of your choice. 
 
-3) After classification is finished, format the output as indicated below:
+3) Format the output file: 
 
-The output from the binary classification tool has to be formatted as a tab separated file containing the following columns and headers (case sensitive):
+The output from the binary classification tool has to be formatted as a tab separated file containing specific columns and headers (case sensitive). See a preloaded example below:
+
+``` bash
+head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
+```
 
 | Prob\_Chromosome | Prob\_Plasmid |  Prediction  | Contig\_name                             | Contig\_length|
 |-----------------:|--------------:|:-------------|:-----------------------------------------|--------------:|
-|       0.40       |      0.60     |    Plasmid   |  S1\_LN:i:4240\_dp:f:1.936810327946946   |      4240     |
-|       0.65       |      0.35     |  Chromosome  | S18\_LN:i:147394\_dp:f:1.05847808445255  |     147394    |
-|       0.12       |      0.88     |    Plasmid   |  S25\_LN:i:7135\_dp:f:2.03512069877433   |      7135     |
+|       1       |      0     |  Chromosome  |  S1\_LN:i:374865\_dp:f:1.0749885035087077   |      374865     |
+|       1       |      0     |  Chromosome  | S10\_LN:i:198295\_dp:f:0.8919341045340952  |     198295    |
+|       0       |      1     |    Plasmid   |  S20\_LN:i:91233\_dp:f:0.5815421095375989   |      91233     |
 
 
-Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids)..
+Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
 
 ### Predict plasmids <a name="predict-plasmids"></a>
-After obtaining the .tab file with the binary classification of the nodes, we are now ready to predict individual plasmids. For this, run gplas setting the **-c** flag to **predict**. Also, use the **-P** flag to indicate the path to the the binary classification file (obtained in Step 1). 
+After pre-processing, we are now ready to predict individual plasmids. 
+
+Run gplas and set the **-c** flag to **predict**. Also, provide the paths to your assembly graph using the **-i** flag, and to your binary classification file with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
 
 ``` bash
-gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P ${path_to_classifcation_file}
+gplas -i test/test_ecoli.gfa -c predict -n 'my_isolate' -P gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 ```
-*Note: If you didn't use plasmidEC, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
+*Note: If you didn't use plasmidEC for preprocessing, make sure that the **-n** argument (in this example: **my_isolate**) matches for both the 'extract' and 'predict' commands.*
 
 # Output files
 
@@ -127,6 +133,7 @@ ls results/my_isolate*
 ```
 
     ## results/my_isolate_bin_1.fasta
+    ## results/my_isolate_bin_2.fasta
     ## results/my_isolate_bins.tab
     ## results/my_isolate_plasmidome_network.png
     ## results/my_isolate_results.tab
@@ -139,16 +146,15 @@ Fasta files with the nodes belonging to each predicted component.
 grep '>' results/my_isolate*.fasta
 ```
 
-    ## >S18_LN:i:54155_dp:f:1.0514645940835776
-    ## >S31_LN:i:21202_dp:f:1.194722937126809
-    ## >S33_LN:i:18202_dp:f:1.1628830074648842
-    ## >S46_LN:i:8487_dp:f:1.2210058174026983
-    ## >S47_LN:i:8177_dp:f:0.9996798934685464
-    ## >S50_LN:i:4993_dp:f:1.1698997426343487
-    ## >S52_LN:i:4014_dp:f:0.9783821389091624
-    ## >S54_LN:i:3077_dp:f:1.1553028848000615
-    ## >S57_LN:i:2626_dp:f:0.9929149754371588
-    ## >S60_LN:i:1589_dp:f:1.0577429501871556
+``` bash
+>S32_LN:i:42460_dp:f:0.6016122804021161
+>S47_LN:i:17888_dp:f:0.5893320957724726
+>S50_LN:i:11225_dp:f:0.6758514700227541
+>S56_LN:i:6837_dp:f:0.5759570101860518
+>S59_LN:i:5519_dp:f:0.5544497698217399
+>S67_LN:i:2826_dp:f:0.6746421335091037
+>S20_LN:i:91233_dp:f:0.5815421095375989
+```
 
 ##### results/\*plasmidome\_network.png
 
@@ -183,16 +189,15 @@ prediction, contig name, k-mer coverage, length, bin assigned.
 # Complete usage
 
 ``` bash
-gplas -h
+gplas --help
 ```
 ``` bash
-usage: gplas -i INPUT -c {mlplasmids,extract,predict} [-s SPECIES] [-n NAME]
-             [-k] [-t THRESHOLD_PREDICTION] [-b BOLD_WALKS]
-             [-x NUMBER_ITERATIONS] [-f FILT_GPLAS] [-e EDGE_THRESHOLD]
-             [-q MODULARITY_THRESHOLD] [-l LENGTH_FILTER] [-h] [-v]
-             [-P PREDICTION]
+usage: gplas -i INPUT -c {extract,predict} [-n NAME] [-P PREDICTION] [-k]
+             [-t THRESHOLD_PREDICTION] [-b BOLD_WALKS] [-x NUMBER_ITERATIONS]
+             [-f FILT_GPLAS] [-e EDGE_THRESHOLD] [-q MODULARITY_THRESHOLD]
+             [-l LENGTH_FILTER] [-h] [-v]
 
-gplas (A tool for binning plasmid-predicted contigs into individual
+gplas: A tool for binning plasmid-predicted contigs into individual
 predictions.
 
 optional arguments:
@@ -200,9 +205,11 @@ optional arguments:
                         Path to the graph file in GFA (.gfa) format, used to
                         extract nodes and links (default: None)
   -c {extract,predict}, --classifier {extract,predict}
-                        Classifier used to predict the contigs extracted from
-                        the input graph. (default: None)
+                        Select to extract nodes from the assembly graph or to
+                        predict individual plasmids. (default: None)
   -n NAME, --name NAME  Output name used in the gplas files (default: unnamed)
+  -P PREDICTION, --prediction PREDICTION
+                        Path to the binary classification file (default: None)
   -k, --keep            Keep intermediary files (default: False)
   -t THRESHOLD_PREDICTION, --threshold_prediction THRESHOLD_PREDICTION
                         Prediction threshold for plasmid-derived sequences
@@ -226,9 +233,7 @@ optional arguments:
                         1000)
   -h, --help            Prints this message (default: None)
   -v, --version         Prints gplas version (default: None)
-  -P PREDICTION, --prediction PREDICTION
-                        Location of independent prediction input (default:
-                        independent_prediction/)
+
 ```
 
 ### Intermediary results files
