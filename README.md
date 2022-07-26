@@ -64,7 +64,7 @@ Gplas needs two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A tab-separated file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See [below](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#binary-classification-of-nodes-using-an-external-tool) for instructions on how to obtain this file. 
+2) A tab-separated file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See [below](https://gitlab.com/mmb-umcu/gplas#binary-classification-of-nodes-using-an-external-tool) for instructions on how to obtain this file. 
 
 ### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
@@ -81,7 +81,7 @@ PlasmidEC outperforms most available binary classification tools, and it offers 
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*. Although, it is possible to train models for new species.
 
 Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
-classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
+classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/#predict-plasmids).
 
 ##### <ins>Using a different binary classifier</ins> <a name="using-a-different-tool"></a>
 
@@ -112,7 +112,7 @@ head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 |       0       |      1     |    Plasmid   |  S20\_LN:i:91233\_dp:f:0.5815421095375989   |      91233     |
 
 
-Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/python_dev/README.md#predict-plasmids).
+Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/#predict-plasmids).
 
 ### Predict plasmids <a name="predict-plasmids"></a>
 After pre-processing, we are now ready to predict individual plasmids. 
