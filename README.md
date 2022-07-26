@@ -64,7 +64,7 @@ Gplas needs two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A tab-separated file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See [below](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#binary-classification-of-nodes-using-an-external-tool) for instructions on how to obtain this file. 
+2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#binary-classification-of-nodes-using-an-external-tool) section for instructions on how to obtain this file. 
 
 ### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
