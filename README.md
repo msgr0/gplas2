@@ -16,7 +16,7 @@ plasmid contigs into several discrete plasmid components.
   - [Installation using pip and conda](#installation-using-pip-and-conda)
 - [Usage](#usage)
     - [Input files](#input-files)
-    - [Binary classification of nodes - Preprocessing](#binary-classification-of-nodes-using-an-external-tool)
+    - [Preprocessing - Binary classification of nodes](#binary-classification-of-nodes-using-an-external-tool)
         - [Using plasmidEC](#using-plasmidec)
         - [Using a different binary classifier](#using-a-different-tool)
     - [Predict plasmids](#predict-plasmids)
@@ -66,7 +66,7 @@ with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycl
 
 2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#binary-classification-of-nodes-using-an-external-tool) section for instructions on how to obtain this file. 
 
-### Binary classification of nodes - Preprocessing <a name="binary-classification-of-nodes-using-an-external-tool"></a>
+### Preprocessing - Binary classification of nodes <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
 -To predict individual plasmids, some preprocessing is needed. Gplas requires that nodes in assembly graph are classified as either plasmid or chromosome, and these classifications should be summarised in a **tab-separated** file with an specific format.
 
