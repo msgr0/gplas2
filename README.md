@@ -64,7 +64,7 @@ Gplas needs two inputs:
 1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
 with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
 
-2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#binary-classification-of-nodes-using-an-external-tool) section for instructions on how to obtain this file. 
+2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#preprocessing-binary-classification-of-nodes) section for instructions on how to obtain this file. 
 
 ### Preprocessing - Binary classification of nodes <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
@@ -93,7 +93,7 @@ Other binary classification tools exist, and we've recently listed and reviewed 
 gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 ```
 
-The output FASTA file will be located in: __gplas_input/__*my_isolate*_raw_nodes.fasta. 
+The output FASTA file will be located in: __gplas_input/__*my_isolate*_contigs.fasta. By default, this file will only contain contigs larger than 1000 bp, however, this can be controlled with the -l flag. 
 
 2) Use this FASTA file as an input for the binary classification tool of your choice. 
 

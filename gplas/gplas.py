@@ -74,15 +74,31 @@ Congratulations! Prediction succesfully done.
 
 Your results are in results/
 
-We hope it helps your research, thanks for using gplas!
-If you have used smlplasmids as a classifier please cite:
-  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
+We hope it helps your research, thanks for using gplas version {VERSION}!
 
-Thank you for using gplas version {VERSION}! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+Please cite: https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
 """)
     
     sys.exit(0)
     
+def success_message_extract():
+    print ('\n')
+    print(read_logo)
+    print ('\n')
+    print(f"""
+
+Congratulations! Your nodes have been succesfully extracted.
+
+Your results are in gplas_input/{args.name}_contigs.fasta. Please, use an external tool to classify the nodes in this file, and then bin them into individual plasmids using gplas.
+
+We hope it helps your research, thanks for using gplas version {VERSION}!.
+
+Please cite: https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
+""")
+    
+    sys.exit(0)
+    
+
 #Prediction not successful
 def error_message():    
     print('\n')
@@ -93,13 +109,19 @@ Please check the file:   coverage/*_clean_prediction.tab.
 If all contigs were predicted as chromosome, gplas probably failed at the step to create random walks starting from plasmid seeds. If that's the case, probably your isolate does not carry any plasmid(s)
 If you don't see any files present at:   gplas_input/  or  coverage/  most likely the installation of gplas failed at some point
 
-If you have used mlplasmids as a classifier please cite:
-  Arredondo-Alonso et al. mlplasmids: a user-friendly tool to predict plasmid- and chromosome-derived sequences for single species, Microbial Genomics, doi: 10.1099/mgen.0.000224
-
-Thank you for using gplas version 1.0.0! - https://academic.oup.com/bioinformatics/article/36/12/3874/5818483
           
         """)
     sys.exit(0)
+
+def error_message_extract():    
+    print('\n')
+    print("""
+Looks like the nodes were not extracted. Please, check above for error messages. 
+
+        """)
+    sys.exit(0)
+
+
 
 #******************************#
 #*                            *#
@@ -256,13 +278,22 @@ if args.keep==False and args.classifier!='extract':
       
 ##3.8 Check that output has been correctly created
 final_results_path='results/'+args.name+'_results.tab'
-if os.path.exists(final_results_path):
-    success_message()
-    sys.exit(0)
-    
+raw_nodes_path='gplas_input/'+args.name+'_contigs.fasta'
+
+if args.classifier!='extract':
+    if os.path.exists(final_results_path):
+        success_message()
+        sys.exit(0)
+    else:
+        error_message()
+        sys.exit(1)
 else:
-    error_message()
-    sys.exit(1)
+    if os.path.exists(raw_nodes_path):
+        success_message_extract()
+        sys.exit(0)
+    else:
+        error_message_extract()
+        sys.exit(1)
 
 
 def start():
