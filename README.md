@@ -70,7 +70,7 @@ with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycl
 
 -To predict individual plasmids, some preprocessing is needed. Gplas requires that nodes in assembly graph are classified as either plasmid or chromosome, and these classifications should be summarised in a **tab-separated** file with an specific format.
 
--This classification step has to be completed by using an **external classification tool**. We strongly recommend using [plasmidEC](https://github.com/lisavader/plasmidEC) for this step. However, all binary classification tools are compatible with gplas.
+-This classification step has to be completed by using an **external classification tool**. We strongly recommend using [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) for this step. However, all binary classification tools are compatible with gplas.
 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
@@ -80,7 +80,7 @@ PlasmidEC outperforms most available binary classification tools, and it offers 
 
 Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*. Although, it is possible to train models for new species.
 
-Follow the instructions on the [plasmidEC](https://github.com/lisavader/plasmidEC) repository to 
+Follow the instructions on the [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) repository to 
 classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#predict-plasmids).
 
 ##### <ins>Using a different binary classifier</ins> <a name="using-a-different-tool"></a>
