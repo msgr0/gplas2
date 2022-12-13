@@ -12,7 +12,6 @@ plasmid contigs into several discrete plasmid components.
 - [gplas: binning plasmid-predicted contigs](#gplas-binning-plasmid-predicted-contigs)
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
-  - [Installation using conda (to be implemented)](#installation-using-conda-to-be-implemented)
   - [Installation using pip and conda](#installation-using-pip-and-conda)
 - [Usage](#usage)
     - [Input files](#input-files)
@@ -27,11 +26,9 @@ plasmid contigs into several discrete plasmid components.
 
 # Installation
 
-## Installation using conda (to be implemented)
-
 ## Installation using pip and conda
 
-While the conda recipe is under construction, the prefered way of installing gplas is using pip and a conda environment. Please follow the instructions below:
+The prefered way of installing gplas is using pip and a conda environment. Please follow the instructions below:
 
 Clone the repository and enter the directory
 ``` bash
@@ -78,7 +75,7 @@ PlasmidEC outperforms most available binary classification tools, and it offers 
 1) It uses assembly graphs in **.gfa** format as input (most tools can't). 
 2) It outputs a **classification file** that is automatically compatible with gplas (Other tools will require extra processing of the output). 
 
-Currently, plasmidEC can be used for binary classification of 8 species: *E. coli, K. pneumoniae, Acinetobacter baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis, E. faecium*. Although, it is possible to train models for new species.
+Currently, plasmidEC has 8 species-specific classification models for *E. coli, K. pneumoniae, A. baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis and E. faecium*. Additionally, plasmidEC has a **General** model for identifying plasmid contigs of other species.
 
 Follow the instructions on the [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) repository to 
 classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#predict-plasmids).
