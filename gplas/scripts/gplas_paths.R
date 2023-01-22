@@ -10,7 +10,6 @@ suppressMessages(library(cooccur))
 suppressMessages(library(ggrepel))
 
 # Inputs
-
 path_nodes <- snakemake@input[["nodes"]]
 path_links <- snakemake@input[["clean_links"]]
 path_prediction <- snakemake@input[["clean_prediction"]]
@@ -43,7 +42,7 @@ stop("There are no suitable plasmids to create the walks. gplas can't do anythin
 initialize_nodes <- initialize_nodes[,1]
 
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
-max_variation <- as.numeric(max_variation[1,1])
+max_variation <- as.numeric(max_variation[1,1]*5)
 
 #Outputs
 
@@ -111,7 +110,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       }
       
       current_links <- subset(links, links$V1 == seed) # Consider the last element present in our path and observe all the possible links
-      
+     
       if(verbose == TRUE)
       {
         print(current_links)
@@ -130,7 +129,6 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       }
       
       list_connections <- unique(current_links$V3) # All the possible connections 
-      
   
       # We do not allow that a node which is not a repeat appears more than 1 time in any solution but we exclude the initial seed from this consideration 
       
@@ -201,8 +199,6 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
       subset_probs <- clean_pred[which(clean_pred$number %in% prob_df$number),]
       final_probs <- subset_probs$Prob_Plasmid[match(prob_df$number,subset_probs$number)]
       
-      
-      
       # Short contigs do not have a reliable probability, we assign them a predefined probability (passed via the argument 'prob_small_repeats')
       final_probs[is.na(final_probs)] <- prob_small_repeats # OVERLAP!  
       
@@ -234,7 +230,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
                                        outgoing_node = list_connections, 
                                        Probability_pl_chr = final_probs,
                                        Probability_cov = 0)
-      
+
       cov_connections_info <- graph_contigs[graph_contigs$number %in% record_connections$outgoing_node,]
       
       up_cutoff <- cov_connections_info$coverage + max_variation
@@ -344,6 +340,7 @@ plasmid_graph <- function(nodes = nodes, links = links, output_path, classifier,
   }
 }
 
+
 for(seed in initialize_nodes)
 {
   set.seed(123)
@@ -352,6 +349,7 @@ for(seed in initialize_nodes)
   plasmid_graph(direction = 'forward', nodes = nodes, links = links, output_path = output_path, initial_seed = positive_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
   plasmid_graph(direction = 'reverse', nodes = nodes, links =  links, output_path = output_path, initial_seed = negative_seed, number_iterations = number_iterations, verbose = FALSE,  number_nodes = 1e2, prob_small_repeats = 0.5, max_variation = max_variation, classifier = classifier, filtering_threshold = filtering_threshold)
 }  
+
 
 
 
