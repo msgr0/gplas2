@@ -13,14 +13,6 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 path_prediction <- snakemake@input[["prediction"]]
 
-#THIS WILL BE REMOVED
-#path_nodes <- '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/gplas_input/test_one_raw_nodes.fasta'
-#path_links <- '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/gplas_input/test_one_raw_links.txt'
-#classifier <- 'predict'
-#threshold <- 0.5
-#path_prediction <- '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_binary_classification/GCF_904866485.1_KSB1_1H_plasmid_prediction.tab'
-#UNTIL HERE
-
 
 raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
 raw_contig_names <- names(raw_nodes)
@@ -70,7 +62,6 @@ graph_neg_contigs$number <- paste(graph_neg_contigs$number, '-', sep = '')
 graph_contigs <- rbind(graph_pos_contigs, graph_neg_contigs)
 
 write.table(x = graph_contigs, file = snakemake@output[["graph_contigs"]], row.names = FALSE)
-#write.table(x = graph_contigs, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_graph_contigs.tab', row.names = FALSE)
 
 small_contigs <- subset(graph_contigs, graph_contigs$length < 500)
 
@@ -105,7 +96,6 @@ for(row in 1:nrow(raw_links))
 links <- as.data.frame(links)
 
 write.table(x = links, file = snakemake@output[["clean_links"]], row.names = FALSE)
-#write.table(x = links, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_clean_links.tab', row.names = FALSE)
 
 unique_nodes <- unique(links$V1)
 
@@ -143,8 +133,6 @@ repeats <- subset(repeat_info, repeat_info$indegree > 1 | repeat_info$outdegree 
 repeats_graph <- repeats
 
 write.table(x = repeats_graph, file = snakemake@output[["graph_repeats"]])
-#write.table(x = repeats_graph, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_repeats_graph.tab', row.names = FALSE)
-
 
 repeats$number <- gsub(pattern = '\\+',replacement = '',x = repeats$number) # Removing directionality (to match the numbers present in mlplasmids prediction)
 repeats$number <- gsub(pattern = '\\-',replacement = '',x = repeats$number) # Removing directionality (to match the numbers present in mlplasmids prediction)
@@ -224,8 +212,6 @@ clean_pred <- merge(clean_pred, contig_info, by = 'Contig_name')
 #get the plasmid nodes without repeats
 final_prediction <- clean_pred[! clean_pred$number %in% repeats$number,]
 write.table(x = final_prediction, file = snakemake@output[["clean_prediction"]], row.names = FALSE)
-#write.table(x = final_prediction, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_clean_prediction.tab', row.names = FALSE)
-
 
 #Get the isolated nodes in the graph. -This nodes should appear in the contig list, but not in the graph
 unique_nodes_singless<-as.data.frame(links$V1)
@@ -235,16 +221,11 @@ unique_nodes_singless$node_number<-gsub(unique_nodes_singless$node_number,patter
 isolated_nodes<-contig_info[! contig_info$number %in% unique_nodes_singless$node_number ,]
 isolated_nodes <- merge(clean_pred, isolated_nodes[4], by = 'Contig_name')
 isolated_nodes <- subset(isolated_nodes, isolated_nodes$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
-if (nrow(isolated_nodes)>=1) {
 write.table(x = isolated_nodes, file = snakemake@output[["isolated_nodes"]], row.names = FALSE)
-#write.table(x = isolated_nodes, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_isolated_nodes.tab', row.names = FALSE)
-}
 
 #Get the repeat information.
 repeats_final <- clean_pred[clean_pred$number %in% repeats$number,]
 write.table(x = repeats_final, file = snakemake@output[["clean_repeats"]], row.names = FALSE)
-#write.table(x = repeats_final, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_clean_repeats.tab', row.names = FALSE)
-
 
 ###########################################################################################################################################
 
@@ -257,15 +238,12 @@ pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the c
 initialize_nodes <- unique(pl_nodes$number) # These contigs are going to be used as seeds to start finding the solutions
 
 write.table(x = initialize_nodes, file = snakemake@output[["initialize_nodes"]], row.names = FALSE)
-#write.table(x = initialize_nodes, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_initialize_nodes.tab', row.names = FALSE)
 
 ###########################################################################################################################################
 
 # Select the repeat nodes that will be used to explore their surroundings
 repeats_nodes<-unique(repeats_final$number)
-write.table(x = repeats_nodes, file = file = snakemake@output[["repeat_nodes"]], row.names = FALSE)
-#write.table(x = repeats_nodes, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_repeat_nodes.tab', row.names = FALSE)
-
+write.table(x = repeats_nodes, file = snakemake@output[["repeat_nodes"]], row.names = FALSE)
 
 ###########################################################################################################################################
 
@@ -287,5 +265,3 @@ max_variation <- cov*1.0
 max_variation_small <- cov*5.0
 
 write.table(x = sd_estimation, file = snakemake@output[["coverage"]], row.names = FALSE)
-#write.table(x = sd_estimation, file = '/home/jpaganini/UMC_PhD/gplas_repeats/gplas/test_2/coverage/test_one_estimation.txt', row.names = FALSE)
-
