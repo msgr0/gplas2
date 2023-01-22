@@ -18,6 +18,7 @@ path_prediction <- snakemake@input[["clean_prediction"]]
 path_graph_contigs <- snakemake@input[["graph_contigs"]]
 path_graph_repeats <- snakemake@input[["graph_repeats"]]
 path_init_nodes <- snakemake@input[["initialize_nodes"]]
+path_isolated_nodes <- snakemake@input[["isolated_nodes"]]
 path_cov_variation <- snakemake@input[["coverage"]]
 input_solutions <- snakemake@input[["solutions"]]
 classifier <- snakemake@params[["classifier"]]
@@ -26,10 +27,11 @@ iterations <- snakemake@params[["iterations"]]
 modularity_threshold <- snakemake@params[["modularity_threshold"]]
 
 
-
+#import links between contigs
 links <- read.table(file = path_links, header = TRUE)
+#import contigs information from the graph
 graph_contigs <- read.table(file = path_graph_contigs, header = TRUE)
-
+#classify as small contigs shorter than 500 bp.
 small_contigs <- subset(graph_contigs, graph_contigs$length < 500)
 
 repeats_graph <- read.table(file = path_graph_repeats)
@@ -42,16 +44,20 @@ initialize_nodes <- initialize_nodes[,1]
 
 clean_pred <- read.table(file = path_prediction, header = TRUE)
 
-
+#import the coverage variance of the chromosomal cotigs.
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
 max_variation <- as.numeric(max_variation[1,1])
+#allow more variance for small contigs.
 max_variation_small <- max_variation*5.0
-
 max_nodes <- max(count.fields(input_solutions, sep = ","))
 
+#import plasmid walks
 solutions <- read.table(input_solutions ,sep=",",fill=TRUE,col.names=1:max_nodes)
 
+#create a null vector to contain all the nodes included in the plasmid walks
 all_nodes <- NULL
+
+#create a list with all the nodes that appear in the plasmid walks.
   for(solution in 1:nrow(solutions))
   {
     iteration <- solutions[solution,]
@@ -61,13 +67,17 @@ all_nodes <- NULL
     all_nodes <- append(x = all_nodes, values = nodes, after = length(all_nodes))
   }
 
+#filter out nodes that appear multiple times in the nodes
 unique_nodes <- unique(all_nodes)
 unique_nodes <- unique_nodes[unique_nodes != ""]
 unique_nodes <- as.character(na.omit(unique_nodes))
 
+#CREATE A CO-OCURRENCE MATRIX 
+##Column names are the nodes included in plasmid walks.
+##Each row is a new walk
+##Assign a 1 if the node is present in walk and a 0 if node is not present
 co_ocurrence <- data.frame(matrix(0, nrow = nrow(solutions), ncol = length(unique_nodes)))
 colnames(co_ocurrence) <- unique_nodes
-
 for(row in 1:nrow(co_ocurrence))
 {
   iteration <- co_ocurrence[row,]
@@ -81,16 +91,21 @@ for(row in 1:nrow(co_ocurrence))
 
 suppressMessages(co_ocurrence <- apply(co_ocurrence, 2, as.integer))
 
+#define the seed nodes
 starting_nodes <- subset(unique_nodes, unique_nodes %in% unique(solutions[,1]))
 
+#Number of iterations
 number_iterations <- as.numeric(iterations)
 
+#create a blank dataframe for co-ocurrence frequency (in network format)
+#Start_node, Connecting_node,nr_occurences
 total_pairs <- NULL
 
 scalar1 <- function(x) {x / sqrt(sum(x^2))}
 
 search_solutions <- as.data.frame(co_ocurrence)
 
+#Get the number of times that two nodes co-ocuur in every walk
 for(node in starting_nodes)
 {
   index_col_node <-  which(colnames(search_solutions) == node)
@@ -107,9 +122,10 @@ for(node in starting_nodes)
 }
 
 
-## Looking back in the solutions if there are circular graphs
-
+#====Find circular sequences
 circular_sequences <- NULL
+
+#Extract from solutions the walks in which start-node and end-node are the same.
 for(solution in 1:nrow(solutions))
 {
   iteration <- solutions[solution,]
@@ -123,6 +139,8 @@ for(solution in 1:nrow(solutions))
   }
 }
 
+#check if the number of circular walks  starting from each node equals the number of iterations.
+#if this is the case, add the circular walk to the total_paris dataframe
 if(is.null(circular_sequences) == FALSE)
 {
   
@@ -149,11 +167,12 @@ total_pairs$Starting_node <- gsub(pattern = '\\-', replacement = '', x = total_p
 total_pairs$Connecting_node <- gsub(pattern = '\\+', replacement = '', x = total_pairs$Connecting_node)
 total_pairs$Connecting_node <- gsub(pattern = '\\-', replacement = '', x = total_pairs$Connecting_node)
 
+#Filter-out cases of no-coocurrence.
 total_pairs <- subset(total_pairs,total_pairs$weight > 1)
-
 
 complete_node_info <- NULL
 
+#Scale weigth
 for(node in unique(total_pairs$Starting_node))
 {
   first_node <- subset(total_pairs, total_pairs$Starting_node %in% node)
@@ -178,10 +197,14 @@ initial_nodes <- gsub(pattern = '\\-', replacement = '', x = initial_nodes)
 total_pairs$Starting_node <- as.character(total_pairs$Starting_node)
 total_pairs$Connecting_node <- as.character(total_pairs$Connecting_node)
 
+#Filter out repeated elements. Keep only connections of unitigs.
 total_pairs <- subset(total_pairs, total_pairs$Starting_node %in% initial_nodes)
 total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_nodes)
 
+#===Reformat the dataframe to obtain the totality of co-courences 
 weight_counting <- NULL
+
+#First check if we actually have co-ocurrence of unitigs.
 if (length(total_pairs) > 0 && nrow(total_pairs) != 0) {
 for(row in 1:nrow(total_pairs))
 {
@@ -205,6 +228,7 @@ for(row in 1:nrow(total_pairs))
   weight_counting <- rbind(weight_counting, df_count)
 }
 } else {
+#if gplas did not find any pair of unitigs connected by plasmid walks, the tool quits.
 print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Please assemby your genome with different paramenters or with a different tool and re-run gplas.")
 quit(status=1)
 }
@@ -212,8 +236,6 @@ quit(status=1)
 single_edge_counting <- weight_counting %>%
   group_by(Pair) %>%
   summarize(Weight = sum(Count))
-
-
 
 weight_graph <- data.frame(From_to = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,1]),
                            To_from = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,2]),
@@ -244,92 +266,89 @@ viz_graph$weight <- NULL
 graph_viz <- graph_from_data_frame(viz_graph, directed = FALSE)
 graph_viz <- igraph::simplify(graph_viz, remove.multiple=FALSE)
 
-# Simplifying the graph 
+# Simplifying the graph - Removing self-loops from the graph
 
 no_loops_graph <- igraph::simplify(graph_pairs, remove.multiple=FALSE)
 
 
-# Starting taking the decision whether to perform a partition or not 
-
-
+#===Analyze if the plasmidome network can be partitioned into different sub-networks.
+#Get clusters based on connectivity alone.
 components_graph <- decompose(no_loops_graph, mode = c("weak"), max.comps = NA,
                               min.vertices = 2)
 
+#Create function to run three community detection algorithms on the plasmidome network.
+#This fuction creates a table as an output that contains the different algorithms names and the global modularity values of the resulting network.
 partitioning_components <- function(graph)
 {
   
   # Spinglass algorithm
   graph_spin <- cluster_spinglass(graph)
   
-  
   # Walktrap algorithm 
   graph_walktrap <- cluster_walktrap(graph)
   
   # Leading eigen values 
-  
   graph_eigen <- cluster_leading_eigen(graph)
   
-  
   # Louvain method 
-  
   graph_louvain <- cluster_louvain(graph)
   
-  
   # Community detection based on propagating labels 
-  
   graph_propag <- cluster_label_prop(graph)
   
   partition_info <<- data.frame(Algorithm = c('Walktrap','Leading-eigen','Louvain'),
                                 Modularity = c(modularity(graph_walktrap), 
                                                modularity(graph_eigen), 
                                                modularity(graph_louvain)))
-  
 }
 
+#Create a data-frame to hold the results from the different clusters
 complete_partition_info <- NULL
 
-
+#Get a table that contains each node and the component it belongs.
 info_comp_member <- components(no_loops_graph)$membership
 original_components <- unique(info_comp_member)
+
 info_comp_size <- components(no_loops_graph)$csize
 
 node_and_component <- data.frame(Node = names(info_comp_member),
                                  Original_component = as.character(info_comp_member))
-
 
 information_components <- data.frame(Original_component = original_components,
                                      Size = info_comp_size)
 
 full_info_components <- merge(node_and_component, information_components, by = 'Original_component')
 
-
+#Analyze if each components needs to be sub-divided
 if(length(components_graph) >= 1)
 {
-  
+
+  #Loop thru each component and run the different community detection algorithms. 
+  #As output we get a table with the different modularity values of each community detection algorithm for each sub-graph.
 for(component in 1:length(components_graph))
 {
   subgraph <- components_graph[[component]]
   partitioning_components(subgraph)
   first_node <- names(V(subgraph))[1]
-  
-  
+
   info_first_node <- subset(full_info_components, full_info_components$Node == first_node)
   
   partition_info$Original_component <- info_first_node$Original_component
   complete_partition_info <- rbind(complete_partition_info, partition_info)
-  
 }
 
 complete_partition_info$Modularity <- round(complete_partition_info$Modularity,2)
 
 modularity_threshold <- as.numeric(modularity_threshold)
 
+#Get the decision of splitting or not. if the modularity value is bigger than the threshold, split. Otherwise, don'.
 complete_partition_info$Decision <- ifelse(complete_partition_info$Modularity >= modularity_threshold, 'Split', 'No_split')
 }
 
+#Add singletons components, namely Single-node components from the plasmidome network.
 singletons_component <- which((components(no_loops_graph)$csize == 1) == TRUE)
 
-
+#Add the singletons to the rest of the data.
 if(length(singletons_component) > 0)
 {
   df_singletons <- data.frame(Algorithm = 'Independent-single_component', 
@@ -342,11 +361,13 @@ if(length(singletons_component) > 0)
 
 complete_partition_info
 
+#When suitable, get the results from the network partitioning algorithm.
 contigs_membership <- NULL
 internal_component <- 1
 
 complete_partition_info <- complete_partition_info[order(complete_partition_info$Original_component),]
 
+#For determining partition, get the algorithm that provides the biggest modularity value.
 for(component in unique(complete_partition_info$Original_component))
 {
   decision_comp <- subset(complete_partition_info, complete_partition_info$Original_component == component)
@@ -446,48 +467,75 @@ png(filename=snakemake@output[["plot_graph"]],width = 700, height = 700)
 plot.igraph(graph_viz)
 dev.off()
 
-
+#Get the final membership data after partitioning
 results_subgraph <- data.frame(number = contigs_membership$Contig,
                                Component = contigs_membership$Final_cluster)
- 
-pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' | clean_pred$Prediction == 'plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
+
+#Get all the plasmid nodes 
+pl_nodes <- subset(clean_pred, clean_pred$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
 
 raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
 pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
-
+#Get all the not-assigned nodes (Unbinned and repeats)
 pl_notassigned <- subset(pl_nodes,! pl_nodes$number %in% results_subgraph$number)
 
+#Get the repeats
 pl_repeats <- subset(pl_notassigned, pl_notassigned$number %in% repeats$number)
 
+#Get the Unbinned nodes
 pl_unassigned <- subset(pl_notassigned,! pl_notassigned$number %in% repeats$number)
 
+#If there are isolated nodes, remove them from the unbinned and create a new category
+isolated_nodes <- read.table(file = path_isolated_nodes, header = TRUE)
+pl_isolated <- subset(pl_unassigned, pl_notassigned$number %in% isolated_nodes$number)
+pl_unassigned <- subset(pl_unassigned,! pl_unassigned$number %in% isolated_nodes$number)
+
+#Get the assigned nodes based on the final membership algorithm
 pl_assigned <- subset(pl_nodes, pl_nodes$number %in% results_subgraph$number)
+
+#Get all the information from the plasmid nodes (Lenght, coverage, bin number, etc)
 full_info_assigned <- merge(pl_assigned, results_subgraph, by = 'number')
 
-if(nrow(pl_unassigned) > 1)
+#Add unbinned category
+if(nrow(pl_unassigned) >= 1)
 {
   pl_unassigned$Component <- 'Unbinned'
   full_info_assigned <- rbind(full_info_assigned, pl_unassigned)
 }
 
-if(nrow(pl_repeats) > 1)
+#Add isolated nodes category
+if(nrow(pl_isolated) >= 1)
 {
-  pl_repeats$Component <- 'Repeat-like'
+  isolated_nr<-1
+  while (isolated_nr<= nrow(pl_isolated)) {
+    isolated_identification<-paste('Isolated',as.character(isolated_nr), sep='_') 
+    pl_isolated$Component[isolated_nr] <- isolated_identification
+    isolated_nr<-isolated_nr+1
+  }
+  full_info_assigned <- rbind(full_info_assigned, pl_isolated)
+}
+
+#Add repeat-like category
+if(nrow(pl_repeats) >= 1)
+{
+  pl_repeats$Component <- 'Repeat_like'
   full_info_assigned <- rbind(full_info_assigned, pl_repeats)
 }
 
+#Add information to the results file
 full_info_assigned$Contig_length <- NULL
 full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
 full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
 full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
 
-
+#Create the fasta files
 assembly_nodes <- readDNAStringSet(filepath = path_nodes)
 df_nodes <- data.frame(Contig_name = names(assembly_nodes), Sequence = paste(assembly_nodes))
 
 df_nodes <- merge(df_nodes, full_info_assigned, by = 'Contig_name')
 
+#Write fasta files
 for(component in unique(df_nodes$Component))
 {
   nodes_component <- subset(df_nodes, df_nodes$Component == component)
