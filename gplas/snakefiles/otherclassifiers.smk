@@ -246,7 +246,7 @@ rule gplas_coocurr_repeats:
         edge_gplas = config["edge_gplas"],
         sample = config["name"],
         modularity_threshold = config["modularity_threshold"],
-        bold_sd_coverage = config["bold_sd_coverage"]
+        bold_sd_coverage = config["repeats_coverage_sd"]
     message:
         "Generating weights for the set of new edges connecting plasmid unitigs"
     script:
