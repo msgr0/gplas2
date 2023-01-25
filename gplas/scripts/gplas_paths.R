@@ -42,7 +42,7 @@ stop("There are no suitable plasmids to create the walks. gplas can't do anythin
 initialize_nodes <- initialize_nodes[,1]
 
 max_variation <- read.table(file = path_cov_variation, header = TRUE)
-max_variation <- as.numeric(max_variation[1,1]*5)
+max_variation <- as.numeric(max_variation[1,1])
 
 #Outputs
 
