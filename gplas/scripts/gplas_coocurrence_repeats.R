@@ -171,42 +171,6 @@ for(node in starting_nodes)
   total_pairs <- rbind(total_pairs, df_presence_absence)
 }
 
-#====Find circular sequences
-circular_sequences <- NULL
-
-#Extract from solutions the walks in which start-node and end-node are the same.
-for(solution in 1:nrow(solutions))
-{
-  iteration <- solutions[solution,]
-  iteration <- t(iteration)
-  nodes <- as.character(iteration[,1])
-  nodes <- nodes[nodes != '']
-  if(length(nodes) > 1 & nodes[1] == nodes[length(nodes)])
-  {
-    
-    circular_sequences <- rbind(circular_sequences, c(nodes[1],nodes[length(nodes)]))
-  }
-}
-
-#check if the number of circular walks  starting from each node equals the number of iterations.
-#if this is the case, add the circular walk to the total_paris dataframe
-if(is.null(circular_sequences) == FALSE)
-{
-no_duplicated <- circular_sequences[!duplicated(circular_sequences),]
-for(combination in 1:nrow(no_duplicated))
-{
-  combi <- no_duplicated[combination,]
-  total_ocurrences <- subset(circular_sequences, circular_sequences[,2] == combi[2])
-  if(nrow(total_ocurrences) == number_iterations)
-  {
-    df_test <- data.frame(Starting_node = combi[1],
-                          Connecting_node = combi[2],
-                          weight = nrow(total_ocurrences))
-    
-    total_pairs <- rbind(total_pairs, df_test)
-  }
-}
-}
 
 total_pairs$Starting_node <- gsub(pattern = '[+]', replacement = '', x = total_pairs$Starting_node)
 total_pairs$Starting_node <- gsub(pattern = '[-]', replacement = '', x = total_pairs$Starting_node)
