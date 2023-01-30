@@ -54,7 +54,7 @@ parser.add_argument('-P','--prediction',help="Path to the binary classification 
 parser.add_argument('-k','--keep', action='store_true', help="Keep intermediary files")
 parser.add_argument('-t','--threshold_prediction',type=float,help="Prediction threshold for plasmid-derived sequences")
 parser.add_argument('-b','--bold_walks',type=int, default=5, help="Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes")
-parser.add_argument('-r','--repeats_coverage_sd',type=int, default=20, help="Coverage variance allowed for assigning repeats to bins")
+parser.add_argument('-r','--repeats_coverage_sd',type=int, default=2, help="Coverage variance allowed for assigning repeats to bins")
 parser.add_argument('-x','--number_iterations',type=int, default=20,help="Number of walk iterations per starting node")
 parser.add_argument('-f','--filt_gplas',type=float, default=0.1, help="filtering threshold to reject outgoing edges")
 parser.add_argument('-e','--edge_threshold', type=float, default=0.1,help="Edge threshold")
