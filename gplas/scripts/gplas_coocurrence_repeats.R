@@ -226,41 +226,23 @@ total_pairs$Bin[is.na(total_pairs$Bin)]<-0
 total_pairs<-total_pairs[,c(2,5,3,4)]
 colnames(total_pairs)[2]<-'Connecting_node'
 
-#===Reformat the dataframe to obtain the totality of co-courences 
-weight_counting <- NULL
+#===Obtain the totality of co-courences 
 
 #First check if we actually have co-ocurrence of unitigs.
 if (length(total_pairs) > 0 && nrow(total_pairs) != 0) {
 for(row in 1:nrow(total_pairs))
 {
-  initial_node <- as.numeric(total_pairs[row,1])
-  connecting_node <- as.numeric(total_pairs[row,2])
-  
-  raw_count <- as.numeric(total_pairs[row,3])
-  if(initial_node < connecting_node)
-  {
-    pair <- paste(initial_node,connecting_node, sep = '-')
-    df_count <- data.frame(Pair = pair,
-               Count = raw_count)
-  }
-  else
-  {
-    pair <- paste(connecting_node,initial_node, sep = '-')
-    df_count <- data.frame(Pair = pair,
-               Count = raw_count)
-  }
-  
-  weight_counting <- rbind(weight_counting, df_count)
+  total_pairs$Pair<-paste(total_pairs$Connecting_node,total_pairs$Starting_node, sep = '-')
 }
 } else {
 #if gplas did not find any unitig-repeat connection
-print ("gplas couldn't find any walks connecting repeats to plasmid-nodes.")
-quit(status=1)
+  print ("gplas couldn't find any walks connecting repeats to plasmid-nodes.")
+  quit(status=1)
 }
   
-single_edge_counting <- weight_counting %>%
+single_edge_counting <- total_pairs %>%
   group_by(Pair) %>%
-  summarize(Weight = sum(Count))
+  summarize(Weight = sum(weight))
 
 weight_graph <- data.frame(From_to = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,2]),
                            To_from = as.character(str_split_fixed(string = single_edge_counting$Pair, pattern = '-', n = 2)[,1]),
