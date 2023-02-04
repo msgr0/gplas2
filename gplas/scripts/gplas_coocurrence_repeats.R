@@ -294,30 +294,35 @@ chromosome_repeats<-repeat_assignments[as.numeric(as.character(repeat_assignment
 
 if (nrow(plasmid_repeats)==0) {
   print("No repeats associated with plasmids were found")
+  bins_data$Prob_Chromosome <- round(bins_data$Prob_Chromosome,2)
+  bins_data$Prob_Plasmid <- round(bins_data$Prob_Plasmid,2)
+  bins_data$coverage <- round(bins_data$coverage,2)
+  bins_data$Bin<-as.character(bins_data$Bin)
+  full_info_assigned<-bins_data
+} else {
+  print("We found repeated elements associated to plasmid predictions")
+ #Get all the repeat nodes 
+ pl_nodes <- clean_repeats[clean_repeats$number %in% plasmid_repeats$number,] # Selecting only contigs predicted as plasmid-derived 
+ raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
+ pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
+
+ #Get all the information from the plasmid nodes (Lenght, coverage, bin number, etc)
+ full_info_assigned <- merge(pl_nodes, plasmid_repeats, by = 'number')
+
+ #Add information to the results file
+ full_info_assigned$Contig_length <- NULL
+ full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
+ full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
+ full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
+ full_info_assigned$Bin<-as.numeric(as.character(full_info_assigned$Bin))
+ full_info_assigned$Prediction<-'Repeat'
+
+ bins_data$Prob_Chromosome <- round(bins_data$Prob_Chromosome,2)
+ bins_data$Prob_Plasmid <- round(bins_data$Prob_Plasmid,2)
+ bins_data$coverage <- round(bins_data$coverage,2)
+ bins_data$Bin<-as.character(bins_data$Bin)
+ full_info_assigned<-rbind(full_info_assigned,bins_data)
 }
-
-#Get all the repeat nodes 
-pl_nodes <- clean_repeats[clean_repeats$number %in% plasmid_repeats$number,] # Selecting only contigs predicted as plasmid-derived 
-raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
-pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
-
-#Get all the information from the plasmid nodes (Lenght, coverage, bin number, etc)
-full_info_assigned <- merge(pl_nodes, plasmid_repeats, by = 'number')
-
-#Add information to the results file
-full_info_assigned$Contig_length <- NULL
-full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
-full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
-full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
-full_info_assigned$Bin<-as.numeric(as.character(full_info_assigned$Bin))
-full_info_assigned$Prediction<-'Repeat'
-
-bins_data$Prob_Chromosome <- round(bins_data$Prob_Chromosome,2)
-bins_data$Prob_Plasmid <- round(bins_data$Prob_Plasmid,2)
-bins_data$coverage <- round(bins_data$coverage,2)
-bins_data$Bin<-as.character(bins_data$Bin)
-
-full_info_assigned<-rbind(full_info_assigned,bins_data)
 
 #Create the fasta files
 assembly_nodes <- readDNAStringSet(filepath = path_nodes)
