@@ -188,7 +188,7 @@ print(total_pairs)
 print(nrow(total_pairs))
 
 if (nrow(total_pairs) == 0) {
-  print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Plasmid nodes will be classified as Unbinned. Please assemby your genome with different paramenters or with a different tool and re-run gplas.")
+  print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Plasmid nodes will be classified as Unbinned. If this is unexpected, please assemble your genome with different parameters or with a different tool and re-run gplas.")
   pl_unassigned <- subset(clean_pred, clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
   
   raw_number <- str_split_fixed(string = pl_unassigned$Contig_name, pattern = '_', n = 2)[,1]
