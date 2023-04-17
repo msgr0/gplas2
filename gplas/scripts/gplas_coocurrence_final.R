@@ -153,7 +153,6 @@ total_pairs$Connecting_node <- gsub(pattern = '\\-', replacement = '', x = total
 
 total_pairs <- subset(total_pairs,total_pairs$weight > 1)
 
-
 complete_node_info <- NULL
 
 for(node in unique(total_pairs$Starting_node))
@@ -173,7 +172,6 @@ for(node in unique(total_pairs$Starting_node))
   complete_node_info <- rbind(complete_node_info, particular_node)
 }
 
-
 total_pairs <- complete_node_info
 
 initial_nodes <- gsub(pattern = '\\+', replacement = '', x = starting_nodes)
@@ -188,6 +186,50 @@ total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_node
 
 weight_counting <- NULL
 
+print(total_pairs)
+print(nrow(total_pairs))
+
+if (nrow(total_pairs) == 0) {
+  print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Plasmid nodes will be classified as Unbinned. If this is unexpected, please assemble your genome with different parameters or with a different tool and re-run gplas.")
+  pl_unassigned <- subset(clean_pred, clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
+  
+  raw_number <- str_split_fixed(string = pl_unassigned$Contig_name, pattern = '_', n = 2)[,1]
+  pl_unassigned$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
+  pl_unassigned$Component <- 'Unbinned'
+  
+  pl_unassigned$Contig_length <- NULL
+  pl_unassigned$Prob_Chromosome <- round(pl_unassigned$Prob_Chromosome,2)
+  pl_unassigned$Prob_Plasmid <- round(pl_unassigned$Prob_Plasmid,2)
+  pl_unassigned$coverage <- round(pl_unassigned$coverage,2)
+  
+  assembly_nodes <- readDNAStringSet(filepath = path_nodes)
+  df_nodes <- data.frame(Contig_name = names(assembly_nodes), Sequence = paste(assembly_nodes))
+  
+  df_nodes <- merge(df_nodes, pl_unassigned, by = 'Contig_name')
+  
+  for(component in unique(df_nodes$Component))
+  {
+    nodes_component <- subset(df_nodes, df_nodes$Component == component)
+    component_complete_name <- paste(snakemake@params[["sample"]], 'bin', sep = '_')
+    filename <- paste('results/', component_complete_name, sep = '')
+    filename <- paste(filename,component, sep = '_')
+    filename <- paste(filename,'.fasta',sep = '')
+    suppressWarnings(write.fasta(sequences = as.list(nodes_component$Sequence), names = nodes_component$Contig_name, file.out = filename))
+    
+  }
+  
+  colnames(pl_unassigned)[8] <- 'Bin'
+  results_subgraph<-pl_unassigned[,c(5,8)]
+  #colnames(results_subgraph)[2] <- 'Bin'
+  
+  suppressWarnings(write.table(x = pl_unassigned, file = snakemake@output[["results"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
+  suppressWarnings(write.table(x = results_subgraph, file = snakemake@output[["components"]], append = TRUE, row.names = FALSE, quote = FALSE, col.names = TRUE))
+  
+  png(filename=snakemake@output[["plot_graph"]],width = 700, height = 700)
+  plot.new()
+  dev.off()
+  quit(status=0)
+} else {
 for(row in 1:nrow(total_pairs))
 {
   initial_node <- as.numeric(total_pairs[row,1])
@@ -210,7 +252,7 @@ for(row in 1:nrow(total_pairs))
   
   weight_counting <- rbind(weight_counting, df_count)
 }
-  
+}  
   
 single_edge_counting <- weight_counting %>%
   group_by(Pair) %>%
