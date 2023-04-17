@@ -20,11 +20,17 @@ rm walks/bold_mode/"$name"_solutions*
 rm walks/unbinned_nodes/"$name"_solutions*
 fi
 
+if [[ -f walks/repeats/"$name"_solutions.csv ]]; then
+rm walks/repeats/"$name"_connections*
+rm walks/repeats/"$name"_solutions*
+fi
+
 rm coverage/"$name"_clean*
 rm coverage/"$name"_graph*
 rm coverage/"$name"_estimation*
-rm coverage/"$name"_repeats*
+rm coverage/"$name"_repeat*
 rm coverage/"$name"_initialize*
+rm coverage/"$name"_isolated*
 
 if [[ -f results/normal_mode/"$name"_results.tab ]]; then
 rm results/normal_mode/"$name"_bin*
@@ -34,3 +40,6 @@ fi
 
 rm templates/"$name"_assembly*
 
+if [[ -f results/"$name"_results_no_repeats.tab ]]; then
+rm results/"$name"_*_no_repeats.tab
+fi

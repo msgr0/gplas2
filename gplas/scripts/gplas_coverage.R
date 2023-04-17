@@ -13,6 +13,7 @@ classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 path_prediction <- snakemake@input[["prediction"]]
 
+
 raw_nodes <- readDNAStringSet(filepath = path_nodes, format="fasta")
 raw_contig_names <- names(raw_nodes)
 
@@ -47,8 +48,6 @@ contig_info <- data.frame(number = number,
                           length = length,
                           coverage = coverage,
                           Contig_name = raw_contig_names)
-
-
 
 
 contig_info$length <- as.numeric(as.character(contig_info$length)) # Converting the column length into a numeric column
@@ -204,27 +203,34 @@ if(classifier == 'plasflow')
 raw_number <- str_split_fixed(string = clean_pred$Contig_name, pattern = '_', n = 2)[,1]
 clean_pred$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
 
-
-#clean_pred$coverage <- str_split_fixed(string = clean_pred$Contig_name, pattern = ':', n = 5)[,5]
-
-#clean_pred$coverage <- as.numeric(as.character(clean_pred$coverage)) # Converting the column length into a numeric column
-#clean_pred$length <- as.numeric(as.character(clean_pred$Contig_length)) # Converting the column coverage into a coverage column
-
 clean_pred$length <- NULL
 clean_pred$coverage <- NULL
 clean_pred$number <- NULL
 
 clean_pred <- merge(clean_pred, contig_info, by = 'Contig_name')
 
+#get the plasmid nodes without repeats
 final_prediction <- clean_pred[! clean_pred$number %in% repeats$number,]
-
 write.table(x = final_prediction, file = snakemake@output[["clean_prediction"]], row.names = FALSE)
+
+#Get the isolated nodes in the graph. -This nodes should appear in the contig list, but not in the graph
+unique_nodes_singless<-as.data.frame(links$V1)
+names(unique_nodes_singless)<-'node_number'
+unique_nodes_singless$node_number<-gsub(unique_nodes_singless$node_number,pattern="[+]",replacement = '')
+unique_nodes_singless$node_number<-gsub(unique_nodes_singless$node_number,pattern="[-]",replacement = '')
+isolated_nodes<-contig_info[! contig_info$number %in% unique_nodes_singless$node_number ,]
+isolated_nodes <- merge(clean_pred, isolated_nodes[4], by = 'Contig_name')
+isolated_nodes <- subset(isolated_nodes, isolated_nodes$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
+write.table(x = isolated_nodes, file = snakemake@output[["isolated_nodes"]], row.names = FALSE)
+
+#Get the repeat information.
+repeats_final <- clean_pred[clean_pred$number %in% repeats$number,]
+write.table(x = repeats_final, file = snakemake@output[["clean_repeats"]], row.names = FALSE)
 
 ###########################################################################################################################################
 
 # Selecting the plasmid seeds in our graph
-
-pl_nodes <- subset(final_prediction, final_prediction$Prediction == 'Plasmid' & final_prediction$Prob_Plasmid >= as.numeric(as.character(threshold)) | final_prediction$Prediction == 'plasmid' & final_prediction$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
+pl_nodes <- subset(final_prediction, final_prediction$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived
 pl_nodes <- subset(pl_nodes, pl_nodes$Contig_length > 5e2) # Filtering the plasmid seeds by length 
 pl_nodes <- pl_nodes[! pl_nodes$number %in% repeats$number,] # From these contigs we remove contigs that could correspond to transposases
 pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the contigs based on length
@@ -232,6 +238,12 @@ pl_nodes <- pl_nodes[order(pl_nodes$length, decreasing = TRUE),] # Sorting the c
 initialize_nodes <- unique(pl_nodes$number) # These contigs are going to be used as seeds to start finding the solutions
 
 write.table(x = initialize_nodes, file = snakemake@output[["initialize_nodes"]], row.names = FALSE)
+
+###########################################################################################################################################
+
+# Select the repeat nodes that will be used to explore their surroundings
+repeats_nodes<-unique(repeats_final$number)
+write.table(x = repeats_nodes, file = snakemake@output[["repeat_nodes"]], row.names = FALSE)
 
 ###########################################################################################################################################
 

@@ -14,6 +14,7 @@ A python wrapped to run the gplas pipeline.
 
 from cProfile import run
 import shutil
+import linecache
 import glob
 import os
 import sys
@@ -53,6 +54,7 @@ parser.add_argument('-P','--prediction',help="Path to the binary classification 
 parser.add_argument('-k','--keep', action='store_true', help="Keep intermediary files")
 parser.add_argument('-t','--threshold_prediction',type=float,help="Prediction threshold for plasmid-derived sequences")
 parser.add_argument('-b','--bold_walks',type=int, default=5, help="Coverage variance allowed for bold walks to recover unbinned plasmid-predicted nodes")
+parser.add_argument('-r','--repeats_coverage_sd',type=int, default=2, help="Coverage variance allowed for assigning repeats to bins")
 parser.add_argument('-x','--number_iterations',type=int, default=20,help="Number of walk iterations per starting node")
 parser.add_argument('-f','--filt_gplas',type=float, default=0.1, help="filtering threshold to reject outgoing edges")
 parser.add_argument('-e','--edge_threshold', type=float, default=0.1,help="Edge threshold")
@@ -214,6 +216,7 @@ with open(template_file, 'w+') as template:
     template.write(f'modularity_threshold: "{str(args.modularity_threshold)}"\n')
     template.write(f'bold_sd_coverage: "{str(args.bold_walks)}"\n')
     template.write(f'min_node_length: "{str(args.length_filter)}"\n')
+    template.write(f'repeats_coverage_sd: "{str(args.repeats_coverage_sd)}"\n')
     template.write(f'predict_dir: "{str(args.prediction)}"\n')
 
 time.sleep(1)
@@ -244,27 +247,43 @@ else:
     
     if check_file_run.returncode == 0: #if file is correctly formated, continue the snakemake pipeline
         print(check_file_run.stdout)
-        command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
-        command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results.tab'
+        command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results_no_repeats.tab'
+        command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/normal_mode/{args.name}_results_no_repeats.tab'
         runSnake(command_snakemake_unlock)
         runSnake(command_snakemake_run)
 
         #3.5 Check for Unbinned contigs
         unbinned_path=f'results/normal_mode/{args.name}_bin_Unbinned.fasta'
         if os.path.exists(unbinned_path): #run bold mode if contigs were left unbinned.
-            ##3.5 If there are contigs left unbinned, unlock and run gplas in bold-mode
+            ##3.5.1 If there are contigs left unbinned, unlock and run gplas in bold-mode
             print('\n')
             print('Some contigs were left Unbinned, running gplas in bold mode')
             print('\n')
-            command_snakemake_unlock=f' snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
+            command_snakemake_unlock=f' snakemake --unlock --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results_no_repeats.tab'
+            command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results_no_repeats.tab'
+            runSnake(command_snakemake_unlock)
+            runSnake(command_snakemake_run)
+        else:            
+            for file in glob.glob(f"results/normal_mode/{args.name}*"):
+                shutil.copy(file, "results/")
+            
+
+## 3.6 ADD REPEATED ELEMENTS.
+        ##3.6.1 Now add the repeats to the final bins 
+        repeated_elements_path=f'coverage/{args.name}_repeat_nodes.tab'
+        line_content=linecache.getline(repeated_elements_path,2)
+        if line_content:
+            print('\n')
+            print('Adding repeated elements to the predictions')
+            print('\n')
+            command_snakemake_unlock=f'snakemake --unlock --use-conda --configfile  {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
             command_snakemake_run=f'snakemake --use-conda --configfile {template_file} -d $PWD -s {snakeFile} results/{args.name}_results.tab'
             runSnake(command_snakemake_unlock)
             runSnake(command_snakemake_run)
-        else:
-            ##3.6 If there was not unbinned contigs, just move results files to the final location.
-            for file in glob.glob(f"results/normal_mode/{args.name}*"):
-                shutil.copy(file, "results/")
-
+        else:##3.6 If there are not repeated elementss, just rename the results files.           
+            shutil.move("results/{args.name}_results_no_repeats.tab", "results/{args.name}_results.tab")
+            shutil.move("results/{args.name}_bins_no_repeats.tab", "results/{args.name}_bins.tab")
+        
     else:
         print(check_file_run.stderr)
         print("Please modify format on input files and re-run gplas")

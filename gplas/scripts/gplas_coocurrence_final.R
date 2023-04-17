@@ -18,12 +18,14 @@ path_prediction <- snakemake@input[["clean_prediction"]]
 path_graph_contigs <- snakemake@input[["graph_contigs"]]
 path_graph_repeats <- snakemake@input[["graph_repeats"]]
 path_init_nodes <- snakemake@input[["initialize_nodes"]]
+path_isolated_nodes <- snakemake@input[["isolated_nodes"]]
 path_cov_variation <- snakemake@input[["coverage"]]
 input_solutions <- snakemake@input[["solutions"]]
 classifier <- snakemake@params[["classifier"]]
 threshold <- snakemake@params[["threshold"]]
 iterations <- snakemake@params[["iterations"]]
 modularity_threshold <- snakemake@params[["modularity_threshold"]]
+
 
 
 
@@ -493,7 +495,7 @@ dev.off()
 results_subgraph <- data.frame(number = contigs_membership$Contig,
                                Component = contigs_membership$Final_cluster)
  
-pl_nodes <- subset(clean_pred, clean_pred$Prediction == 'Plasmid' | clean_pred$Prediction == 'plasmid' & clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
+pl_nodes <- subset(clean_pred, clean_pred$Prob_Plasmid >= as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
 
 raw_number <- str_split_fixed(string = pl_nodes$Contig_name, pattern = '_', n = 2)[,1]
 pl_nodes$number <- gsub(pattern = 'S', replacement = '', x = raw_number)
@@ -505,18 +507,36 @@ pl_repeats <- subset(pl_notassigned, pl_notassigned$number %in% repeats$number)
 
 pl_unassigned <- subset(pl_notassigned,! pl_notassigned$number %in% repeats$number)
 
+#If there are isolated nodes, remove them from the unbinned and create a new category
+isolated_nodes <- read.table(file = path_isolated_nodes, header = TRUE)
+pl_isolated <- subset(pl_unassigned, pl_notassigned$number %in% isolated_nodes$number)
+pl_unassigned <- subset(pl_unassigned,! pl_unassigned$number %in% isolated_nodes$number)
+
+
 pl_assigned <- subset(pl_nodes, pl_nodes$number %in% results_subgraph$number)
 full_info_assigned <- merge(pl_assigned, results_subgraph, by = 'number')
 
-if(nrow(pl_unassigned) > 1)
+if(nrow(pl_unassigned) >= 1)
 {
   pl_unassigned$Component <- 'Unbinned'
   full_info_assigned <- rbind(full_info_assigned, pl_unassigned)
 }
 
-if(nrow(pl_repeats) > 1)
+#Add isolated nodes category
+if(nrow(pl_isolated) >= 1)
 {
-  pl_repeats$Component <- 'Repeat-like'
+  isolated_nr<-1
+  while (isolated_nr<= nrow(pl_isolated)) {
+    isolated_identification<-paste('Isolated',as.character(isolated_nr), sep='_') 
+    pl_isolated$Component[isolated_nr] <- isolated_identification
+    isolated_nr<-isolated_nr+1
+  }
+  full_info_assigned <- rbind(full_info_assigned, pl_isolated)
+}
+
+if(nrow(pl_repeats) >= 1)
+{
+  pl_repeats$Component <- 'Repeat_like'
   full_info_assigned <- rbind(full_info_assigned, pl_repeats)
 }
 
@@ -524,7 +544,6 @@ full_info_assigned$Contig_length <- NULL
 full_info_assigned$Prob_Chromosome <- round(full_info_assigned$Prob_Chromosome,2)
 full_info_assigned$Prob_Plasmid <- round(full_info_assigned$Prob_Plasmid,2)
 full_info_assigned$coverage <- round(full_info_assigned$coverage,2)
-
 
 assembly_nodes <- readDNAStringSet(filepath = path_nodes)
 df_nodes <- data.frame(Contig_name = names(assembly_nodes), Sequence = paste(assembly_nodes))
