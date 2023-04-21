@@ -186,9 +186,6 @@ total_pairs <- subset(total_pairs, total_pairs$Connecting_node %in% initial_node
 
 weight_counting <- NULL
 
-print(total_pairs)
-print(nrow(total_pairs))
-
 if (nrow(total_pairs) == 0) {
   print ("gplas couldn't find any walks connecting plasmid-predicted nodes. Plasmid nodes will be classified as Unbinned. If this is unexpected, please assemble your genome with different parameters or with a different tool and re-run gplas.")
   pl_unassigned <- subset(clean_pred, clean_pred$Prob_Plasmid > as.numeric(as.character(threshold))) # Selecting only contigs predicted as plasmid-derived 
