@@ -5,7 +5,7 @@ gplas2: binning plasmid-predicted contigs
 
 gplas2 is a tool to bin plasmid-predicted contigs based on sequence
 composition, coverage and assembly graph information. 
-Gplas2 is a new version of [gplas](https://gitlab.com/sirarredondo/gplas) that extends the possibility of accurately bin predicted
+Gplas2 is a new version of [gplas](https://gitlab.com/sirarredondo/gplas) that allows for plasmid classification of any binary plasmid classifier and extends the possibility of accurately binning predicted
 plasmid contigs into several discrete plasmid components by also attempting to place unbinned and repeat contigs into plasmid bins.
 
 # Table of Contents
