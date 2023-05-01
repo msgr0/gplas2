@@ -16,3 +16,5 @@ coverage/
 gplas/coverage/
 gplas.egg-info/
 gplas/__pycache__/
+.snakemake
+templates/final.yaml
