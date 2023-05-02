@@ -1,15 +1,15 @@
-gplas: binning plasmid-predicted contigs
+gplas2: binning plasmid-predicted contigs
 ================
 
 <div align="center"><img src="figures/logo.png" alt="gplas" width="600"/></div>
 
-gplas is a tool to bin plasmid-predicted contigs based on sequence
-composition, coverage and assembly graph information. Gplas is a new
-tool that extends the possibility of accurately binning predicted
-plasmid contigs into several discrete plasmid components.
+gplas2 is a tool to bin plasmid-predicted contigs based on sequence
+composition, coverage and assembly graph information. 
+Gplas2 is a new version of [gplas](https://gitlab.com/sirarredondo/gplas) that allows for plasmid classification of any binary plasmid classifier and extends the possibility of accurately binning predicted
+plasmid contigs into several discrete plasmid components by also attempting to place unbinned and repeat contigs into plasmid bins.
 
 # Table of Contents
-- [gplas: binning plasmid-predicted contigs](#gplas-binning-plasmid-predicted-contigs)
+- [gplas2: binning plasmid-predicted contigs](#gplas2-binning-plasmid-predicted-contigs)
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
   - [Installation using pip and conda](#installation-using-pip-and-conda)
@@ -28,21 +28,21 @@ plasmid contigs into several discrete plasmid components.
 
 ## Installation using pip and conda
 
-The prefered way of installing gplas is using pip and a conda environment. Please follow the instructions below:
+The prefered way of installing gplas2 is using pip and a conda environment. Please follow the instructions below:
 
 Clone the repository and enter the directory
 ``` bash
-git clone https://gitlab.com/mmb-umcu/gplas.git
-cd gplas
+git clone https://gitlab.com/mmb-umcu/gplas2.git
+cd gplas2
 ```
 
 Create a new conda environment and activate it
 ``` bash
-conda env create --name gplas --file envs/gplas.yaml
-conda activate gplas
+conda env create --name gplas2 --file envs/gplas.yaml
+conda activate gplas2
 ```
 
-Install gplas using pip
+Install gplas2 using pip
 ``` bash
 pip install -e .
 ```
@@ -50,47 +50,47 @@ When this has finished, test the installation using
 ``` bash
 gplas --help
 ```
-This should should show the help page of gplas.
+This should should show the help page of gplas2.
 
 # Usage
 
 ### Input files
 
-Gplas needs two inputs:
+Gplas2 needs two inputs:
 
-1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained
-with [SPAdes genome assembler](https://github.com/ablab/spades) or with [Unicycler](https://github.com/rrwick/Unicycler). 
+1) An assembly graph in **.gfa** format. Such an assembly graph can be obtained after quality trimming of the reads with
+with [Unicycler](https://github.com/rrwick/Unicycler) (preferred) or with [SPAdes genome assembler](https://github.com/ablab/spades). 
 
-2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#preprocessing-binary-classification-of-nodes) section for instructions on how to obtain this file. 
+2) A **tab-separated** file containing a binary classification (plasmid/chromsome) of each node in the assembly graph. See the [Preprocessing](https://gitlab.com/mmb-umcu/gplas2/-/blob/master/README.md#preprocessing-binary-classification-of-nodes) section for instructions on how to obtain this file. 
 
 ### Preprocessing - Binary classification of nodes <a name="binary-classification-of-nodes-using-an-external-tool"></a>
 
--To predict individual plasmids, some preprocessing is needed. Gplas requires that nodes in assembly graph are classified as either plasmid or chromosome, and these classifications should be summarised in a **tab-separated** file with an specific format.
+-To predict individual plasmids, some preprocessing is needed. Gplas2 requires that nodes in the assembly graph are classified as either plasmid or chromosome, and these classifications should be summarised in a **tab-separated** file using a specific format. See here an example of a [classification file](https://gitlab.com/mmb-umcu/gplas/-/blob/master/gplas/independent_prediction/test_ecoli_plasmid_prediction.tab).
 
--This classification step has to be completed by using an **external classification tool**. We strongly recommend using [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) for this step. However, all binary classification tools are compatible with gplas.
+-This classification step has to be completed by using an **external classification tool**. We strongly recommend using [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) for this step. However, all binary classification tools are compatible with gplas2, given a tab-separated output file
 
 ##### <ins>Using plasmidEC</ins> <a name="using-plasmidec"></a>
 
 PlasmidEC outperforms most available binary classification tools, and it offers two extra-advantages:
 1) It uses assembly graphs in **.gfa** format as input (most tools can't). 
-2) It outputs a **classification file** that is automatically compatible with gplas (Other tools will require extra processing of the output). 
+2) It outputs a **classification file** that is automatically compatible with gplas2. (Other tools will require extra processing of the output). 
 
 Currently, plasmidEC has 8 species-specific classification models for *E. coli, K. pneumoniae, A. baummannii, P. aeruginosa, S. enterica, S. aureus, E. faecalis and E. faecium*. Additionally, plasmidEC has a **General** model for identifying plasmid contigs of other species.
 
 Follow the instructions on the [plasmidEC](https://gitlab.com/mmb-umcu/plasmidEC) repository to 
-classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#predict-plasmids).
+classify the nodes in your .gfa file. After obtaining your **classification file**, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas2/-/blob/master/README.md#predict-plasmids).
 
 ##### <ins>Using a different binary classifier</ins> <a name="using-a-different-tool"></a>
 
-Other binary classification tools exist, and we've recently listed and reviewed several of these  [here](https://www.mdpi.com/2076-2607/9/8/1613). Although they are all compatible with gplas, extra preprocessing steps are required:
+Other binary classification tools exist, and we've recently listed and reviewed several of these [here](https://www.mdpi.com/2076-2607/9/8/1613). Although they are all compatible with gplas2, extra preprocessing steps are required:
 
-1) Use gplas to convert the nodes from the assembly graph to FASTA format (most binary classifiers only accept FASTA files as input). To do this, the **-c** flag should be set to **extract**.
+1) Use gplas2 to convert the nodes from the assembly graph to FASTA format (most binary classifiers only accept FASTA files as input). To do this, the **-c** flag should be set to **extract**.
 
 ``` bash
 gplas -i test/test_ecoli.gfa -c extract -n 'my_isolate'
 ```
 
-The output FASTA file will be located in: __gplas_input/__*my_isolate*_contigs.fasta. By default, this file will only contain contigs larger than 1000 bp, however, this can be controlled with the -l flag. 
+The output FASTA file will be located in: __gplas2_input/__*my_isolate*_contigs.fasta. By default, this file will only contain contigs larger than 1000 bp, however, this can be controlled with the -l flag. 
 
 2) Use this FASTA file as an input for the binary classification tool of your choice. 
 
@@ -109,12 +109,12 @@ head -n 4 gplas/independent_prediction/test_ecoli_plasmid_prediction.tab
 |       0       |      1     |    Plasmid   |  S20\_LN:i:91233\_dp:f:0.5815421095375989   |      91233     |
 
 
-Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas/-/blob/master/README.md#predict-plasmids).
+Once you've formatted the output file as above, move to [Predict plasmids](https://gitlab.com/mmb-umcu/gplas2/-/blob/master/README.md#predict-plasmids).
 
 ### Predict plasmids <a name="predict-plasmids"></a>
 After pre-processing, we are now ready to predict individual plasmids. 
 
-Run gplas and set the **-c** flag to **predict**. Provide the paths to your assembly graph, using the **-i** flag, and to your binary classification file, with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
+Run gplas2 and set the **-c** flag to **predict**. Provide the paths to your assembly graph, using the **-i** flag, and to your binary classification file, with the **-P** flag. Set the name of your output with the **-n** flag. See example below: 
 
 ``` bash
 gplas -c predict -i test/test_ecoli.gfa -P gplas/independent_prediction/test_ecoli_plasmid_prediction.tab -n 'my_isolate'
@@ -123,7 +123,7 @@ gplas -c predict -i test/test_ecoli.gfa -P gplas/independent_prediction/test_eco
 
 # Output files
 
-Gplas will create a folder called ‘results’ with the following files:
+Gplas2 will create a folder called ‘results’ with the following files:
 
 ``` bash
 ls results/my_isolate*
@@ -155,16 +155,16 @@ grep '>' results/my_isolate*.fasta
 
 ##### results/\*plasmidome\_network.png
 
-Png file of the plasmidome network generated by gplas after creating an
+A png file of the plasmidome network generated by gplas2 after creating an
 undirected graph from edges between plasmid unitigs co-existing in the
-walks created by gplas.
+walks created by gplas2.
 
 ![](figures/my_isolate_plasmidome_network.png)<!-- -->
 
 ##### results/\*results.tab
 
 Tab delimited file containing the prediction given by plasmidEC (or
-other binary classification tool) together with the bin prediction by gplas. The file contains
+other binary classification tool) together with the bin prediction by gplas2. The file contains
 the following information: contig number, probability of being
 chromosome-derived, probability of being plasmid-derived, class
 prediction, contig name, k-mer coverage, length, bin assigned.
@@ -231,11 +231,11 @@ optional arguments:
 
 ### Intermediary results files
 
-If the **-k** flag is selected, gplas will also **keep** all intermediary files needed to construct the plasmid predictions. For example:
+If the **-k** flag is selected, gplas2 will also **keep** all intermediary files needed to construct the plasmid predictions. For example:
 
 ##### walks/normal_mode/\*solutions.csv
 
-gplas generates plasmid-like walks per each plasmid starting node. These
+gplas2 generates plasmid-like walks per each plasmid starting node. These
 paths are used later to generate the edges from the plasmidome network
 but they can also be useful to observe all the different walks starting
 from a single node (plasmid unitig). These walk can be directly given to
@@ -244,7 +244,7 @@ Bandage to visualize and manually inspect a walk.
 In this case, we find different possible plasmid walks starting from the
 node 67-. These paths may contain inversions and rearrangements since
 repeats units such as transposases which can be present several times in
-the same plasmid sequence. In these cases, gplas can traverse the
+the same plasmid sequence. In these cases, gplas2 can traverse the
 sequence in different ways generating different plasmid-like paths.
 
 ``` bash
@@ -272,4 +272,4 @@ For example, we can inspect in Bandage the path:
 # Issues and Bugs
 
 You can report any issues or bugs that you find while installing/running
-gplas using the [issue tracker](https://gitlab.com/sirarredondo/gplas/issues).
+gplas2 using the [issue tracker](https://gitlab.com/mmb-umcu/gplas2/-/issues).
