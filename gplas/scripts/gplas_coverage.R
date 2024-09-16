@@ -128,7 +128,7 @@ for(node in unique_nodes)
 
 repeat_info <- merge(indegree_info, outdegree_info , by = 'number')
 
-repeats <- subset(repeat_info, repeat_info$indegree > 1 | repeat_info$outdegree > 1) # Transposases may be identified as hubs in the graph. They should have more than one link
+repeats <- subset(repeat_info, repeat_info$indegree > 2 | repeat_info$outdegree > 2) # Transposases may be identified as hubs in the graph. They should have more than one link
 
 repeats_graph <- repeats
 
